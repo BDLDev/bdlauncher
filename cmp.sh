@@ -1,1 +1,1 @@
-clang++ -fPIC -O3 -shared main.cpp libPFishHook.a mods.cpp -o a.so -ldl -I ../PFishHook/ -fsanitize=undefined
+g++ -fPIC -O0 -g -shared main.cpp libPFishHook.a mods.cpp -o a.so -ldl -I ../PFishHook/ 

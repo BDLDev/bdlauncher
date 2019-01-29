@@ -6,10 +6,19 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+
+#include <execinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <signal.h>
+
 std::list<void*> mods;
 std::unordered_map<std::string,char*> hooks;
 char* ppool;
+void catch_signal(int sign);
 void MOD_loadall(){
+  signal(SIGSEGV, catch_signal);
     struct dirent *entry;
      struct stat statbuf;
      ppool=(char*)mmap(0,65536,7,MAP_PRIVATE|MAP_ANONYMOUS,-1,0);
@@ -38,25 +47,57 @@ void MOD_loadall(){
      }
     }
 }
+#define BACKTRACE_SIZE   16
+
+void dump(void)
+{
+	int j, nptrs;
+	void *buffer[BACKTRACE_SIZE];
+	char **strings;
+	
+	nptrs = backtrace(buffer, BACKTRACE_SIZE);
+	
+	printf("backtrace() returned %d addresses\n", nptrs);
+
+	strings = backtrace_symbols(buffer, nptrs);
+	if (strings == NULL) {
+		perror("backtrace_symbols");
+		exit(EXIT_FAILURE);
+	}
+
+	for (j = 0; j < nptrs; j++)
+		printf("  [%02d] %s\n", j, strings[j]);
+
+	free(strings);
+}
+
+void catch_signal(int sign)
+{
+    switch (sign)
+    {
+    case SIGSEGV:
+        dump();
+        exit(0);
+        break;
+    }
+}
 void* MCHook(std::string&& name,void* func){
+  printf("call hook %s %p\n",name.c_str(),func);
   void* oldfunc;
-  //HookIt(dlsym(MCHandle(),name.c_str()),&oldfunc,func);
-  //return oldfunc;
   if(hooks.count(name)==0){
     printf("[DBG] Creating Proxy for %s\n",name.c_str());
     memcpy(ppool,"\xff\x25\x00\x00\x00\x00",6);
     memcpy(ppool+6,&func,8);
     HookIt(dlsym(MCHandle(),name.c_str()),&oldfunc,ppool);
-    //((void(*)())ppool)();
     hooks[name]=ppool;
     ppool+=14;
     return oldfunc;
   }else{
     printf("[DBG] Modifying Proxy for %s\n",name.c_str());
     char* proxy=hooks[name];
-    void* oldfunc;
     memcpy(&oldfunc,proxy+6,8);
     memcpy(proxy+6,&func,8);
     return oldfunc;
   }
+  return oldfunc;
 }
