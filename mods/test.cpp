@@ -9,6 +9,7 @@ extern "C"{
   Player* FindPlayer(std::string* pp);
   void KickPlayerByPlayer(void* player,std::string&& reason);
   void sendMessage(Player* player, std::string *msg);
+  void getPlayersForeach(void(*cb)(Player*));
 };
 static fn_6 Minecraft12initCommands;
 static fn_66 SayCommand5setup;

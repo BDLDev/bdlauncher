@@ -120,6 +120,7 @@ fn_666 useblock_orig;
 fn_66666 destroy_orig;
 fn_666666 place_orig;
 bool permHelper(Player* pp,BlockPos* bp){
+  if(pp->getDimensionId()!=0) return true;
   auto res=checkperm(bp->x,bp->z,*pp->getPlayerName());
   if(res.first==false){
     char buf[256];
@@ -157,15 +158,42 @@ u64 place(u64 thi,Actor* ppa,BlockPos* bp,u64 unk,ItemInstance* it,u64 bl){
   else
   return place_orig(thi,ppa,bp,unk,it,bl);
 }
+void (*getPlayersForeach)(void(*cb)(Player*));
+int cnt;
+void landbc(Player* pp){
+  if(pp==NULL) return;
+  std::string dmy;
+  auto res=checkperm((int)pp->getPos().x,(int)pp->getPos().z,dmy);
+  if(res.first==false){
+    std::string sb;
+    sb="this is ";
+    sb+=res.second;
+    sb+="'s land";
+    sendMessage(pp,&sb);
+  }
+}
+fn_6 onTick_orig;
+u64 onTick(Level* thi){
+  u64 rv=onTick_orig(thi);
+  //printf("tick\n");
+  cnt++;
+  if(cnt%40==0){
+    getPlayersForeach(landbc);
+  }
+  return rv;
+}
+
 void mod_init(){
   addCmdhook=getFuncEx("addCmdhook");
   FindPlayer=getFuncEx("FindPlayer");
   sendMessage=getFuncEx("sendMessage");
+  getPlayersForeach=getFuncEx("getPlayersForeach");
   addCmdhook(cmdSetup);
   mkdir("land",S_IRWXU);
   load();
   MCHok("_ZNK5Block3useER6PlayerRK8BlockPos",useblock,useblock_orig);
   MCHok("_ZN11BlockSource28checkBlockDestroyPermissionsER5ActorRK8BlockPosRK12ItemInstanceb",destroy,destroy_orig);
   MCHok("_ZN11BlockSource21checkBlockPermissionsER5ActorRK8BlockPosaRK12ItemInstanceb",place,place_orig);
+  MCHok("_ZN5Level4tickEv",onTick,onTick_orig);
 }
 
