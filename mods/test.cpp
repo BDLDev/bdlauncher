@@ -4,12 +4,13 @@
 #include "../BedrockMod/include/base.h"
 #include "fklib/lib.hpp"
 extern "C"{
-	void mod_init();
-  void addCmdhook(fn_6 hook);
-  Player* FindPlayer(std::string* pp);
-  void KickPlayerByPlayer(void* player,std::string&& reason);
-  void sendMessage(Player* player, std::string *msg);
-  void getPlayersForeach(void(*cb)(Player*));
+	__attribute__((visibility ("default"))) void mod_init();
+  __attribute__((visibility ("default"))) void addCmdhook(fn_6 hook);
+  __attribute__((visibility ("default"))) Player* FindPlayer(std::string* pp);
+  __attribute__((visibility ("default"))) void KickPlayerByPlayer(void* player,std::string&& reason);
+  __attribute__((visibility ("default"))) void sendMessage(Player* player, std::string *msg);
+  __attribute__((visibility ("default"))) void getPlayersForeach(void(*cb)(Player*));
+  __attribute__((visibility ("default"))) void* getLevel();
 };
 static fn_6 Minecraft12initCommands;
 static fn_66 SayCommand5setup;

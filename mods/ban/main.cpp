@@ -13,7 +13,7 @@
 #include <minecraft/command/CommandVersion.h>
 #include<fcntl.h>
 extern "C"{
-	void mod_init();
+	__attribute__((visibility ("default"))) void mod_init();
 };
 std::forward_list<std::string> list;
 bool check(std::string* a){
@@ -60,11 +60,12 @@ struct BanCmd : Command
     ~BanCmd() override = default;
     static void setup(CommandRegistry &registry)
     {
-        registry.registerCommand("ban", "Ban Command", (CommandPermissionLevel)2, (CommandFlag)0, (CommandFlag)0);
+        registry.registerCommand("ban", "Ban Command", (CommandPermissionLevel)0, (CommandFlag)0, (CommandFlag)32);
         registry.registerOverload<BanCmd>("ban", CommandVersion(1, INT_MAX),CommandParameterData(CommandMessage::type_id(), &CommandRegistry::parse<CommandMessage>, "name", (CommandParameterDataType)0, nullptr, offsetof(BanCmd, name), false, -1));
     }
     void execute(CommandOrigin const &origin, CommandOutput &outp) override
     {
+        if(origin.getOriginType()==0 && ((Player*)origin.getEntity())->getCommandPermissionLevel()<1){ outp.addMessage("no perm!");outp.success();return;}
         char outbuf[512];
         sprintf(outbuf,"okay banned %s",name.getMessage(origin).c_str());
         Player* sb=FindPlayer(&name.getMessage(origin));
@@ -81,11 +82,37 @@ struct BanCmd : Command
         outp.success();
     }
 };
-
+struct UnBanCmd : Command
+{
+  CommandMessage name;
+    ~UnBanCmd() override = default;
+    static void setup(CommandRegistry &registry)
+    {
+        registry.registerCommand("unban", "UnBan Command", (CommandPermissionLevel)0, (CommandFlag)0, (CommandFlag)32);
+        registry.registerOverload<UnBanCmd>("unban", CommandVersion(1, INT_MAX),CommandParameterData(CommandMessage::type_id(), &CommandRegistry::parse<CommandMessage>, "name", (CommandParameterDataType)0, nullptr, offsetof(UnBanCmd, name), false, -1));
+    }
+    void execute(CommandOrigin const &origin, CommandOutput &outp) override
+    {
+      if(origin.getOriginType()==0 && ((Player*)origin.getEntity())->getCommandPermissionLevel()<1){ outp.addMessage("no perm!");outp.success();return;}
+        char outbuf[512];
+        sprintf(outbuf,"okay unbanned %s",name.getMessage(origin).c_str());
+        std::string tmp;
+        for(auto c:list){
+          if(c.find("#"+name.getMessage(origin))!=std::string::npos){
+            tmp=c;
+          }
+        }
+        list.remove(tmp);
+        save();
+        outp.addMessage(outbuf);
+        outp.success();
+    }
+};
 fn_6 addCmd;
 void cmdSetup(CommandRegistry* a){
   printf("[Ban] loaded\n");
   BanCmd::setup(*a);
+  UnBanCmd::setup(*a);
 }
 void mod_init(){
   addCmd=getFuncEx("addCmdhook");

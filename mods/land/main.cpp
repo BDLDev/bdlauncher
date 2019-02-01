@@ -13,11 +13,20 @@
 #include <minecraft/command/CommandVersion.h>
 #include<fcntl.h>
 extern "C"{
-	void mod_init();
+	 __attribute__((visibility ("default"))) void mod_init();
 };
 struct land{
   int x,y,lx,ly;
   std::string owner;
+  bool checkOwn(std::string name){
+    return owner.find("["+name+"]")!=std::string::npos;
+  }
+  operator==(const land& b) const{
+    return x==b.x && y==b.y && lx==b.lx && ly==b.ly;
+  }
+  void addOwn(std::string name){
+    owner+="["+name+"]";
+  }
 };
 std::string land_string(land& a){
   char buf[512];
@@ -40,13 +49,20 @@ bool checkland(land& a,int x,int z){
 }
 std::pair<bool,std::string> checkperm(int x,int z,std::string& name){
   for(auto a:list){
-    if(checkland(a,x,z) && a.owner!=name){
+    if(checkland(a,x,z) && !a.checkOwn(name)){
       return std::make_pair(false,a.owner);
     }
   }
   return std::make_pair(true,"");
 }
-
+land nullland;
+land tmpland;
+land* getland(int x,int z){
+for(auto a:list){
+if(checkland(a,x,z)) {tmpland=a;return &tmpland;}
+}
+return &nullland;
+}
 void load(){
   int fd=open("land/land.txt",O_CREAT,S_IRWXU);
   close(fd);
@@ -66,7 +82,8 @@ struct Vc2{
 std::unordered_map<std::string,Vc2> pStart,pEnd;
 bool buyLand(Player* pp,Vc2 st,Vc2 ed){
   land tmp;
-  tmp.owner=*pp->getPlayerName();
+  //tmp.owner=*pp->getPlayerName();
+  tmp.addOwn(*pp->getPlayerName());
   tmp.x=st.x;
   tmp.y=st.z;
   tmp.lx=ed.x-st.x+1;
@@ -75,13 +92,18 @@ bool buyLand(Player* pp,Vc2 st,Vc2 ed){
   save();
   return true;
 }
+void sellLand(Player* pp,land& ld){
+  //addMoney(pp,abs(ld.lx*ld.ly))
+  list.remove(ld);
+  save();
+}
 struct LandCmd : Command
 {
   CommandMessage op;
     ~LandCmd() override = default;
     static void setup(CommandRegistry &registry)
     {
-        registry.registerCommand("land", "land Command", (CommandPermissionLevel)0, (CommandFlag)16, (CommandFlag)32);
+        registry.registerCommand("land", "land Command", (CommandPermissionLevel)0, (CommandFlag)0, (CommandFlag)32);
         registry.registerOverload<LandCmd>("land", CommandVersion(1, INT_MAX),CommandParameterData(CommandMessage::type_id(), &CommandRegistry::parse<CommandMessage>, "oper", (CommandParameterDataType)0, nullptr, offsetof(LandCmd, op), false, -1));
     }
     void execute(CommandOrigin const &origin, CommandOutput &outp) override
@@ -98,12 +120,36 @@ struct LandCmd : Command
             }
             if(sb=="buy"){
               g_end.erase(*pp->getPlayerName());
+              if(pStart.count(*pp->getPlayerName())==0 || pEnd.count(*pp->getPlayerName())==0 ){
+                outp.addMessage("Failed buying land,Select start and end plz.");
+                return;
+              }
               if(!buyLand(pp,pStart[*pp->getPlayerName()],pEnd[*pp->getPlayerName()])){
                 outp.addMessage("Failed buying land");
               }else{
                 outp.addMessage("Successed buying land");
               }
-          }
+            }
+            if(sb=="sell"){
+              land* fk=getland((int)pp->getPos().x,(int)pp->getPos().z);
+              if(pp->getCommandPermissionLevel()<1|| !fk->checkOwn(*pp->getPlayerName())){
+                outp.addMessage("Failed selling land,not your land!");
+                return;
+              }
+              sellLand(pp,*fk);
+            }
+            if(sb.length()>7 && memcmp(sb.c_str(),"invite",6)==0){
+              std::string tmp=sb.substr(7);
+              land* fk=getland((int)pp->getPos().x,(int)pp->getPos().z);
+              if(!fk->checkOwn(*pp->getPlayerName())){
+                outp.addMessage("Failed sharing land,not your land!");
+                return;
+              }
+              list.remove(*fk);
+              fk->addOwn(tmp);
+              list.push_front(*fk);
+              save();
+            }
           outp.addMessage(op.getMessage(origin));
           outp.success();
         }
@@ -160,17 +206,18 @@ u64 place(u64 thi,Actor* ppa,BlockPos* bp,u64 unk,ItemInstance* it,u64 bl){
 }
 void (*getPlayersForeach)(void(*cb)(Player*));
 int cnt;
-void landbc(Player* pp){
-  if(pp==NULL) return;
+Level* (*getLev)();
+bool landbc(Player& pp){
   std::string dmy;
-  auto res=checkperm((int)pp->getPos().x,(int)pp->getPos().z,dmy);
+  auto res=checkperm((int)pp.getPos().x,(int)pp.getPos().z,dmy);
   if(res.first==false){
     std::string sb;
     sb="this is ";
     sb+=res.second;
     sb+="'s land";
-    sendMessage(pp,&sb);
+    sendMessage(&pp,&sb);
   }
+  return true;
 }
 fn_6 onTick_orig;
 u64 onTick(Level* thi){
@@ -178,16 +225,47 @@ u64 onTick(Level* thi){
   //printf("tick\n");
   cnt++;
   if(cnt%40==0){
-    getPlayersForeach(landbc);
+    //getPlayersForeach(landbc);
+    getLev()->forEachPlayer(landbc);
   }
   return rv;
 }
-
+u64 (*_ZN3Mob6attackER5Actor)(Mob* thi,Actor* a2,double a3,float a4);
+u64 (*onAttack_orig)(Player* thi,Actor* a2,double a3,float a4);
+u64 onAttack(Player* thi,Actor* a2,double a3,float a4){
+  std::pair<bool,std::string> res;
+  if(!(res=checkperm((int)a2->getPos().x,(int)a2->getPos().z,*thi->getPlayerName())).first)
+  {
+    char buf[256];
+    //printf("nmsl %s\n",res.second.c_str());
+    sprintf(buf,"it's %s's land!!!",res.second.c_str());
+    std::string bufx(buf);
+    sendMessage(thi,&bufx);
+    return 0;
+  }else{
+    return onAttack_orig(thi,a2,a3,a4);
+  }
+}
+u64 onAttack2(Mob* thi,Actor* a2,double a3,float a4){
+  std::pair<bool,std::string> res;
+  if(thi->getPlayerOwner()!=NULL && !(res=checkperm((int)a2->getPos().x,(int)a2->getPos().z,*thi->getPlayerOwner()->getPlayerName())).first)
+  {
+    char buf[256];
+    //printf("nmsl %s\n",res.second.c_str());
+    sprintf(buf,"it's %s's land!!!",res.second.c_str());
+    std::string bufx(buf);
+    sendMessage(thi->getPlayerOwner(),&bufx);
+    return 0;
+  }else{
+    return _ZN3Mob6attackER5Actor(thi,a2,a3,a4);
+  }
+}
 void mod_init(){
   addCmdhook=getFuncEx("addCmdhook");
   FindPlayer=getFuncEx("FindPlayer");
   sendMessage=getFuncEx("sendMessage");
   getPlayersForeach=getFuncEx("getPlayersForeach");
+  getLev=getFuncEx("getLevel");
   addCmdhook(cmdSetup);
   mkdir("land",S_IRWXU);
   load();
@@ -195,5 +273,7 @@ void mod_init(){
   MCHok("_ZN11BlockSource28checkBlockDestroyPermissionsER5ActorRK8BlockPosRK12ItemInstanceb",destroy,destroy_orig);
   MCHok("_ZN11BlockSource21checkBlockPermissionsER5ActorRK8BlockPosaRK12ItemInstanceb",place,place_orig);
   MCHok("_ZN5Level4tickEv",onTick,onTick_orig);
+  MCHok("_ZN6Player6attackER5Actor",onAttack,onAttack_orig);
+  MCHok("_ZN3Mob6attackER5Actor",onAttack2,_ZN3Mob6attackER5Actor);
 }
 
