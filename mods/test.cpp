@@ -31,9 +31,10 @@ ServerNetworkHandler* getSNH(){
 void* getLevel(){
   return ZNK9Minecraft8getLevelEv(MC);
 }
+/*5584 for 1.8*/
 void KickPlayerByPlayer(void* player,std::string&& reason){
-  printf("call kick %p %p\n",MC_kick,(void*)((u64)player+5584));
-	MC_kick(pSNH,(void*)((u64)player+5584),&reason,NULL);
+  printf("call kick %p %p\n",MC_kick,(void*)((u64)player+5576));
+	MC_kick(pSNH,(void*)((u64)player+5576),&reason,NULL);
 }
 void KickPlayerByNetI(void* neti,std::string&& reason){
 	MC_kick(pSNH,neti,&reason,NULL);

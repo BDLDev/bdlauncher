@@ -98,15 +98,13 @@ struct Packet {
 
   Packet(unsigned char playerSubIndex)
       : playerSubIndex(playerSubIndex) {}
-  Packet(){}
-/*
   virtual ~Packet();
   virtual void *getId() const                                               = 0;
   virtual void *getName() const                                             = 0;
   virtual void *write(BinaryStream &) const                                 = 0;
   virtual void *read(BinaryStream &)                                        = 0;
   virtual void *handle(NetworkIdentifier const &, NetEventCallback &) const = 0;
-  virtual bool disallowBatching() const;*/
+  virtual bool disallowBatching() const;
 };
 
 struct BlockEntity {
@@ -171,7 +169,7 @@ struct ExtendedCertificate {
   static std::string getXuid(Certificate const &);
 };
 
-static auto const uuidoffset = 5704;
+//static auto const uuidoffset = 5704;
 //struct Player;
 //mce::UUID &Player::getUUID() { return *(mce::UUID *)((char *)this + uuidoffset); }
 
@@ -192,11 +190,11 @@ struct Player : Mob {
   bool isWorldBuilder();
   void sendNetworkPacket(Packet &packet) const;
   void setOffhandSlot(ItemInstance const &);
-  std::string* getPlayerName(){return (std::string*)((long)this+5400);};
+  std::string* getPlayerName(){return &getNameTag();/*return (std::string*)((long)this+5400);*/};
   struct PacketSender* getPKSender(){return (PacketSender*)((long)this+6472);};
 };
-mce::UUID &Player::getUUID() const { return *(mce::UUID *)((char *)this + uuidoffset); }
-std::string Player::getXUID() const { return ExtendedCertificate::getXuid(getCertificate()); }
+__attribute__((weak)) mce::UUID &Player::getUUID() const { return *(mce::UUID *)((char *)this + 5704); }
+__attribute__((weak)) std::string Player::getXUID() const { return ExtendedCertificate::getXuid(getCertificate()); }
 struct ServerPlayer : Player {
   void disconnect();
   void changeDimension(DimensionId, bool);
@@ -337,10 +335,16 @@ struct Blacklist
 enum class TextPacketType;
 struct TextPacket : Packet
 {
-  char filler[0xff];
-  TextPacket(){};
+  char filler[0x30];
   TextPacket(TextPacketType, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, bool, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&);
-  TextPacket createJukeboxPopup(std::string const &);
-  TextPacket createSystemMessage(std::string const &);
-  void SendTo(Player* p) { ((ServerPlayer*)p)->sendNetworkPacket(this); }
+  static TextPacket createJukeboxPopup(std::string const &);
+  static TextPacket createSystemMessage(std::string const &);
+  void SendTo(Player* p) { ((ServerPlayer*)p)->sendNetworkPacket(*this); }
+  void SendTo(ServerPlayer* p) { ((ServerPlayer*)p)->sendNetworkPacket(*this); }
+  void *getId() const;
+   void *getName() const                                             ;
+   void *write(BinaryStream &) const                                ;
+   void *read(BinaryStream &)                                        ;
+   void *handle(NetworkIdentifier const &, NetEventCallback &) const ;
+   bool disallowBatching() const;
 };
