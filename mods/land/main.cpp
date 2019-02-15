@@ -12,7 +12,7 @@
 #include <minecraft/command/CommandRegistry.h>
 #include <minecraft/command/CommandVersion.h>
 #include<fcntl.h>
-using std::min,std::swap;
+using std::min,std::swap,std::max;
 using std::string;
 extern "C"{
 	 __attribute__((visibility ("default"))) void mod_init();
@@ -123,9 +123,14 @@ bool checkColl2(Vc2& st,Vc2& ed,string name){
     sswap(ya1,ya2);
     sswap(yb1,yb2);
     sswap(xb1,xb2);
-    if(min(xa1,xb1)<=min(xa2,xb2) && min(xa1,xb1)<=min(xa2,xb2) && !a.checkOwn(name)){
-      return false;
-    }
+	int t1x=max(xa1,xb1);
+	int t1y=max(ya1,yb1);
+	int t2x=min(xa2,xb2);
+	int t2y=min(ya2,yb2);
+	if(t2x>=t1x && t2y>=t1y && !a.checkOwn(name)) return false;
+    //if(max(xa1,xb1)<=(xa2,xb2) && min(xa1,xb1)<=min(xa2,xb2) && !a.checkOwn(name)){
+    //  return false;
+    //}
   }
   return true;
 }
@@ -180,7 +185,7 @@ struct LandCmd : Command
                 return;
               }
               if(!buyLand(pp,pStart[*pp->getPlayerName()],pEnd[*pp->getPlayerName()])){
-                outp.addMessage("Failed buying land");
+                outp.addMessage("Failed buying land,check overlap or money");
               }else{
                 outp.addMessage("Successed buying land");
               }
