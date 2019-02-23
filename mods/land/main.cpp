@@ -41,7 +41,7 @@ std::string land_string(land& a){
 land to_land(std::string& dat){
   char buf[512];
   land a;
-  sscanf(dat.c_str(),"%d:%d:%d:%d:%s",&a.x,&a.y,&a.lx,&a.ly,buf);
+  sscanf(dat.c_str(),"%d:%d:%d:%d:%[^\n]",&a.x,&a.y,&a.lx,&a.ly,buf);
   a.owner=std::string(buf);
   return a;
 }
