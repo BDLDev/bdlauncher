@@ -12,27 +12,34 @@ LD_LIBRARY_PATH=. LD_PRELOAD=./bin/launch.so ./bedrock_server
 put mods(bin/a.so,amoney.so,ban.so,land.so) into folder mods,and start the server.
 
 example plugin intro:
+范例插件用法
+
 # ban 黑名单
 <pre>
-/ban PlayerName
-/unban PlayerName
+/ban ［PlayerName］
+/unban ［PlayerName］
 </pre>
 # money 简单经济
 <pre>
-/money query [Playername] 查钱（初始500)
-/money set <playername> <int:money> 设置钱
-/money add <PlayerName> <int money> 添加钱
+/money query [Playername] 
+查询余额（初始500)
+/money set [playername] [int:money] 
+设置钱
+/money add [PlayerName] [int money] 
+添加钱
 </pre>
  
 # land 迫真领地
  <pre>
 /land start
 /land end
-then touch the ground to determine the pos of land 先输指令，然后点地确定起点终点
+then touch the ground to determine the pos of land 
+先输指令，然后点地（右键）确定起点终点
 /land buy
 buy the land 买(价格 每个方块10）
-/land invite <PlayerName>
+/land invite ［PlayerName］
 share permissions with others (分享)
 /land sell
-sell the land on which you stand.(OP can force sell lands) （卖)
+sell the land on which you stand.
+(OP can force sell lands) （卖 管理可以卖掉任何领地)
  </pre>
