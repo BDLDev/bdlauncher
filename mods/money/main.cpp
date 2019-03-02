@@ -104,6 +104,17 @@ struct MCmd : Command
             outp.success();
           }
         }
+	if(origin.getOriginType()==0 && ((Player*)origin.getEntity())->getCommandPermissionLevel()<1) return;
+        if(swith(oper,"add")){
+          if(oper.size()>4){
+            char buf[512];
+            int nm;
+            sscanf(oper.c_str()+4,"%s %d",buf,&nm);
+			addMoney(string(buf),nm);
+            outp.addMessage("add ok!");
+            outp.success();
+          }
+        }
     }
 };
 fn_6 addCmd;
