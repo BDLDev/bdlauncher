@@ -20,7 +20,8 @@ example plugin intro:
 # money 简单经济
 <pre>
 /money query [Playername] 查钱（初始500)
-/monry set <playername> <int:money> 设置钱
+/money set <playername> <int:money> 设置钱
+/money add <PlayerName> <int money> 添加钱
 </pre>
  
 # land 迫真领地
