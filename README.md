@@ -1,6 +1,7 @@
 # bdlauncher
 BedRockServer launcher with mods support
-# (Only for BDS 1.9!!!!!)
+Notice: CentOS and low version GLIBC system support(Neither docker nor root is required):https://www.minebbs.com/threads/centos-bds-root-docker.2424/
+# (BDS 1.9 TESTED,1.10 TESTING)
 (Some codes from https://github.com/codehz/BedrockMod.  Thanks @codehz for decompiling BDS.)
 LD_LIBRARY_PATH=. LD_PRELOAD=./bin/launch.so ./bedrock_server
 
