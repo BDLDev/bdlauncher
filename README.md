@@ -4,7 +4,7 @@ Notice: CentOS and low version GLIBC system support(Neither docker nor root is r
 # (BDS 1.9 TESTED,1.10 TESTING)
 (Some codes from https://github.com/codehz/BedrockMod.  Thanks @codehz for decompiling BDS.)
 LD_LIBRARY_PATH=. LD_PRELOAD=./bin/launch.so ./bedrock_server
-land will not work in 1.10
+<br>land will not work in 1.10<br>
 开服方法：
 先把bin文件夹里面除launch.so外的其他.so放到mods文件夹
 然后执行
