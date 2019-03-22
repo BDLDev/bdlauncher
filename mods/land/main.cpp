@@ -318,9 +318,9 @@ void mod_init(){
   mkdir("land",S_IRWXU);
   load();
   MCHok("_ZNK5Block3useER6PlayerRK8BlockPos",useblock,useblock_orig);
-  MCHok("_ZN11BlockSource28checkBlockDestroyPermissionsER5ActorRK8BlockPosRK12ItemInstanceb",destroy,destroy_orig);
-  MCHok("_ZN11BlockSource21checkBlockPermissionsER5ActorRK8BlockPosaRK12ItemInstanceb",place,place_orig);
-  MCHok("_ZN5Level4tickEv",onTick,onTick_orig);
+  MCHok("_ZN11BlockSource28checkBlockDestroyPermissionsER5ActorRK8BlockPosRK9ItemStackb",destroy,destroy_orig);
+  MCHok("_ZN11BlockSource21checkBlockPermissionsER5ActorRK8BlockPoshRK9ItemStackb",place,place_orig);
+  MCHok("_ZN11BlockSource8getLevelEv",onTick,onTick_orig);
   MCHok("_ZN6Player6attackER5Actor",onAttack,onAttack_orig);
 }
 
