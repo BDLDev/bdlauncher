@@ -6,6 +6,10 @@ Notice: CentOS and low version GLIBC system support(Neither docker nor root is r
 land.so is for MinecraftBE 1.9
 land1.10.so is for MinecraftBE 1.10
 You have to choose according to your version, and delete. so files which is mismatching your version.
+
+Official qq group:
+欢迎加入bdlauncher开发，群聊号码：955765957
+
 (Some codes from https://github.com/codehz/BedrockMod.  Thanks @codehz for decompiling BDS.)
 LD_LIBRARY_PATH=. LD_PRELOAD=./bin/launch.so ./bedrock_server
 开服方法：
