@@ -1,14 +1,15 @@
 # bdlauncher
+
+Maintaining has been stopped.
+没动力继续整了
+
 BedRockServer launcher with mods support<br>
 Notice: CentOS and low version GLIBC system support(Neither docker nor root is required):https://www.minebbs.com/threads/centos-bds-root-docker.2424/
-# (BDS 1.9 TESTED,1.10 TESTING)
+# (BDS 1.9 TESTED,1.10 SEEMS NOT WORKS)
 # please use correct version of land.so
 land.so is for MinecraftBE 1.9
 land1.10.so is for MinecraftBE 1.10
 You have to choose according to your version, and delete. so files which is mismatching your version.
-
-Official qq group:
-欢迎加入bdlauncher开发，群聊号码：955765957
 
 (Some codes from https://github.com/codehz/BedrockMod.  Thanks @codehz for decompiling BDS.)
 LD_LIBRARY_PATH=. LD_PRELOAD=./bin/launch.so ./bedrock_server
