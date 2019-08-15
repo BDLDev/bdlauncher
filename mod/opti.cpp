@@ -30,8 +30,8 @@ u32 Rnd_int32(u32* a) {
     last=(last*1103515245+12345);
     return last;
 }
-u32 Rnd_int(u32* t,u32 a){
-return a?Rnd_int32(t)%a:0;
+u32 Rnd_int(u32* t,u32 a) {
+    return a?Rnd_int32(t)%a:0;
 }
 
 double R_R(u32* a) {
@@ -102,9 +102,9 @@ void patchall() {
     //spec
     patch_func("_ZNK5Block14getLegacyBlockEv","\x48\x8b\x47\x10\x48\x8b\x00\xc3",8);
     patch_func("_ZNK8SubChunk8getBlockEt","\x48\x8b\x7f\x20\x48\x8b\x07\xff\x60\x18",10);
- patch_func("_ZNKSt6atomicI10ChunkStateEcvS0_Ev","\x0f\xbe\x07\xc3",4);
-patch_func("_ZNKSt6atomicI10ChunkStateE4loadESt12memory_order","\x0f\xbe\x07\xc3",4);
-patch_func("_ZNSt6atomicI10ChunkStateE5storeES0_St12memory_order","\x40\x88\x37\xc3",4);
+    patch_func("_ZNKSt6atomicI10ChunkStateEcvS0_Ev","\x0f\xbe\x07\xc3",4);
+    patch_func("_ZNKSt6atomicI10ChunkStateE4loadESt12memory_order","\x0f\xbe\x07\xc3",4);
+    patch_func("_ZNSt6atomicI10ChunkStateE5storeES0_St12memory_order","\x40\x88\x37\xc3",4);
 }
 /*
 _ZNKSt8__detail10_Hash_nodeISt4pairIK8ChunkPosSt8weak_ptrI10LevelChunkEELb1EE7_M_nextEv
@@ -136,7 +136,7 @@ _ZSt3maxIiERKT_S2_S2_
    0x0000000000001153 <+3>:	8b 0f	mov    (%rdi),%ecx
    0x0000000000001155 <+5>:	3b 0e	cmp    (%rsi),%ecx
    0x0000000000001157 <+7>:	48 0f 4f c7	cmovg  %rdi,%rax
-   0x000000000000115b <+11>:	c3	retq  
+   0x000000000000115b <+11>:	c3	retq
 \x48\x89\xf0\x8b\x0f\x3b\x0e\x48\x0f\x4f\xc7\xc3
 */
 /*
@@ -144,17 +144,17 @@ _ZNK11BlockLegacyeqERKS_
    0x0000000000001160 <+0>:	31 c0	xor    %eax,%eax
    0x0000000000001162 <+2>:	48 39 f7	cmp    %rsi,%rdi
    0x0000000000001165 <+5>:	0f 94 c0	sete   %al
-   0x0000000000001168 <+8>:	c3	retq 
+   0x0000000000001168 <+8>:	c3	retq
 \x31\xc0\x48\x39\xf7\x0f\x94\xc0\xc3
 _ZNK11BlockLegacyneERKS_
-\x31\xc0\x48\x39\xf7\x0f\x95\xc0\xc3  
+\x31\xc0\x48\x39\xf7\x0f\x95\xc0\xc3
 */
 /*
 _ZN7NewTypeIhEC2ERKh
 _ZN7NewTypeIhEC2ERKS0_
    0x0000000000001170 <+0>:	8a 06	mov    (%rsi),%al
    0x0000000000001172 <+2>:	88 07	mov    %al,(%rdi)
-   0x0000000000001174 <+4>:	c3	retq  
+   0x0000000000001174 <+4>:	c3	retq
 */
 /*
 _ZNK4Vec33dotERKS_
@@ -166,24 +166,24 @@ _ZNK4Vec33dotERKS_
    0x0000000000001195 <+21>:	f3 0f 58 c8	addss  %xmm0,%xmm1
    0x0000000000001199 <+25>:	0f c6 c0 e5	shufps $0xe5,%xmm0,%xmm0
    0x000000000000119d <+29>:	f3 0f 58 c1	addss  %xmm1,%xmm0
-   0x00000000000011a1 <+33>:	c3	retq   
+   0x00000000000011a1 <+33>:	c3	retq
 "\363\017\020\016\363\017Y\017\362\017\020W\004\362\017\020F\004\017Y\302\363\017X\310\017\306\300\345\363\017X\301\xc3"
 */
 /*
 _ZNKSt10unique_ptrI25SubChunkBrightnessStorageSt14default_deleteIS0_EE3getEv
    0x00000000000011b0 <+0>:	48 8b 07	mov    (%rdi),%rax
-   0x00000000000011b3 <+3>:	c3	retq 
+   0x00000000000011b3 <+3>:	c3	retq
 
 
 _ZN4Vec3C2Efff
    0x00000000000011c0 <+0>:	f3 0f 11 07	movss  %xmm0,(%rdi)
    0x00000000000011c4 <+4>:	f3 0f 11 4f 04	movss  %xmm1,0x4(%rdi)
    0x00000000000011c9 <+9>:	f3 0f 11 57 08	movss  %xmm2,0x8(%rdi)
-   0x00000000000011ce <+14>:	c3	retq   
+   0x00000000000011ce <+14>:	c3	retq
 
 _ZNK5Block14getLegacyBlockEv
    0x00000000000011f0 <+0>:	48 8b 47 10	mov    0x10(%rdi),%rax
-   0x00000000000011f4 <+4>:	c3	retq 
+   0x00000000000011f4 <+4>:	c3	retq
 
 */
 void opti_init(std::list<string>& modlist) {

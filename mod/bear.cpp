@@ -55,7 +55,6 @@ static std::unordered_map<string,int> des_tim;
 class ISlots {
 public:
     ItemStack* v[9];
-    //string v[9];
     ISlots() {
         for(int i=0; i<9; ++i) {
 //			v[i]="0 x (0)@0";
@@ -153,11 +152,11 @@ bool isBanned(const string& name) {
 static u64(*hori)(u64 t,NetworkIdentifier& a, Certificate& b);
 static int logfd;
 static int logsz;
-static void initlog(){
+static void initlog() {
     logfd=open("player.log",O_WRONLY|O_APPEND|O_CREAT,S_IRWXU);
     logsz=lseek(logfd,0,SEEK_END);
 }
-static void async_log(const char* fmt,...){
+static void async_log(const char* fmt,...) {
     char buf[65535];
     /*struct aiocb ac;
     memset(&ac,0,sizeof(ac));
@@ -169,10 +168,10 @@ static void async_log(const char* fmt,...){
     va_end(vl);
     ac.aio_offset=logsz;
     logsz+=ac.aio_nbytes;*/
-	int s=vsprintf(buf,fmt,vl);
+    int s=vsprintf(buf,fmt,vl);
     write(1,buf,s);
-write(logfd,buf,s);
-va_end(vl);
+    write(logfd,buf,s);
+    va_end(vl);
     //aio_write(&ac);
 }
 
@@ -208,7 +207,7 @@ int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
     return iori(thi,b);
 }
 static int (*cori)(void*,Player const&,string&);
-static int hkc(void* a,Player & b,string& c){
+static int hkc(void* a,Player & b,string& c) {
     int ret=cori(a,b,c);
     async_log("%d *[CHAT]%s:%s",time(0),b.getName().c_str(),c.c_str());
     return ret;
@@ -242,7 +241,7 @@ static void do_patch() {
 static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     if((int)b.getPermissionsLevel()>0) {
         Player* pp=getplayer_byname(a[0]);
-        if(pp){
+        if(pp) {
             ((ServerPlayer*)pp)->disconnect();
         }
         banlist[a[0]]=a.size()==1?0:(time(0)+atoi(a[1].c_str()));
@@ -257,19 +256,19 @@ static void oncmd2(std::vector<string>& a,CommandOrigin const & b,CommandOutput 
         outp.success("okay");
     }
 }
-static int handle_u(GameMode* a0,ItemStack * a1,BlockPos const& a2,unsigned char a3,Vec3 const& a4,Block const* a5){
+static int handle_u(GameMode* a0,ItemStack * a1,BlockPos const& a2,unsigned char a3,Vec3 const& a4,Block const* a5) {
     if(a0->getPlayer()->getPlayerPermissionLevel()>1) return 1;
     string sn=a0->getPlayer()->getName();
     char buf[1024];
     strcpy(buf,a1->toString().c_str());
-    for(int i=0;buf[i];++i)
-    buf[i]=tolower(buf[i]);
-    #define check(a) strstr(buf,a)!=NULL
-    if(check("spawn_egg") || check("barrier") || check("bedrock") || check("command_block") || check("mob_spawner") ){
+    for(int i=0; buf[i]; ++i)
+        buf[i]=tolower(buf[i]);
+#define check(a) strstr(buf,a)!=NULL
+    if(check("spawn_egg") || check("barrier") || check("bedrock") || check("command_block") || check("mob_spawner") ) {
         async_log("%d [ITEM]%s 使用高危物品(banned) %s pos: %d %d %d\n",time(0),sn.c_str(),buf,a2.x,a2.y,a2.z);
         return 0;
     }
-    if(check("tnt") || check("lava")){
+    if(check("tnt") || check("lava")) {
         async_log("%d [ITEM]%s 使用危险物品(warn) %s pos: %d %d %d\n",time(0),sn.c_str(),buf,a2.x,a2.y,a2.z);
         return 1;
     }

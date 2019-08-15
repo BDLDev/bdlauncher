@@ -119,6 +119,7 @@ KillActor(b.getEntity());
 outp.success("killed");
 }
 static void oncmd_dim(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp){
+    ARGSZ(1)
     int pl=(int)b.getPermissionsLevel();
     string name=b.getName();
     Player* dst=NULL;
@@ -133,7 +134,8 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     string dnm=a.size()==2?a[1]:"";
     Player* dst=NULL;
     if(dnm!="")
-        dst=getplayer_byname(dnm);
+        dst=getplayer_byname2(dnm);
+    ARGSZ(1)
     if(a[0]=="f"){
         //from
         if(dst==NULL){
@@ -216,10 +218,10 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
 static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp){
     int pl=(int)b.getPermissionsLevel();
     string name=b.getName();
-    string homen=a.size()==2?a[1]:"";
+    string homen=a.size()==2?a[1]:"hape";
     Vec3 pos=b.getWorldPosition();
     //printf("%f %f %f\n",pos.x,pos.y,pos.z);
-    if(a.size()==0) return;
+    ARGSZ(1)
     if(a[0]=="add"){
         if(homes.count(name)==0) homes[name]={};
         home& myh=homes[name];
@@ -272,9 +274,10 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
    // printf("pl %d\n",pl);
     string name=b.getName();
     Vec3 pos=b.getWorldPosition();
-    if(a.size()==0) return;
+    ARGSZ(1)
     if(a[0]=="add"){
         if(pl<1) return;
+        ARGSZ(2)
         wps.push_front(Vpos(pos.x,pos.y,pos.z,b.getEntity()->getDimensionId(),a[1]));
         //save();
         outp.success("已添加");
@@ -282,6 +285,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
     }
     if(a[0]=="del"){
         if(pl<1) return;
+        ARGSZ(2)
         wps.remove_if([a](const Vpos& b)->bool{return b.name==a[1];});
         //save();
         outp.success("已删除");

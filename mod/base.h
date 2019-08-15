@@ -17,9 +17,10 @@ void reg_destroy(void* a);
 void sendText(Player* a,string ct);
 void TeleportA(Actor& a,Vec3 b,AutomaticID<Dimension,int> c);
 Player* getplayer_byname(const string& name);
-bool give_item(Player* a,const string& name,short spec,int amo);
-bool red_item(Player* a,const string& name,short spec,int amo);
+Player* getplayer_byname2(const string& name);
 void KillActor(Actor* a);
 void sendText2(Player* a,string ct);
 MCRESULT runcmd(const string& a);
+
+#define ARGSZ(b) if(a.size()<b){outp.error("check your arg");return;}
 
