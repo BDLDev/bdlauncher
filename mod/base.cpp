@@ -225,9 +225,9 @@ extern void load_helper(list<string>& modlist);
 void TeleportA(Actor& a,Vec3 b,AutomaticID<Dimension,int> c) {
     /* cmd_p.teleport(a,b,nullptr,c);
     cmd_p.teleport(a,b,nullptr,c);*/
-    if(a.getDimensionId()!=c) {
-        a.changeDimension(c,false);
-    }
+    //if(a.getDimensionId()!=c) {
+    //    a.changeDimension(c,false);
+    //}
     cmd_p.teleport(a,b,nullptr,c);
     cmd_p.teleport(a,b,nullptr,c);
 }

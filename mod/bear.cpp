@@ -69,7 +69,7 @@ public:
     bool onChg(int id,ItemStack* from,ItemStack* to) {
         if(id>8 || id<0) return false;
         int fg=1;
-        if(*from!=*v[id]) fg=0;
+        if(*from!=*v[id] && !from->isNull()) fg=0;
 //delete(v[id]);
         v[id]=new ItemStack(*to);
         return fg;
@@ -188,9 +188,9 @@ static u64 handleLogin(u64 t,NetworkIdentifier& a, Certificate& b) {
 
 static int(*iori)(const InventoryTransactionManager*,InventoryAction const&);
 int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
-    //printf("player %s sid %d src %s from %s to %s\n",thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem().toString().c_str(),b.getToItem().toString().c_str());
+    //printf("player %s sid %d src %s from %s to %s\n",thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
     auto& x=b.getSource();
-    if(x.getType()==100 && x.getFlags()==0 && (x.getContainerId()==-100 || x.getContainerId()==-2)) {
+    if(x.getType()==100 && x.getFlags()==0 && x.getContainerId()!=-23) {
         string name=thi->getPlayer()->getName();
         //printf("early\n");
         if(!PSlot.count(name)) PSlot[name]=new ISlots();
@@ -209,7 +209,7 @@ int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
 static int (*cori)(void*,Player const&,string&);
 static int hkc(void* a,Player & b,string& c) {
     int ret=cori(a,b,c);
-    async_log("%d *[CHAT]%s:%s",time(0),b.getName().c_str(),c.c_str());
+    async_log("%d *[CHAT]%s:%s\n",time(0),b.getName().c_str(),c.c_str());
     return ret;
 }
 /*
@@ -245,6 +245,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             ((ServerPlayer*)pp)->disconnect();
         }
         banlist[a[0]]=a.size()==1?0:(time(0)+atoi(a[1].c_str()));
+        runcmd(string("kick ")+a[0]);
         save();
         outp.success("banned "+a[0]);
     }
@@ -274,6 +275,86 @@ static int handle_u(GameMode* a0,ItemStack * a1,BlockPos const& a2,unsigned char
     }
     return 1;
 }
+static clock_t lastcl;
+static string lastn;
+static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
+    int pl=a0->getPlayer()->getPlayerPermissionLevel();
+    if(pl>1 || a0->getPlayer()->isCreative()) {
+        //op
+        //printf("op\n");
+        return 1;
+    }
+    const string& name=a0->getPlayer()->getName();
+    int x(a1.x),y(a1.y),z(a1.z); //fixed
+    Block& bk=a0->getPlayer()->getBlockSource()->getBlock(a1);
+    int id=bk.getLegacyBlock()->getBlockItemId();
+    if(name==lastn && clock()-lastcl<1000000*0.1){
+       lastcl=clock();
+        async_log("%d [FD]%s fast dest %d delta %f\n",time(0),name.c_str(),id,((float)(clock()-lastcl))/1000000);
+        return 0;
+    }
+    lastn=name;
+    lastcl=clock();
+   /* if(id==4){
+        //fuck
+        async_log("%d [FD]%s fast dest %d\n",time(0),name.c_str(),id);
+        return 0;
+    }*/
+    const Vec3& fk=a0->getPlayer()->getPos();
+    #define abs(x) ((x)<0?-(x):(x))
+    int dx=fk.x-x;
+    int dy=fk.y-y;
+    int dz=fk.z-z;
+    int d2=dx*dx+dy*dy+dz*dz;
+    if(d2>36){
+        async_log("%d [FD]%s far dest %d\n",time(0),name.c_str(),d2);
+        return 0;
+    }
+    return 1;
+}
+struct Mc3{
+    float y;
+    int airt;
+};
+static unordered_map<string,Mc3> mp;
+static inline bool isinAir(Player& tg,Vec3& fk){
+    int x=round(fk.x);
+    int y=round(fk.y);
+    int z=round(fk.z);
+    //printf("%d\n",y);
+    //printf("get %s\n",tg.getBlockSource()->getBlock({x,y-3,z}).getFullName().c_str());
+    return tg.getBlockSource()->getBlock({x,y-3,z}).getLegacyBlock()->getBlockItemId()==0 && tg.getBlockSource()->getBlock({x,y-4,z}).getLegacyBlock()->getBlockItemId()==0;
+}
+static void flych(Level* lv){
+    //0.5s y=-2
+    lv->forEachPlayer([&](Player& tg)->bool{
+        const string& nm=tg.getName();
+        auto x=tg.getPos();
+        if(mp.count(nm)==0) {mp[nm]={x.y,0};return true;}
+        auto& y=mp[nm];
+        float del=x.y-y.y;
+        if(!tg.isRiding() && !tg.isCreative() && isinAir(tg,x) && del>0){
+            y.airt++;
+            if(y.airt>=3){
+                async_log("%d [FLY] %s fly for %f s delt %f\n",time(0),nm.c_str(),y.airt*0.5,del);
+            }
+        }else{
+            y.airt=0;
+        }
+        y.y=x.y;
+        return true;
+    });
+}
+typedef unsigned int u32;
+u32(*tick_o)(Level*);
+static int tkl;
+u32 onTick(Level* a){
+    int rt=tick_o(a);
+    tkl++;
+    if(tkl%10==0)
+    flych(a);
+    return rt;
+}
 void bear_init(std::list<string>& modlist) {
     //0x0000555559d377a0 _ZNK27ComplexInventoryTransaction6handleER6Playerb +681 e8 d2 bc 00 00	callq  0x555559d43720 <_ZN27InventoryTransactionManager17addExpectedActionERK15InventoryAction>
 //0x0000555559d43760 _ZN27InventoryTransactionManager9addActionERK15InventoryAction
@@ -284,6 +365,8 @@ void bear_init(std::list<string>& modlist) {
     register_cmd("ban",fp(oncmd),"ban");
     register_cmd("unban",fp(oncmd2),"unban");
     reg_useitemon(fp(handle_u));
+    reg_destroy(fp(handle_dest));
+   // tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
     printf("[ANTI-BEAR] Loaded\n");
     //reg_destroy(fp(handle_dest2));
     load_helper(modlist);

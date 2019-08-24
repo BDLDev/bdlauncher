@@ -11,6 +11,7 @@ class BlockLegacy {
 public:
   std::string const &getRawNameId() const;
   Block const *getDefaultState() const;
+  char getBlockItemId() const;
 };
 
 class Block {

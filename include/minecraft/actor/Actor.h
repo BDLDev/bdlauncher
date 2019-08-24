@@ -38,8 +38,8 @@ public:
   void kill();
   void changeDimension(AutomaticID<Dimension, int>, bool);
   int getDimensionId() const;
-  Vec3 getPos() const;	
-
+  Vec3& getPos() const;	
+  bool isRiding() const;
   template <typename T> T *tryGetComponent();
 
   virtual ~Actor();

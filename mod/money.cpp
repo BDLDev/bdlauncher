@@ -64,7 +64,7 @@ static void load() {
 }
 
 int get_money(const string& pn) {
-    if(moneys.count(pn)==0) moneys[pn]=250; //TODO:init money
+    if(moneys.count(pn)==0) moneys[pn]=50; //TODO:init money
     return moneys[pn];
 }
 void set_money(const string& pn,int am) {

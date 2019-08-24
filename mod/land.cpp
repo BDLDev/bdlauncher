@@ -73,6 +73,11 @@ struct land {
     void addown(const string& name) {
         owner+="|"+name+"|";
     }
+    void rmown(const string& n){
+		string fk="|"+n+"|";
+		auto i=owner.find(fk);
+		if(i!=string::npos) owner.erase(i,i+fk.size());
+	}
     static string tostr(const land& a) {
         char buf[32768];
         int ptr=0;
@@ -155,7 +160,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         int xx(round(min(pa.x,pb.x))),yy(round(min(pa.z,pb.z))),xx2(round(max(pa.x,pb.x))),yy2(round(max(pa.z,pb.z)));
         int fg=0;
         for(auto const& i:lands) {
-            if(i.coll(xx,xx2,yy,yy2,b.getEntity()->getDimensionId(),name)) {
+            if(i.coll(xx,xx2,yy,yy2,b.getEntity()->getDimensionId(),name) && pl==0) {
                 fg=1;
                 break;
             }
@@ -168,7 +173,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         }
         land tmp;
         tmp.x=xx,tmp.y=yy,tmp.dx=xx2-xx+1,tmp.dy=yy2-yy+1;
-        int price=tmp.size();
+        int price=10*tmp.size();
         char buf[1000];
         sprintf(buf,"选择完毕，该区域价格 %d,使用“/land buy”购买",price);
         outp.success(string(buf));
@@ -184,7 +189,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         tmp.x=xx,tmp.y=yy,tmp.dx=xx2-xx+1,tmp.dy=yy2-yy+1;
         tmp.addown(name);
         tmp.dim_perm=(b.getEntity()->getDimensionId()<<4)|PERMP;
-        int price=tmp.size();
+        int price=10*tmp.size();
         if(pl>0 || red_money(name,price)) {
             lands.push_front(tmp);
             ccache();
@@ -224,9 +229,9 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         //for(auto& i:lands){
         //   if(i.inland(x,y,dim) && i.checkown(name)){
         land* i=getLand(x,y,dim);
-        if(i&&i->checkown(name)) {
+        if(i&&(i->checkown(name)||pl>0)) {
             char buf[1000];
-            int price=i->size();
+            int price=0*i->size();
             add_money(name,price);
             sprintf(buf,"出售价格 %d\n",price);
             outp.success(string(buf));
@@ -247,10 +252,23 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         int x=round(b.getWorldPosition().x);
         int y=round(b.getWorldPosition().z); //fix
         land* i=getLand(x,y,dim);
-        if(i&&i->checkown(name)) {
+        if(i&&(i->checkown(name)||pl>0)) {
             i->addown(a[1]);
             //save();
             outp.success("已信任");
+            return;
+        }
+    }
+if(a[0]=="untrust") {
+        ARGSZ(2)
+        int dim=b.getEntity()->getDimensionId();
+        int x=round(b.getWorldPosition().x);
+        int y=round(b.getWorldPosition().z); //fix
+        land* i=getLand(x,y,dim);
+        if(i&&(i->checkown(name)||pl>0)) {
+            i->rmown(a[1]);
+            //save();
+            outp.success("已取消");
             return;
         }
     }
@@ -364,7 +382,14 @@ static int handle_useion(GameMode* a0,ItemStack & a1,BlockPos const& a2,unsigned
     const string& name=a0->getPlayer()->getName();
     int dim=a0->getPlayer()->getDimensionId();
     int x(a2.x),y(a2.z),z(a2.z); //fixed
-    dbg_printf("use handle dim %d %d %d %d",dim,x,y,z);
+/*
+char fku[555];
+    sprintf(fku,"use handle %d %d a3 %d\n",x,z,a3);
+sendText(a0->getPlayer(),string(fku));
+*/
+const int Z[]={-1,1,0,0};
+const int X[]={0,0,-1,1};
+if(a3>1 && a3<6) x+=X[a3-2],y+=Z[a3-2];
     /*for(auto const& i:lands){
         if(i.inland(x,y,dim)){
             if(!i.canuse(name)){

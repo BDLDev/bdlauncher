@@ -29,6 +29,7 @@ public:
   unsigned char getPlayerPermissionLevel() const;
   unsigned char getCommandPermissionLevel() const;
   float getDestroySpeed(Block const&) const;
+  bool isCreative(void)const;
 };
 
 class ServerPlayer : public Player {
