@@ -1,10 +1,6 @@
 # bdlauncher
 
-BedRockServer launcher with mods support (for BedRock Edition 1.12) <br>
-
-低版本CentOS Ubuntu免升级启动方法<br>
-Notice: CentOS and low version GLIBC system support(Neither docker nor root is required):https://www.minebbs.com/threads/centos-bds-root-docker.2424/
-
+BedRockServer launcher with mods support (1.12)
 # How to:
 <pre>
 如何安装
@@ -46,6 +42,9 @@ tp.so
 tpa home支持
 </pre>
 <pre>
+所有玩家名带空格的，可以写成"bla bla"
+例如
+/money query "114514 1919810"
 经济
 初始250块
 /money query查钱
@@ -58,17 +57,21 @@ op可以/money add 钱数
 /warp ls查看
 /warp 地名
 /warp add 添加点（op）
+
+玩家名可以模糊匹配，例如AbCde 可以只输入ab
 /tpa f 玩家名 让玩家传送到你
 /tpa t 玩家名 你到玩家
+
 /tpa ac 同意
 /tpa de 拒绝
 /tpa rand 随机传送到野外，可能卡区块，卡了就退了重进
 领地：
 /land start选择起点（你站的地方）
 /land end选择终点
-/land buy选点之后买地(1格1块）
+/land buy选点之后买地(1格10块）
 /land trust 人名 添加主人
-/land sell卖地
+/land untrust 人名 删除主人
+/land sell卖地（op可以强行卖）
 /land test查看当前领地主人
 /suicide 自杀
 /shop ls
