@@ -73,6 +73,17 @@ op可以/money add 钱数
 /land untrust 人名 删除主人
 /land sell卖地（op可以强行卖）
 /land test查看当前领地主人
+/land perm 数字 指定领地具体权限
+#define PERMB 1 建造和破坏
+#define PERMU 2 空手使用
+#define PERMP 4 land test查看
+#define PERMA 8 攻击生物
+数字为允许的权限之和，默认为4
+常用权限：
+6（可睡觉，开箱子）
+14（可以攻击，睡觉，开箱子）
+12（可攻击）
+
 /suicide 自杀
 /shop ls
 /shop buy 商店名
