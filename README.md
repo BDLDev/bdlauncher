@@ -74,7 +74,7 @@ op可以/money add 钱数
 /land sell卖地（op可以强行卖）
 /land test查看当前领地主人
 /land perm 数字 指定领地具体权限
-#define PERMB 1 建造和破坏
+#define PERMB 1 破坏
 #define PERMU 2 空手使用
 #define PERMP 4 land test查看
 #define PERMA 8 攻击生物
