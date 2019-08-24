@@ -3,9 +3,10 @@
 BedRockServer launcher with mods support (1.12)
 # How to:
 <pre>
-如何安装
+快速安装
 (In your server folder)在你的服务器目录
 mkdir mods
+cp out/*.so mods
 cd mods
 
 nano mod.list
@@ -20,7 +21,7 @@ cp a.so ..
 cd ..
 LD_LIBRARY_PATH=. LD_PRELOAD=a.so ./bedrock_server
 </pre>
-# Compile:
+# 编译:
 <pre>
 sh cmp.sh
 cd mod
