@@ -30,7 +30,7 @@ sh all.sh
 # DOC:
 <pre>
 opti.so
-实验性服务器优化
+实验性服务器优化（安装后建议删除worlds文件夹，否则老世界的新chunk会出现地形bug）
 base.so
 基础插件（required）
 bear.so
