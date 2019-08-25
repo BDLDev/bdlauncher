@@ -245,7 +245,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             ((ServerPlayer*)pp)->disconnect();
         }
         banlist[a[0]]=a.size()==1?0:(time(0)+atoi(a[1].c_str()));
-        runcmd(string("kick ")+a[0]);
+        runcmd(string("kick \"")+a[0]+"\"");
         save();
         outp.success("banned "+a[0]);
     }
