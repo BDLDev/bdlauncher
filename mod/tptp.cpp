@@ -324,9 +324,9 @@ void tp_init(std::list<string>& modlist){
     printf("[TPs] loaded!\n");
     load();
     register_cmd("suicide",(void*)oncmd_suic,"自杀");
-    register_cmd("tpa",(void*)oncmd,"传送");
+    register_cmd("tpa",(void*)oncmd,"传送系统");
     register_cmd("home",(void*)oncmd_home,"家");
-    register_cmd("warp",(void*)oncmd_warp,"Warp");
+    register_cmd("warp",(void*)oncmd_warp,"地标");
     register_cmd("chdim",(void*)oncmd_dim);
     srand(time(0));
     load_helper(modlist);

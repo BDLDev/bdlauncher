@@ -432,7 +432,7 @@ if(a3>1 && a3<6) x+=X[a3-2],y+=Z[a3-2];
 void land_init(std::list<string>& modlist) {
     printf("[LAND] loaded!\n");
     load();
-    register_cmd("land",(void*)oncmd,"领地插件");
+    register_cmd("land",(void*)oncmd,"领地系统");
     reg_destroy(fp(handle_dest));
     //reg_build(fp(handle_bui));
     reg_useitemon(fp(handle_useion));

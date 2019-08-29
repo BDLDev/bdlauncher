@@ -235,7 +235,7 @@ static void oncmd2(std::vector<string>& a,CommandOrigin & b,CommandOutput &outp)
 void money_init(std::list<string>& modlist) {
     printf("[MONEY&SHOP] loaded!\n");
     load();
-    register_cmd("money",(void*)oncmd,"经济");
+    register_cmd("money",(void*)oncmd,"经济系统");
     register_cmd("shop",(void*)oncmd2,"商店");
     load_helper(modlist);
 }
