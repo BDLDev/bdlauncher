@@ -331,7 +331,7 @@ static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
     if(i&&!i->checkown(name)) {
         if(!i->canbuild(name)) {
             char buf[1000];
-            sprintf(buf,"§c这是 %s 的领地，你无法破坏",i->owner.c_str());
+            sprintf(buf,"§c你不能破坏 %s 的领地",i->owner.c_str());
             sendText2(a0->getPlayer(),string(buf));
             return 0;
         } else {
@@ -354,7 +354,7 @@ static int handle_atk(Player* a0,Actor & a1) {
     if(i&&!i->checkown(name)) {
         if(!i->canatk(name)) {
             char buf[1000];
-            sprintf(buf,"§c在 %s 的领地内，你不可以攻击",i->owner.c_str());
+            sprintf(buf,"§c你不可以在 %s 的领地内攻击",i->owner.c_str());
             sendText2(a0,string(buf));
             return 0;
         } else {
@@ -419,7 +419,7 @@ if(a3>1 && a3<6) x+=X[a3-2],y+=Z[a3-2];
     if(i&&!i->checkown(name)) {
         if(!i->canuse(name)) {
             char buf[1000];
-            sprintf(buf,"§c这里是 %s 的领地，你不能交互",i->owner.c_str());
+            sprintf(buf,"§c你不能在 %s 的领地与方块互交",i->owner.c_str());
 			sendText2(a0->getPlayer(),string(buf));
             return 0;
         } else {
@@ -432,7 +432,7 @@ if(a3>1 && a3<6) x+=X[a3-2],y+=Z[a3-2];
 void land_init(std::list<string>& modlist) {
     printf("[LAND] loaded!\n");
     load();
-    register_cmd("land",(void*)oncmd,"领地");
+    register_cmd("land",(void*)oncmd,"领地插件");
     reg_destroy(fp(handle_dest));
     //reg_build(fp(handle_bui));
     reg_useitemon(fp(handle_useion));
