@@ -1,6 +1,8 @@
 # bdlauncher
 
 BedRockServer launcher with mods support (1.12)
+QQ group 955765957
+
 # How to:
 <pre>
 快速安装
