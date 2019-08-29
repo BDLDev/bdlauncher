@@ -47,10 +47,11 @@ tpa home支持
 例如
 /money query "114514 1919810"
 经济
-初始250块
-/money query查钱
+初始50块
+/money query 查钱
 或/money query 玩家名
 op可以/money add 钱数
+/money pay 玩家ID 钱数 玩家间转账(单次最大10000)
 家
 /home add 名字
 /home ls 查看
@@ -67,13 +68,13 @@ op可以/money add 钱数
 /tpa de 拒绝
 /tpa rand 随机传送到野外，可能卡区块，卡了就退了重进
 领地：
-/land start选择起点（你站的地方）
-/land end选择终点
-/land buy选点之后买地(1格10块）
+/land start 选择起点（你站的地方）
+/land end 选择终点
+/land buy 选点之后买地(1格10块）
 /land trust 人名 添加主人
 /land untrust 人名 删除主人
-/land sell卖地（op可以强行卖）
-/land test查看当前领地主人
+/land sell 卖地（op可以强行卖）
+/land test 查看当前领地主人
 /land perm 数字 指定领地具体权限
 #define PERMB 1 破坏
 #define PERMU 2 空手使用

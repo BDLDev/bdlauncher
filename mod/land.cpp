@@ -147,13 +147,13 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     ARGSZ(1)
     if(a[0]=="start") {
         startpos[name]=b.getWorldPosition();
-        outp.success("已选择点A");
+        outp.success("§e[Land system] 已选择点A，输入/land end选择另一个点");
     }
     if(a[0]=="end") {
         endpos[name]=b.getWorldPosition();
-        outp.success("已选择点B");
+        outp.success("§e[Land system] 已选择点B");
         if(startpos.count(name)+endpos.count(name)!=2) {
-            outp.error("请选择开始和结束点");
+            outp.error("[Land system] 请选择开始和结束点");
         }
         Vec3 pa=startpos[name];
         Vec3 pb=endpos[name];
@@ -166,21 +166,21 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             }
         }
         if(fg) {
-            outp.error("领地不得重叠");
+            outp.error("[Land system] 领地不得重叠");
             startpos.erase(name);
             endpos.erase(name);
-            return;
+			return;
         }
         land tmp;
         tmp.x=xx,tmp.y=yy,tmp.dx=xx2-xx+1,tmp.dy=yy2-yy+1;
         int price=10*tmp.size();
         char buf[1000];
-        sprintf(buf,"选择完毕，该区域价格 %d,使用“/land buy”购买",price);
+        sprintf(buf,"§e[Land system] 选择完毕，该区域价格 %d,使用“/land buy”购买",price);
         outp.success(string(buf));
     }
     if(a[0]=="buy") {
         if(startpos.count(name)+endpos.count(name)!=2) {
-            outp.error("请选择开始和结束点");
+            outp.error("[Land system] 请选择开始和结束点");
         }
         Vec3 pa=startpos[name];
         Vec3 pb=endpos[name];
@@ -194,12 +194,12 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             lands.push_front(tmp);
             ccache();
             //save();
-            outp.success("购买成功");
+            outp.success("§e[Land system] 购买成功");
         } else {
-            outp.error("金币不足");
+            outp.error("[Land system] 你的余额不足");
         }
     }
-    if(a[0]=="test") {
+    if(a[0]=="query") {
         auto act=b.getEntity();
         if(act==NULL) return;
         int dim=act->getDimensionId();
@@ -216,12 +216,16 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         land* i=getLand(x,y,dim);
         if(i && i->canpop(name)) {
             char buf[1000];
-            sprintf(buf,"这里是 %s's 的领地\n",i->owner.c_str());
-            //outp.success(string(buf));
-            sendText2(getplayer_byname(name),string(buf));
+            sprintf(buf,"§e[Land system] 这里是 %s 的领地",i->owner.c_str());
+            outp.success(string(buf));
+            //sendText2(getplayer_byname(name),string(buf));
             return;
+		} else {
+			char buf[1000];
+			sprintf(buf,"[Land system] 这里没有领地");
+            outp.error(string(buf));
+		}
         }
-    }
     if(a[0]=="sell") {
         int dim=b.getEntity()->getDimensionId();
         int x=round(b.getWorldPosition().x);
@@ -233,7 +237,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             char buf[1000];
             int price=0*i->size();
             add_money(name,price);
-            sprintf(buf,"出售价格 %d\n",price);
+            sprintf(buf,"§e[Land system] 领地出售成功，出售价格 %d",price);
             outp.success(string(buf));
             i->dim_perm=114514; //remove flag
             lands.remove_if([](const land& n) {
@@ -242,10 +246,12 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             ccache();
             //save();
             return;
-        }
-        //   }
-        //}
-    }
+        } else {
+			char buf[1000];
+			sprintf(buf,"[Land system] 这不是你的领地");
+			outp.error(string(buf));
+			}
+		}
     if(a[0]=="trust") {
         ARGSZ(2)
         int dim=b.getEntity()->getDimensionId();
@@ -255,7 +261,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         if(i&&(i->checkown(name)||pl>0)) {
             i->addown(a[1]);
             //save();
-            outp.success("已信任");
+            outp.success("§e[Land system] 已信任玩家 "+a[1]);
             return;
         }
     }
@@ -268,7 +274,7 @@ if(a[0]=="untrust") {
         if(i&&(i->checkown(name)||pl>0)) {
             i->rmown(a[1]);
             //save();
-            outp.success("已取消");
+            outp.success("§e[Land system] 已取消玩家 "+a[1]+" 的信任");
             return;
         }
     }
@@ -282,9 +288,13 @@ if(a[0]=="untrust") {
             i->dim_perm-=(i->dim_perm&15);
             i->dim_perm|=atoi(a[1].c_str());
             //save();
-            outp.success("okay new perm "+a[1]);
+            outp.success("§e[Land system] 权限更改 "+a[1]);
         }
     }
+
+if(a[0]=="help") {
+		outp.error("领地系统指令列表:\n/land start ——选择起点（你站的地方）\n/land end ——选择终点\n/land buy ——选点之后买地（1格10块）\n/land trust 玩家ID ——添加访客\n/land untrust 玩家ID ——删除访客\n/land sell ——卖地\n/land query ——查看当前领地主人\n/land perm 权限ID ——更改权限(详细看github)");
+	}
 }
 
 static void save() {
@@ -321,8 +331,8 @@ static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
     if(i&&!i->checkown(name)) {
         if(!i->canbuild(name)) {
             char buf[1000];
-            sprintf(buf,"这是 %s' 的领地，请勿破坏!",i->owner.c_str());
-            sendText(a0->getPlayer(),string(buf));
+            sprintf(buf,"§c这是 %s 的领地，你无法破坏",i->owner.c_str());
+            sendText2(a0->getPlayer(),string(buf));
             return 0;
         } else {
             return 1;
@@ -344,8 +354,8 @@ static int handle_atk(Player* a0,Actor & a1) {
     if(i&&!i->checkown(name)) {
         if(!i->canatk(name)) {
             char buf[1000];
-            sprintf(buf,"在 %s 的领地内，你不可以攻击!",i->owner.c_str());
-            sendText(a0,string(buf));
+            sprintf(buf,"§c在 %s 的领地内，你不可以攻击",i->owner.c_str());
+            sendText2(a0,string(buf));
             return 0;
         } else {
             return 1;
@@ -409,8 +419,8 @@ if(a3>1 && a3<6) x+=X[a3-2],y+=Z[a3-2];
     if(i&&!i->checkown(name)) {
         if(!i->canuse(name)) {
             char buf[1000];
-            sprintf(buf,"这里是 %s 的领地!",i->owner.c_str());
-            sendText(a0->getPlayer(),string(buf));
+            sprintf(buf,"§c这里是 %s 的领地，你不能交互",i->owner.c_str());
+			sendText2(a0->getPlayer(),string(buf));
             return 0;
         } else {
             return i->checkown(name) || a1.isNull();
@@ -422,7 +432,7 @@ if(a3>1 && a3<6) x+=X[a3-2],y+=Z[a3-2];
 void land_init(std::list<string>& modlist) {
     printf("[LAND] loaded!\n");
     load();
-    register_cmd("land",(void*)oncmd);
+    register_cmd("land",(void*)oncmd,"领地");
     reg_destroy(fp(handle_dest));
     //reg_build(fp(handle_bui));
     reg_useitemon(fp(handle_useion));
