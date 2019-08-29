@@ -74,7 +74,7 @@ op可以/money add 钱数
 /land trust 人名 添加主人
 /land untrust 人名 删除主人
 /land sell 卖地（op可以强行卖）
-/land test 查看当前领地主人
+/land query 查看当前领地主人
 /land perm 数字 指定领地具体权限
 #define PERMB 1 破坏
 #define PERMU 2 空手使用
