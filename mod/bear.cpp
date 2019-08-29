@@ -179,7 +179,7 @@ static u64 handleLogin(u64 t,NetworkIdentifier& a, Certificate& b) {
     string pn=ExtendedCertificate::getIdentityName(b);
     async_log("%d [JOIN]%s joined game\n",time(0),pn.c_str());
     if(isBanned(pn)) {
-        string ban("你在黑名单内!");
+        string ban("§c你在当前服务器的黑名单内!");
         getMC()->getNetEventCallback()->disconnectClient(a,ban,false);
         return 0;
     }
@@ -190,7 +190,7 @@ static int(*iori)(const InventoryTransactionManager*,InventoryAction const&);
 int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
     //printf("player %s sid %d src %s from %s to %s\n",thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
     auto& x=b.getSource();
-    if(x.getType()==100 && x.getFlags()==0 && x.getContainerId()!=-23) {
+    if((x.getType()==100 && x.getFlags()==0 && x.getContainerId()!=-23) || (x.getType()==0 && x.getFlags()==0 && x.getContainerId()==119)) {
         string name=thi->getPlayer()->getName();
         //printf("early\n");
         if(!PSlot.count(name)) PSlot[name]=new ISlots();
@@ -198,7 +198,9 @@ int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
         // printf("check\n");
         if(!is->onChg(b.getSid(),b.getFromItem(),b.getToItem())) {
             async_log("%d player %s sid %d src %s from %s to %s\n",time(0),thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
-            async_log("%d 检测到toolbox玩家： %s\n",time(0),name.c_str());
+            async_log("%d 检测到作弊玩家： %s\n",time(0),name.c_str());
+			runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品 "+b.getFromItem()->toString()+"请管理员手动检察该玩家的行为"));
+			runcmd(string("kick \"")+name+"\" §c使用外挂刷物品");
             //sendText(thi->getPlayer(),"toolbox detected");
             //return 0;
         }
@@ -245,16 +247,16 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             ((ServerPlayer*)pp)->disconnect();
         }
         banlist[a[0]]=a.size()==1?0:(time(0)+atoi(a[1].c_str()));
-        runcmd(string("kick \"")+a[0]+"\"");
+        runcmd(string("kick \"")+a[0]+"\" §c你号没了");
         save();
-        outp.success("banned "+a[0]);
+        outp.success("§e玩家已封禁: "+a[0]);
     }
 }
 static void oncmd2(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     if((int)b.getPermissionsLevel()>0) {
         banlist.erase(a[0]);
         save();
-        outp.success("okay");
+        outp.success("§e玩家已解封: "+a[0]);
     }
 }
 static int handle_u(GameMode* a0,ItemStack * a1,BlockPos const& a2,unsigned char a3,Vec3 const& a4,Block const* a5) {
@@ -265,8 +267,10 @@ static int handle_u(GameMode* a0,ItemStack * a1,BlockPos const& a2,unsigned char
     for(int i=0; buf[i]; ++i)
         buf[i]=tolower(buf[i]);
 #define check(a) strstr(buf,a)!=NULL
-    if(check("spawn_egg") || check("barrier") || check("bedrock") || check("command_block") || check("mob_spawner") ) {
+	//mob_spawner与spawn_egg因无法检测而修改为spawn
+	if(check("barrier") || check("bedrock") || check("spawn")) {
         async_log("%d [ITEM]%s 使用高危物品(banned) %s pos: %d %d %d\n",time(0),sn.c_str(),buf,a2.x,a2.y,a2.z);
+		sendText2(a0->getPlayer(),"§c无法使用违禁物品");		 
         return 0;
     }
     if(check("tnt") || check("lava")) {
@@ -362,8 +366,8 @@ void bear_init(std::list<string>& modlist) {
     do_patch();
     load();
     initlog();
-    register_cmd("ban",fp(oncmd),"ban");
-    register_cmd("unban",fp(oncmd2),"unban");
+    register_cmd("ban",fp(oncmd),"封禁玩家");
+    register_cmd("unban",fp(oncmd2),"解除封禁");
     reg_useitemon(fp(handle_u));
     reg_destroy(fp(handle_dest));
    // tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
