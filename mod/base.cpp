@@ -15,6 +15,7 @@
 #include"minecraft/actor/PlayerInventoryProxy.h"
 #include"minecraft/item/Item.h"
 #include"seral.hpp"
+#include<signal.h>
 #include <sys/stat.h>
 #include<unistd.h>
 #include <sys/stat.h>
@@ -276,8 +277,20 @@ MCRESULT runcmd(const string& a) {
     ServerCommandOrigin* b=new ServerCommandOrigin(sname,*(ServerLevel*)getMC()->getLevel(),(CommandPermissionLevel)5);
     return getMC()->getCommands()->requestCommandExecution(std::unique_ptr<CommandOrigin>((CommandOrigin*)b),a,4,1);
 }
+typedef unsigned int u32;
+static u32(*tick_o)(Level*);
+static int tkl;
+void call_sht(int d);
+static u32 onTick(Level* a){
+    int rt=tick_o(a);
+    tkl++;
+    if(tkl%(15*60*20)==0) //15min
+    call_sht(SIGABRT);
+    return rt;
+}
 void base_init(list<string>& modlist)
 {
     printf("[MOD/BASE] loaded!\n");
+    tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
     load_helper(modlist);
 }

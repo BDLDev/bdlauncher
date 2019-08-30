@@ -117,6 +117,8 @@ static int hk(Block * a0, BlockSource * a1, const BlockPos *a2) {
         char buf[6666];
         sprintf(buf,"fill %d %d %d %d %d %d air",a2->x,a2->y,a2->z,a2->x,a2->y,a2->z);
         runcmd(string(buf));
+        sprintf(buf,"kill @e[type=item,x=%d,y=%d,z=%d,r=5]",a2->x,a2->y,a2->z);
+        runcmd(string(buf));
     }
     return ori(a0,a1,a2);
 }
@@ -190,15 +192,15 @@ static int(*iori)(const InventoryTransactionManager*,InventoryAction const&);
 int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
     //printf("player %s sid %d src %s from %s to %s\n",thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
     auto& x=b.getSource();
-    if((x.getType()==100 && x.getFlags()==0 && x.getContainerId()!=-23) || (x.getType()==0 && x.getFlags()==0 && x.getContainerId()==119)) {
+    if((x.getType()==100 && x.getFlags()==0 && x.getContainerId()!=23) || (x.getType()==0 && x.getFlags()==0 && x.getContainerId()==119)) {
         string name=thi->getPlayer()->getName();
         //printf("early\n");
         if(!PSlot.count(name)) PSlot[name]=new ISlots();
         ISlots* is=PSlot[name];
         // printf("check\n");
         if(!is->onChg(b.getSid(),b.getFromItem(),b.getToItem())) {
-            async_log("%d player %s sid %d src %s from %s to %s\n",time(0),thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
-            async_log("%d 检测到作弊玩家： %s\n",time(0),name.c_str());
+            async_log("%d 检测到作弊玩家： %s sid %d src %s from %s to %s\n",time(0),thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
+            //async_log("%d 检测到作弊玩家： %s\n",time(0),name.c_str());
 			runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品 "+b.getFromItem()->toString()+"请管理员手动检察该玩家的行为"));
 			runcmd(string("kick \"")+name+"\" §c使用外挂刷物品");
             //sendText(thi->getPlayer(),"toolbox detected");
@@ -242,10 +244,10 @@ static void do_patch() {
 }
 static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     if((int)b.getPermissionsLevel()>0) {
-        Player* pp=getplayer_byname(a[0]);
+        /*Player* pp=getplayer_byname(a[0]);
         if(pp) {
             ((ServerPlayer*)pp)->disconnect();
-        }
+        }*/
         banlist[a[0]]=a.size()==1?0:(time(0)+atoi(a[1].c_str()));
         runcmd(string("kick \"")+a[0]+"\" §c你号没了");
         save();
@@ -294,16 +296,11 @@ static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
     int id=bk.getLegacyBlock()->getBlockItemId();
     if(name==lastn && clock()-lastcl<1000000*0.1){
        lastcl=clock();
-        async_log("%d [FD]%s fast dest %d delta %f\n",time(0),name.c_str(),id,((float)(clock()-lastcl))/1000000);
+       // async_log("%d [FD]%s fast dest %d delta %f\n",time(0),name.c_str(),id,((float)(clock()-lastcl))/1000000);
         return 0;
     }
     lastn=name;
     lastcl=clock();
-   /* if(id==4){
-        //fuck
-        async_log("%d [FD]%s fast dest %d\n",time(0),name.c_str(),id);
-        return 0;
-    }*/
     const Vec3& fk=a0->getPlayer()->getPos();
     #define abs(x) ((x)<0?-(x):(x))
     int dx=fk.x-x;
@@ -311,7 +308,7 @@ static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
     int dz=fk.z-z;
     int d2=dx*dx+dy*dy+dz*dz;
     if(d2>36){
-        async_log("%d [FD]%s far dest %d\n",time(0),name.c_str(),d2);
+    //    async_log("%d [FD]%s far dest %d\n",time(0),name.c_str(),d2);
         return 0;
     }
     return 1;
@@ -349,16 +346,7 @@ static void flych(Level* lv){
         return true;
     });
 }
-typedef unsigned int u32;
-u32(*tick_o)(Level*);
-static int tkl;
-u32 onTick(Level* a){
-    int rt=tick_o(a);
-    tkl++;
-    if(tkl%10==0)
-    flych(a);
-    return rt;
-}
+
 void bear_init(std::list<string>& modlist) {
     //0x0000555559d377a0 _ZNK27ComplexInventoryTransaction6handleER6Playerb +681 e8 d2 bc 00 00	callq  0x555559d43720 <_ZN27InventoryTransactionManager17addExpectedActionERK15InventoryAction>
 //0x0000555559d43760 _ZN27InventoryTransactionManager9addActionERK15InventoryAction

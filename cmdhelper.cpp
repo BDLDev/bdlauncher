@@ -67,7 +67,13 @@ void call_sht(int d) {
         ((void(*)())i)();
     }
     if(d==SIGINT) {
-        printf("use stop instead!\n");
+        int pipefd[2];
+        pipe2(pipefd,0);
+        close(0);
+        dup2(pipefd[0],0);
+        write(pipefd[1],"stop\nstop\n",10);
+        close(pipefd[1]);
+        printf("\nshuting down... press enter,use stop instead!\n");
     }
 }
 ACmd* chelper(void* fn) {

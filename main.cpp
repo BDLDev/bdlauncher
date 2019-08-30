@@ -8,7 +8,7 @@ extern "C"{
 }
 void* old_main;
 void call_sht(int);
-int mc_entry(int ac,char** av){
+static int mc_entry(int ac,char** av){
     printf("[MOD] main,start loading mods\n");
     mod_loadall();
     cmdhelper_init();

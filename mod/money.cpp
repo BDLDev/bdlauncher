@@ -40,12 +40,15 @@ struct shop {
     }
 };
 static std::unordered_map<string,shop> shops;
+static int shopmod=0;
 static void save() {
     char* bf;
     int sz=maptomem(moneys,&bf,h_str2str,h_int2str);
     mem2file("data/money/money.db",bf,sz);
+    if(shopmod){
     sz=maptomem(shops,&bf,h_str2str,shop::tostr);
     mem2file("data/money/shop.db",bf,sz);
+  }
 }
 static void load() {
     register_shutdown(fp(save));
@@ -64,8 +67,10 @@ static void load() {
 }
 
 int get_money(const string& pn) {
-    if(moneys.count(pn)==0) moneys[pn]=50; //TODO:init money
-    return moneys[pn];
+    /*if(moneys.count(pn)==0) moneys[pn]=50; //TODO:init money
+    return moneys[pn];*/
+    //lazy init
+    return moneys.count(pn)==0?50:moneys[pn];
 }
 void set_money(const string& pn,int am) {
     moneys[pn]=am;
@@ -187,12 +192,14 @@ static void oncmd2(std::vector<string>& a,CommandOrigin & b,CommandOutput &outp)
         sk.amo=atoi(a[3].c_str());
         sk.mon=atoi(a[4].c_str());
         shops[a[1]]=sk;
+        shopmod=1;
         //save();
         outp.success("添加成功");
     }
     if(a[0]=="del" && (int)b.getPermissionsLevel()>0) {
         ARGSZ(2)
         shops.erase(a[1]);
+        shopmod=1;
         // save();
         outp.success("删除成功");
     }
