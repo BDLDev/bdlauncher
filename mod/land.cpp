@@ -247,9 +247,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             //save();
             return;
         } else {
-			char buf[1000];
-			sprintf(buf,"[Land system] 这不是你的领地");
-			outp.error(string(buf));
+			outp.error("[Land system] 这不是你的领地");
 			}
 		}
     if(a[0]=="trust") {
@@ -263,7 +261,9 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             //save();
             outp.success("§e[Land system] 已信任玩家 "+a[1]);
             return;
-        }
+        } else {
+			outp.error("[Land system] 这不是你的领地");
+		}
     }
 if(a[0]=="untrust") {
         ARGSZ(2)
@@ -276,7 +276,9 @@ if(a[0]=="untrust") {
             //save();
             outp.success("§e[Land system] 已取消玩家 "+a[1]+" 的信任");
             return;
-        }
+        } else {
+			outp.error("[Land system] 这不是你的领地");
+		}
     }
     if(a[0]=="perm") {
         ARGSZ(2)
@@ -284,16 +286,18 @@ if(a[0]=="untrust") {
         int x=round(b.getWorldPosition().x);
         int y=round(b.getWorldPosition().z); //fix
         land* i=getLand(x,y,dim);
-        if(i&&i->checkown(name)) {
+        if(i&&(i->checkown(name)||pl>0)) {
             i->dim_perm-=(i->dim_perm&15);
             i->dim_perm|=atoi(a[1].c_str());
             //save();
             outp.success("§e[Land system] 权限更改 "+a[1]);
-        }
+        } else {
+			outp.error("[Land system] 这不是你的领地");
+		}
     }
 
 if(a[0]=="help") {
-		outp.error("领地系统指令列表:\n/land start ——选择起点（你站的地方）\n/land end ——选择终点\n/land buy ——选点之后买地（1格10块）\n/land trust 玩家ID ——添加访客\n/land untrust 玩家ID ——删除访客\n/land sell ——卖地\n/land query ——查看当前领地主人\n/land perm 权限ID ——更改权限(详细看github)");
+		outp.error("领地系统指令列表:\n/land start ——选择起点（你站的地方）\n/land end ——选择终点\n/land buy ——选点之后买地（1格10块）\n/land trust 玩家ID ——添加访客\n/land untrust 玩家ID ——删除访客\n/land sell ——卖地\n/land query ——查看当前领地主人\n/land perm 数字 ——指定具体权限(详细看github)");
 	}
 }
 
