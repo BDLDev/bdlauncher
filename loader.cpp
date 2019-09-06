@@ -5,7 +5,6 @@ void load_helper(std::list<std::string>& modlist){
   while(fplug.size()==0 && !modlist.empty()){
     const std::string& item=modlist.front();
     fplug=(item[item.size()-1]=='\r')?item.substr(0,item.size()-1):item;
-    //printf("enabling %s\n",fplug.c_str());
     modlist.pop_front();
   }
   if(fplug.size()==0) return;

@@ -54,11 +54,11 @@ extern void load_helper(std::list<string>& modlist);
 static std::unordered_map<string,int> des_tim;
 class ISlots {
 public:
-    ItemStack* v[9];
+    //ItemStack* v[9];
+    char filler[136*9];
     ISlots() {
         for(int i=0; i<9; ++i) {
-//			v[i]="0 x (0)@0";
-            v[i]=new ItemStack();
+            new (filler+i*136) ItemStack();
         }
     }
     ~ISlots() {
@@ -69,9 +69,9 @@ public:
     bool onChg(int id,ItemStack* from,ItemStack* to) {
         if(id>8 || id<0) return false;
         int fg=1;
-        if(*from!=*v[id] && !from->isNull()) fg=0;
-//delete(v[id]);
-        v[id]=new ItemStack(*to);
+        if(!from->isNull() && *from!=*((ItemStack*)(filler+id*136))) fg=0;
+        ((ItemStack*)(filler+id*136))->~ItemStack();
+        new (filler+id*136) ItemStack(*to);
         return fg;
     }
 };
@@ -102,15 +102,7 @@ struct InventorySource {
         return std::to_string(getType())+":"+std::to_string(getFlags())+":"+std::to_string(getContainerId());
     }
 };
-static int handle_dest2(GameMode* a0,BlockPos const& a1,unsigned char a2) {
-    int pl=a0->getPlayer()->getPlayerPermissionLevel();
-    if(pl>1) {
-        return 1;
-    }
-    float sp=a0->getPlayer()->getCarriedItem().getDestroySpeed(a0->getPlayer()->getBlockSource()->getBlock(a1));
-    printf("sp %f\n",sp);
-    return 1;
-}
+
 static int(*ori)(Block *, BlockSource *, const BlockPos *);
 static int hk(Block * a0, BlockSource * a1, const BlockPos *a2) {
     if(a0->isContainerBlock()) {
@@ -216,16 +208,15 @@ static int hkc(void* a,Player & b,string& c) {
     async_log("%d *[CHAT]%s:%s\n",time(0),b.getName().c_str(),c.c_str());
     return ret;
 }
-/*
+
 #include <sys/socket.h>
 #include <arpa/inet.h>
 ssize_t (*rori)(int socket, void * buffer, size_t length,
            int flags, struct sockaddr * address,
            socklen_t * address_len);
-extern "C" ssize_t recvfrom(int socket, void * buffer, size_t length,
+extern "C" ssize_t recvfrom_hook(int socket, void * buffer, size_t length,
            int flags, struct sockaddr * address,
            socklen_t * address_len){
-               printf("hook\n");
                int rt=rori(socket,buffer,length,flags,address,address_len);
                if(rt && ((char*)buffer)[0]==0x5){
                    char buf[1024];
@@ -234,6 +225,7 @@ extern "C" ssize_t recvfrom(int socket, void * buffer, size_t length,
                }
                return rt;
            }
+/*
 extern "C" char* GetELFAddr();
 */
 static void do_patch() {
@@ -244,10 +236,6 @@ static void do_patch() {
 }
 static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     if((int)b.getPermissionsLevel()>0) {
-        /*Player* pp=getplayer_byname(a[0]);
-        if(pp) {
-            ((ServerPlayer*)pp)->disconnect();
-        }*/
         banlist[a[0]]=a.size()==1?0:(time(0)+atoi(a[1].c_str()));
         runcmd(string("kick \"")+a[0]+"\" §c你号没了");
         save();
@@ -348,9 +336,6 @@ static void flych(Level* lv){
 }
 
 void bear_init(std::list<string>& modlist) {
-    //0x0000555559d377a0 _ZNK27ComplexInventoryTransaction6handleER6Playerb +681 e8 d2 bc 00 00	callq  0x555559d43720 <_ZN27InventoryTransactionManager17addExpectedActionERK15InventoryAction>
-//0x0000555559d43760 _ZN27InventoryTransactionManager9addActionERK15InventoryAction
-//patch _ZNK27ComplexInventoryTransaction6handleER6Playerb+682 0x0000bcd2+0x40
     do_patch();
     load();
     initlog();
@@ -358,6 +343,7 @@ void bear_init(std::list<string>& modlist) {
     register_cmd("unban",fp(oncmd2),"解除封禁");
     reg_useitemon(fp(handle_u));
     reg_destroy(fp(handle_dest));
+    rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
    // tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
     printf("[ANTI-BEAR] Loaded\n");
     //reg_destroy(fp(handle_dest2));
