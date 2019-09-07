@@ -46,7 +46,6 @@ static void save() {
     int sz=maptomem(moneys,&bf,h_str2str,h_int2str);
     mem2file("data/money/money.db",bf,sz);
     if(shopmod){
-    shopmod=0;
     sz=maptomem(shops,&bf,h_str2str,shop::tostr);
     mem2file("data/money/shop.db",bf,sz);
   }
@@ -59,7 +58,6 @@ static void load() {
     int sz;
     struct stat tmp;
     if(stat("data/money/money.db",&tmp)==-1) {
-	shopmod=1;
         save();
     }
     file2mem("data/money/money.db",&buf,sz);
