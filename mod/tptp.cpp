@@ -26,19 +26,19 @@ using std::forward_list;
 #define max(a,b) ((a)>(b)?(a):(b))
 //#define dbg_printf(...) {}
 #define dbg_printf printf
-extern "C"{
+extern "C" {
     void tp_init(std::list<string>& modlist);
 }
 extern void load_helper(std::list<string>& modlist);
-struct Vpos{
+struct Vpos {
     int x,y,z,dim;
     string name;
-    Vpos(){}
-    Vpos(int a,int b,int c,int d,string e){
+    Vpos() {}
+    Vpos(int a,int b,int c,int d,string e) {
         x=a,y=b,z=c,dim=d,name=e;
         //printf("new vpos %d %d %d\n",a,b,c);
     }
-    static string tostr(const Vpos& a){
+    static string tostr(const Vpos& a) {
         char buf[32768];
         int ptr=0;
         putint(buf,ptr,a.x);
@@ -48,7 +48,7 @@ struct Vpos{
         putstr(buf,ptr,a.name);
         return string(buf,ptr);
     }
-    static void fromstr(const string& a,Vpos& b){
+    static void fromstr(const string& a,Vpos& b) {
         const char* buf=a.c_str();
         int ptr=0;
         getint(buf,ptr,b.x);
@@ -57,27 +57,27 @@ struct Vpos{
         getint(buf,ptr,b.dim);
         b.name=getstr(buf,ptr);
     }
-    void tele(Actor& ply) const{
-        TeleportA(ply,{x,y,z},{dim});
+    void tele(Actor& ply) const {
+        TeleportA(ply, {x,y,z}, {dim});
     }
 };
-struct home{
+struct home {
     int cnt=0;
     Vpos vals[5];
-    static string tostr(const home& a){
+    static string tostr(const home& a) {
         char buf[65535];
         int ptr=0;
         putint(buf,ptr,a.cnt);
-        for(int i=0;i<a.cnt;++i){
+        for(int i=0; i<a.cnt; ++i) {
             putstr(buf,ptr,Vpos::tostr(a.vals[i]));
         }
         return string(buf,ptr);
     }
-    static void fromstr(const string& a,home& b){
+    static void fromstr(const string& a,home& b) {
         const char* buf=a.c_str();
         int ptr=0;
         getint(buf,ptr,b.cnt);
-        for(int i=0;i<b.cnt;++i){
+        for(int i=0; i<b.cnt; ++i) {
             string tmp;
             tmp=getstr(buf,ptr);
             Vpos::fromstr(tmp,b.vals[i]);
@@ -86,20 +86,21 @@ struct home{
 };
 static unordered_map<string,home> homes;
 static forward_list<Vpos> wps;
-static void save(){
+static void save() {
     char* bf;
     int sz=maptomem(homes,&bf,h_str2str,home::tostr);
     mem2file("data/tp/tp.db",bf,sz);
     sz=settomem(wps,&bf,Vpos::tostr);
     mem2file("data/tp/wps.db",bf,sz);
 }
-static void load(){
-register_shutdown(fp(save));
+static void load() {
+    register_shutdown(fp(save));
     mkdir("data",S_IRWXU);
     mkdir("data/tp",S_IRWXU);
-    char* buf;int sz;
+    char* buf;
+    int sz;
     struct stat tmp;
-    if(stat("data/tp/tp.db",&tmp)==-1){
+    if(stat("data/tp/tp.db",&tmp)==-1) {
         save();
     }
     file2mem("data/tp/tp.db",&buf,sz);
@@ -107,28 +108,28 @@ register_shutdown(fp(save));
     file2mem("data/tp/wps.db",&buf,sz);
     memtoset(wps,buf,Vpos::fromstr);
 }
-struct tpreq{
+struct tpreq {
     int dir; //0=f
     string name;
 };
 static unordered_map<string,tpreq> tpmap;
 static unordered_map<string,int> wild_limit;
-static void oncmd_suic(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp){
-	//b.getEntity()->kill();
-	KillActor(b.getEntity());
-	outp.success("§e你死了");
+static void oncmd_suic(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
+    //b.getEntity()->kill();
+    KillActor(b.getEntity());
+    outp.success("§e你死了");
 }
-static void oncmd_dim(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp){
+static void oncmd_dim(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     ARGSZ(1)
     int pl=(int)b.getPermissionsLevel();
     string name=b.getName();
     Player* dst=NULL;
     dst=getplayer_byname(name);
     if(pl<1) return;
-    TeleportA(*dst,b.getWorldPosition(),{atoi(a[0].c_str())});
+    TeleportA(*dst,b.getWorldPosition(), {atoi(a[0].c_str())});
     outp.success("okay");
 }
-static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp){
+static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     int pl=(int)b.getPermissionsLevel();
     string name=b.getName();
     string dnm=a.size()==2?a[1]:"";
@@ -136,53 +137,53 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     if(dnm!="")
         dst=getplayer_byname2(dnm);
     ARGSZ(1)
-    if(a[0]=="f"){
+    if(a[0]=="f") {
         //from
-        if(dst==NULL){
+        if(dst==NULL) {
             outp.error("§e[Teleport] 玩家不在线");
-		return;
+            return;
         }
-        if(tpmap.count(dnm)){
+        if(tpmap.count(dnm)) {
             outp.error("§e[Teleport] 请求中");
-			return;
-        }	   
-        tpmap[dnm]={0,name};
+            return;
+        }
+        tpmap[dnm]= {0,name};
         //printf("%p\n",dst);
         outp.success("§e[Teleport] 你向对方发送了传送请求");
-		sendText(dst,"§e[Teleport] "+name+" 想让你传送到他/她所在的位置\n§e输入“/tpa ac” 接受 或 “/tpa de” 拒绝");
+        sendText(dst,"§e[Teleport] "+name+" 想让你传送到他/她所在的位置\n§e输入“/tpa ac” 接受 或 “/tpa de” 拒绝");
     }
-    if(a[0]=="t"){
+    if(a[0]=="t") {
         //to
-        if(dst==NULL){
+        if(dst==NULL) {
             outp.error("§e[Teleport] 玩家不在线");
-			return;
+            return;
         }
-        if(tpmap.count(dnm)){
+        if(tpmap.count(dnm)) {
             outp.error("§e[Teleport] 请求中");
-			return;
+            return;
         }
-        tpmap[dnm]={1,name};
-		outp.success("§e[Teleport] 你向对方发送了传送请求");
-		sendText(dst,"§e[Teleport] "+name+" 想传送到你所在位置\n§e输入“/tpa ac” 接受 或 “/tpa de” 拒绝");
+        tpmap[dnm]= {1,name};
+        outp.success("§e[Teleport] 你向对方发送了传送请求");
+        sendText(dst,"§e[Teleport] "+name+" 想传送到你所在位置\n§e输入“/tpa ac” 接受 或 “/tpa de” 拒绝");
     }
-    if(a[0]=="ac"){
+    if(a[0]=="ac") {
         //accept
         if(tpmap.count(name)==0) return;
         tpreq req=tpmap[name];
         tpmap.erase(name);
         outp.success("§e[Teleport] 你已接受对方的传送请求");
         dst=getplayer_byname(req.name);
-        if(dst){
+        if(dst) {
             sendText(dst,"§e[Teleport] "+name+" 接受了请求");
-            if(req.dir==0){
+            if(req.dir==0) {
                 //f
-                TeleportA(*getplayer_byname(name),dst->getPos(),{dst->getDimensionId()});
-            }else{
-                TeleportA(*dst,b.getWorldPosition(),{b.getEntity()->getDimensionId()});
+                TeleportA(*getplayer_byname(name),dst->getPos(), {dst->getDimensionId()});
+            } else {
+                TeleportA(*dst,b.getWorldPosition(), {b.getEntity()->getDimensionId()});
             }
         }
     }
-    if(a[0]=="de"){
+    if(a[0]=="de") {
         //deny
         if(tpmap.count(name)==0) return;
         tpreq req=tpmap[name];
@@ -190,47 +191,47 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         outp.success("§e[Teleport] 你已拒绝对方的传送请求");
         dst=getplayer_byname(req.name);
         if(dst)
-        sendText(dst,"§c[Teleport] "+name+" 已拒绝传送请求");
+            sendText(dst,"§c[Teleport] "+name+" 已拒绝传送请求");
     }
-/* 导致服务端崩溃
-    if(a[0]=="rand"){
-        if(pl>0){
-            if(a[1]!="")
-                name=a[1];
-        }else{
-            int s=wild_limit[name];
-            if(s==3){
-                outp.error("limit!\n");
-                return;
+    /* 导致服务端崩溃
+        if(a[0]=="rand"){
+            if(pl>0){
+                if(a[1]!="")
+                    name=a[1];
+            }else{
+                int s=wild_limit[name];
+                if(s==3){
+                    outp.error("limit!\n");
+                    return;
+                }
+                s++;
+                wild_limit[name]=s;
             }
-            s++;
-            wild_limit[name]=s;
+            //* random *
+            int y=72+rand()%10;
+            int x=rand()%80000-40000;
+            int z=rand()%80000-40000;
+            Player* py=getplayer_byname(name);
+            if(py) TeleportA(*py,{x,y,z},{b.getEntity()->getDimensionId()});
+            outp.success("okay");
         }
-        //* random *
-        int y=72+rand()%10;
-        int x=rand()%80000-40000;
-        int z=rand()%80000-40000;
-        Player* py=getplayer_byname(name);
-        if(py) TeleportA(*py,{x,y,z},{b.getEntity()->getDimensionId()});
-        outp.success("okay");
+    */
+    if(a[0]=="help") {
+        outp.error("传送系统指令列表:\n/tpa f 玩家名 ——让玩家传送到你\n/tpa t 玩家名 ——传送你到玩家\n/tpa ac ——同意\n/tpa de ——拒绝");
     }
-*/
-if(a[0]=="help") {
-		outp.error("传送系统指令列表:\n/tpa f 玩家名 ——让玩家传送到你\n/tpa t 玩家名 ——传送你到玩家\n/tpa ac ——同意\n/tpa de ——拒绝");
-	}
 }
 
-static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp){
+static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     int pl=(int)b.getPermissionsLevel();
     string name=b.getName();
     string homen=a.size()==2?a[1]:"hape";
     Vec3 pos=b.getWorldPosition();
     //printf("%f %f %f\n",pos.x,pos.y,pos.z);
     ARGSZ(1)
-    if(a[0]=="add"){
-        if(homes.count(name)==0) homes[name]={};
+    if(a[0]=="add") {
+        if(homes.count(name)==0) homes[name]= {};
         home& myh=homes[name];
-        if(myh.cnt==5){
+        if(myh.cnt==5) {
             outp.error("[Teleport] 无法再添加更多的家");
             return;
         }
@@ -239,14 +240,14 @@ static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOut
         //save();
         outp.success("§e[Teleport] 已添加家");
     }
-    if(a[0]=="del"){
-        if(homes.count(name)==0) homes[name]={};
+    if(a[0]=="del") {
+        if(homes.count(name)==0) homes[name]= {};
         home& myh=homes[name];
         home tmpn;
         tmpn=myh;
         tmpn.cnt=0;
-        for(int i=0;i<myh.cnt;++i){
-            if(myh.vals[i].name!=homen){
+        for(int i=0; i<myh.cnt; ++i) {
+            if(myh.vals[i].name!=homen) {
                 tmpn.vals[tmpn.cnt++]=myh.vals[i];
             }
         }
@@ -254,36 +255,36 @@ static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOut
         //save();
         outp.success("§e[Teleport] 已删除家");
     }
-    if(a[0]=="go"){
-        if(homes.count(name)==0) homes[name]={};
+    if(a[0]=="go") {
+        if(homes.count(name)==0) homes[name]= {};
         home& myh=homes[name];
-        for(int i=0;i<myh.cnt;++i){
-            if(myh.vals[i].name==homen){
+        for(int i=0; i<myh.cnt; ++i) {
+            if(myh.vals[i].name==homen) {
                 myh.vals[i].tele(*b.getEntity());
-				outp.success("§e[Teleport] 已传送到家");
+                outp.success("§e[Teleport] 已传送到家");
             }
         }
     }
-    if(a[0]=="ls"){
-        if(homes.count(name)==0) homes[name]={};
+    if(a[0]=="ls") {
+        if(homes.count(name)==0) homes[name]= {};
         home& myh=homes[name];
-		sendText((Player*)b.getEntity(),"§e家列表:");
-        for(int i=0;i<myh.cnt;++i){
+        sendText((Player*)b.getEntity(),"§e家列表:");
+        for(int i=0; i<myh.cnt; ++i) {
             sendText((Player*)b.getEntity(),myh.vals[i].name);
         }
-		outp.success("§e============");
+        outp.success("§e============");
     }
-	if(a[0]=="help") {
-		outp.error("家指令列表:\n/home add 名字 ——添加一个家\n/home ls ——查看你的所有家\n/home go 名字 ——回家");
-	}
+    if(a[0]=="help") {
+        outp.error("家指令列表:\n/home add 名字 ——添加一个家\n/home ls ——查看你的所有家\n/home go 名字 ——回家");
+    }
 }
-static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp){
+static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     int pl=(int)b.getPermissionsLevel();
-   // printf("pl %d\n",pl);
+    // printf("pl %d\n",pl);
     string name=b.getName();
     Vec3 pos=b.getWorldPosition();
     ARGSZ(1)
-    if(a[0]=="add"){
+    if(a[0]=="add") {
         if(pl<1) return;
         ARGSZ(2)
         wps.push_front(Vpos(pos.x,pos.y,pos.z,b.getEntity()->getDimensionId(),a[1]));
@@ -291,7 +292,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
         outp.success("§e§e[Teleport] 已添加Warp");
         return;
     }
-    if(a[0]=="del"){
+    if(a[0]=="del") {
         if(pl<1) return;
         ARGSZ(2)
         wps.remove_if([a](const Vpos& b)->bool{return b.name==a[1];});
@@ -299,28 +300,28 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
         outp.success("§e§e[Teleport] 已删除Warp");
         return;
     }
-    if(a[0]=="ls"){
-		outp.addMessage("§eWarp列表:");
-        for(auto const& i:wps){
+    if(a[0]=="ls") {
+        outp.addMessage("§eWarp列表:");
+        for(auto const& i:wps) {
             outp.addMessage(i.name);
         }
-		outp.success("§e===========");
+        outp.success("§e===========");
         return;
     }
-	if(a[0]=="help") {
-		outp.error("Warp指令列表:\n/warp ls ——查看地标列表\n/warp 地标名 ——前往一个地标");
-	}
+    if(a[0]=="help") {
+        outp.error("Warp指令列表:\n/warp ls ——查看地标列表\n/warp 地标名 ——前往一个地标");
+    }
     //go
-	for(auto const& i:wps){
-		if(i.name==a[0]){
-			i.tele(*b.getEntity());
+    for(auto const& i:wps) {
+        if(i.name==a[0]) {
+            i.tele(*b.getEntity());
             outp.success("§e[Teleport] 已传送到Warp");
-			return;
+            return;
         }
-	}
+    }
 }
 
-void tp_init(std::list<string>& modlist){
+void tp_init(std::list<string>& modlist) {
     printf("[TPs] loaded!\n");
     load();
     register_cmd("suicide",(void*)oncmd_suic,"自杀");

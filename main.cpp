@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include<signal.h>
-extern "C"{
+extern "C" {
     int main(int ac,char** av);
 }
 static void* old_main;
@@ -26,8 +26,8 @@ void call_sht(int d) {
         printf("\nshuting down... press enter,use stop instead at next time!\n");
     }
 }
-static void shthelper_reg(){
-    #define sh(a) signal(a,call_sht);
+static void shthelper_reg() {
+#define sh(a) signal(a,call_sht);
     sh(SIGHUP)
     sh(SIGINT)
     sh(SIGILL)
@@ -36,18 +36,18 @@ static void shthelper_reg(){
     sh(SIGSEGV)
 }
 
-static int mc_entry(int ac,char** av){
+static int mc_entry(int ac,char** av) {
     printf("[MOD] main,start loading mods\n");
     mod_loadall();
     shthelper_reg();
     int fk= ((typeof(&main))old_main)(ac,av);
     call_sht(0);
-   return fk;
+    return fk;
 }
 
-struct init_d{
-    init_d(){
+struct init_d {
+    init_d() {
         printf("[MOD] inject to %p pid %d\n",main,getpid());
         old_main=MyHook(fp(main),fp(mc_entry));
     }
-}_dummy;
+} _dummy;

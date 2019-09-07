@@ -72,7 +72,6 @@ void patchall() {
     mprotect((void*)start, end - start, PROT_READ | PROT_EXEC);
 #define fixr(a,b) MyHook(fp(dlsym(NULL,a)),fp(b))
     fixr("_ZNK12LayerDetails9LayerBase10initRandomEll",L_init);
-    //fixr("_ZN12LayerDetails9LayerBase4initEl",L_init2);
     fixr("_ZN12LayerDetails9LayerBase11_nextRandomERljl",L_next);
     fixr("_ZN6Random13_genRandInt32Ev",Rnd_int32);
     fixr("_ZN6Random16_initGenRandFastEj",Rnd_init);
@@ -86,25 +85,27 @@ void patchall() {
     auto pr=(void*)R_R;
     memcpy(((char*)jmpbed)+6,&pr,8);
     mprotect((void*)start, end - start, PROT_READ | PROT_EXEC);
-    patch_func("_ZNKSt8__detail10_Hash_nodeISt4pairIK8ChunkPosSt8weak_ptrI10LevelChunkEELb1EE7_M_nextEv","\x48\x8b\x07\xc3",4);
-    patch_func("_ZNK7WeakPtrI11BlockLegacyEdeEv","\x48\x8b\x07\x48\x8b\x00\xc3",7);
-    patch_func("_ZNK7WeakPtrI11BlockLegacyEptEv","\x48\x8b\x07\x48\x8b\x00\xc3",7);
-    patch_func("_ZSt3maxIiERKT_S2_S2_","\x48\x89\xf0\x8b\x0f\x3b\x0e\x48\x0f\x4f\xc7\xc3",12);
-    patch_func("_ZNK11BlockLegacyeqERKS_","\x31\xc0\x48\x39\xf7\x0f\x94\xc0\xc3",9);
-    patch_func("_ZNK8ChunkPoseqERKS_","H\213\aH;\006\017\224\300\xc3",10);
-    patch_func("_ZNK11BlockLegacyneERKS_","\x31\xc0\x48\x39\xf7\x0f\x95\xc0\xc3",9);
-    patch_func("_ZN7NewTypeIhEC2ERKh","\x8a\x06\x88\x07\xc3",5);
-    patch_func("_ZN7NewTypeIhEC2ERKS0_","\x8a\x06\x88\x07\xc3",5);
-    patch_func("_ZNK4Vec33dotERKS_","\363\017\020\016\363\017Y\017\362\017\020W\004\362\017\020F\004\017Y\302\363\017X\310\017\306\300\345\363\017X\301\xc3",34);
-    patch_func("_ZNKSt10unique_ptrI25SubChunkBrightnessStorageSt14default_deleteIS0_EE3getEv","\x48\x8b\x07\xc3",4);
-    patch_func("_ZN4Vec3C2Efff","\363\017\021\a\363\017\021O\004\363\017\021W\b\xc3",15);
+    /*
+        patch_func("_ZNKSt8__detail10_Hash_nodeISt4pairIK8ChunkPosSt8weak_ptrI10LevelChunkEELb1EE7_M_nextEv","\x48\x8b\x07\xc3",4);
+        patch_func("_ZNK7WeakPtrI11BlockLegacyEdeEv","\x48\x8b\x07\x48\x8b\x00\xc3",7);
+        patch_func("_ZNK7WeakPtrI11BlockLegacyEptEv","\x48\x8b\x07\x48\x8b\x00\xc3",7);
+        patch_func("_ZSt3maxIiERKT_S2_S2_","\x48\x89\xf0\x8b\x0f\x3b\x0e\x48\x0f\x4f\xc7\xc3",12);
+        patch_func("_ZNK11BlockLegacyeqERKS_","\x31\xc0\x48\x39\xf7\x0f\x94\xc0\xc3",9);
+        patch_func("_ZNK8ChunkPoseqERKS_","H\213\aH;\006\017\224\300\xc3",10);
+        patch_func("_ZNK11BlockLegacyneERKS_","\x31\xc0\x48\x39\xf7\x0f\x95\xc0\xc3",9);
+        patch_func("_ZN7NewTypeIhEC2ERKh","\x8a\x06\x88\x07\xc3",5);
+        patch_func("_ZN7NewTypeIhEC2ERKS0_","\x8a\x06\x88\x07\xc3",5);
+        patch_func("_ZNK4Vec33dotERKS_","\363\017\020\016\363\017Y\017\362\017\020W\004\362\017\020F\004\017Y\302\363\017X\310\017\306\300\345\363\017X\301\xc3",34);
+        patch_func("_ZNKSt10unique_ptrI25SubChunkBrightnessStorageSt14default_deleteIS0_EE3getEv","\x48\x8b\x07\xc3",4);
+        patch_func("_ZN4Vec3C2Efff","\363\017\021\a\363\017\021O\004\363\017\021W\b\xc3",15);
 
-    //spec
-    patch_func("_ZNK5Block14getLegacyBlockEv","\x48\x8b\x47\x10\x48\x8b\x00\xc3",8);
-    patch_func("_ZNK8SubChunk8getBlockEt","\x48\x8b\x7f\x20\x48\x8b\x07\xff\x60\x18",10);
-    patch_func("_ZNKSt6atomicI10ChunkStateEcvS0_Ev","\x0f\xbe\x07\xc3",4);
-    patch_func("_ZNKSt6atomicI10ChunkStateE4loadESt12memory_order","\x0f\xbe\x07\xc3",4);
-    patch_func("_ZNSt6atomicI10ChunkStateE5storeES0_St12memory_order","\x40\x88\x37\xc3",4);
+        //spec
+        patch_func("_ZNK5Block14getLegacyBlockEv","\x48\x8b\x47\x10\x48\x8b\x00\xc3",8);
+        patch_func("_ZNK8SubChunk8getBlockEt","\x48\x8b\x7f\x20\x48\x8b\x07\xff\x60\x18",10);
+        patch_func("_ZNKSt6atomicI10ChunkStateEcvS0_Ev","\x0f\xbe\x07\xc3",4);
+        patch_func("_ZNKSt6atomicI10ChunkStateE4loadESt12memory_order","\x0f\xbe\x07\xc3",4);
+        patch_func("_ZNSt6atomicI10ChunkStateE5storeES0_St12memory_order","\x40\x88\x37\xc3",4);
+    */
 }
 /*
 _ZNKSt8__detail10_Hash_nodeISt4pairIK8ChunkPosSt8weak_ptrI10LevelChunkEELb1EE7_M_nextEv

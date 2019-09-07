@@ -73,11 +73,11 @@ struct land {
     void addown(const string& name) {
         owner+="|"+name+"|";
     }
-    void rmown(const string& n){
-		string fk="|"+n+"|";
-		auto i=owner.find(fk);
-		if(i!=string::npos) owner.erase(i,i+fk.size());
-	}
+    void rmown(const string& n) {
+        string fk="|"+n+"|";
+        auto i=owner.find(fk);
+        if(i!=string::npos) owner.erase(i,i+fk.size());
+    }
     static string tostr(const land& a) {
         char buf[32768];
         int ptr=0;
@@ -116,18 +116,23 @@ struct lc_ent {
     int x,z,dim;
     land* v;
 };
-deque<lc_ent> cpool;
+std::list<lc_ent> cpool;
 static void ccache() {
     cpool.clear();
 }
 static bool cache_fetch(land** res,int x,int z,int dim) {
-    for(auto const &i :cpool) {
+    int fg=0;
+    lc_ent *found;
+    for(auto &i :cpool) {
         if(i.x==x && i.z==z && i.dim==dim) {
             *res=i.v;
-            return true;
+            found=&i;
+            fg=1;
+            break;
         }
     }
-    return false;
+    if(fg) std::swap(cpool.front(),*found);
+    return fg;
 }
 static land* cache_push(const lc_ent& en) {
     if(cpool.size()==100) {
@@ -169,7 +174,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             outp.error("[Land system] 领地不得重叠");
             startpos.erase(name);
             endpos.erase(name);
-			return;
+            return;
         }
         land tmp;
         tmp.x=xx,tmp.y=yy,tmp.dx=xx2-xx+1,tmp.dy=yy2-yy+1;
@@ -220,12 +225,12 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             outp.success(string(buf));
             //sendText2(getplayer_byname(name),string(buf));
             return;
-		} else {
-			char buf[1000];
-			sprintf(buf,"[Land system] 这里没有领地");
+        } else {
+            char buf[1000];
+            sprintf(buf,"[Land system] 这里没有领地");
             outp.error(string(buf));
-		}
         }
+    }
     if(a[0]=="sell") {
         int dim=b.getEntity()->getDimensionId();
         int x=round(b.getWorldPosition().x);
@@ -247,9 +252,9 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             //save();
             return;
         } else {
-			outp.error("[Land system] 这不是你的领地");
-			}
-		}
+            outp.error("[Land system] 这不是你的领地");
+        }
+    }
     if(a[0]=="trust") {
         ARGSZ(2)
         int dim=b.getEntity()->getDimensionId();
@@ -262,10 +267,10 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             outp.success("§e[Land system] 已信任玩家 "+a[1]);
             return;
         } else {
-			outp.error("[Land system] 这不是你的领地");
-		}
+            outp.error("[Land system] 这不是你的领地");
+        }
     }
-if(a[0]=="untrust") {
+    if(a[0]=="untrust") {
         ARGSZ(2)
         int dim=b.getEntity()->getDimensionId();
         int x=round(b.getWorldPosition().x);
@@ -277,8 +282,8 @@ if(a[0]=="untrust") {
             outp.success("§e[Land system] 已取消玩家 "+a[1]+" 的信任");
             return;
         } else {
-			outp.error("[Land system] 这不是你的领地");
-		}
+            outp.error("[Land system] 这不是你的领地");
+        }
     }
     if(a[0]=="perm") {
         ARGSZ(2)
@@ -292,13 +297,13 @@ if(a[0]=="untrust") {
             //save();
             outp.success("§e[Land system] 权限更改 "+a[1]);
         } else {
-			outp.error("[Land system] 这不是你的领地");
-		}
+            outp.error("[Land system] 这不是你的领地");
+        }
     }
 
-if(a[0]=="help") {
-		outp.error("领地系统指令列表:\n/land start ——选择起点（你站的地方）\n/land end ——选择终点\n/land buy ——选点之后买地（1格10块）\n/land trust 玩家ID ——添加访客\n/land untrust 玩家ID ——删除访客\n/land sell ——卖地\n/land query ——查看当前领地主人\n/land perm 数字 ——指定具体权限(详细看github)");
-	}
+    if(a[0]=="help") {
+        outp.error("领地系统指令列表:\n/land start ——选择起点（你站的地方）\n/land end ——选择终点\n/land buy ——选点之后买地（1格10块）\n/land trust 玩家ID ——添加访客\n/land untrust 玩家ID ——删除访客\n/land sell ——卖地\n/land query ——查看当前领地主人\n/land perm 数字 ——指定具体权限(详细看github)");
+    }
 }
 
 static void save() {
@@ -396,14 +401,14 @@ static int handle_useion(GameMode* a0,ItemStack & a1,BlockPos const& a2,unsigned
     const string& name=a0->getPlayer()->getName();
     int dim=a0->getPlayer()->getDimensionId();
     int x(a2.x),y(a2.z),z(a2.z); //fixed
-/*
-char fku[555];
-    sprintf(fku,"use handle %d %d a3 %d\n",x,z,a3);
-sendText(a0->getPlayer(),string(fku));
-*/
-const int Z[]={-1,1,0,0};
-const int X[]={0,0,-1,1};
-if(a3>1 && a3<6) x+=X[a3-2],y+=Z[a3-2];
+    /*
+    char fku[555];
+        sprintf(fku,"use handle %d %d a3 %d\n",x,z,a3);
+    sendText(a0->getPlayer(),string(fku));
+    */
+    const int Z[]= {-1,1,0,0};
+    const int X[]= {0,0,-1,1};
+    if(a3>1 && a3<6) x+=X[a3-2],y+=Z[a3-2];
     /*for(auto const& i:lands){
         if(i.inland(x,y,dim)){
             if(!i.canuse(name)){
@@ -424,7 +429,7 @@ if(a3>1 && a3<6) x+=X[a3-2],y+=Z[a3-2];
         if(!i->canuse(name)) {
             char buf[1000];
             sprintf(buf,"§c你不能在 %s 的领地与方块互交",i->owner.c_str());
-			sendText2(a0->getPlayer(),string(buf));
+            sendText2(a0->getPlayer(),string(buf));
             return 0;
         } else {
             return i->checkown(name) || a1.isNull();

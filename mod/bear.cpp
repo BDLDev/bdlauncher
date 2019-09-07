@@ -193,8 +193,9 @@ int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
         if(!is->onChg(b.getSid(),b.getFromItem(),b.getToItem())) {
             async_log("%d 检测到作弊玩家： %s sid %d src %s from %s to %s\n",time(0),thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
             //async_log("%d 检测到作弊玩家： %s\n",time(0),name.c_str());
-			runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品 "+b.getFromItem()->toString()+"请管理员手动检察该玩家的行为"));
-			runcmd(string("kick \"")+name+"\" §c使用外挂刷物品");
+            runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品 "+b.getFromItem()->toString()+"请管理员手动检察该玩家的行为"));
+            //runcmd(string("kick \"")+name+"\" §c使用外挂刷物品");
+            runcmd(string("ban \"")+name+"\" 60");
             //sendText(thi->getPlayer(),"toolbox detected");
             //return 0;
         }
@@ -212,19 +213,19 @@ static int hkc(void* a,Player & b,string& c) {
 #include <sys/socket.h>
 #include <arpa/inet.h>
 ssize_t (*rori)(int socket, void * buffer, size_t length,
-           int flags, struct sockaddr * address,
-           socklen_t * address_len);
+                int flags, struct sockaddr * address,
+                socklen_t * address_len);
 extern "C" ssize_t recvfrom_hook(int socket, void * buffer, size_t length,
-           int flags, struct sockaddr * address,
-           socklen_t * address_len){
-               int rt=rori(socket,buffer,length,flags,address,address_len);
-               if(rt && ((char*)buffer)[0]==0x5){
-                   char buf[1024];
-                   inet_ntop(AF_INET,&(((sockaddr_in*)address)->sin_addr),buf,*address_len);
-                   async_log("%d %s send conn\n",time(0),buf);
-               }
-               return rt;
-           }
+                                 int flags, struct sockaddr * address,
+                                 socklen_t * address_len) {
+    int rt=rori(socket,buffer,length,flags,address,address_len);
+    if(rt && ((char*)buffer)[0]==0x5) {
+        char buf[1024];
+        inet_ntop(AF_INET,&(((sockaddr_in*)address)->sin_addr),buf,*address_len);
+        async_log("%d %s send conn\n",time(0),buf);
+    }
+    return rt;
+}
 /*
 extern "C" char* GetELFAddr();
 */
@@ -257,10 +258,10 @@ static int handle_u(GameMode* a0,ItemStack * a1,BlockPos const& a2,unsigned char
     for(int i=0; buf[i]; ++i)
         buf[i]=tolower(buf[i]);
 #define check(a) strstr(buf,a)!=NULL
-	//mob_spawner与spawn_egg因无法检测而修改为spawn
-	if(check("barrier") || check("bedrock") || check("spawn")) {
+    //mob_spawner与spawn_egg因无法检测而修改为spawn
+    if(check("barrier") || check("bedrock") || check("spawn")) {
         async_log("%d [ITEM]%s 使用高危物品(banned) %s pos: %d %d %d\n",time(0),sn.c_str(),buf,a2.x,a2.y,a2.z);
-		sendText2(a0->getPlayer(),"§c无法使用违禁物品");		 
+        sendText2(a0->getPlayer(),"§c无法使用违禁物品");
         return 0;
     }
     if(check("tnt") || check("lava")) {
@@ -282,59 +283,85 @@ static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
     int x(a1.x),y(a1.y),z(a1.z); //fixed
     Block& bk=a0->getPlayer()->getBlockSource()->getBlock(a1);
     int id=bk.getLegacyBlock()->getBlockItemId();
-    if(name==lastn && clock()-lastcl<1000000*0.1){
-       lastcl=clock();
-       // async_log("%d [FD]%s fast dest %d delta %f\n",time(0),name.c_str(),id,((float)(clock()-lastcl))/1000000);
+    if(name==lastn && clock()-lastcl<1000000*0.1) {
+        lastcl=clock();
+        // async_log("%d [FD]%s fast dest %d delta %f\n",time(0),name.c_str(),id,((float)(clock()-lastcl))/1000000);
         return 0;
     }
     lastn=name;
     lastcl=clock();
     const Vec3& fk=a0->getPlayer()->getPos();
-    #define abs(x) ((x)<0?-(x):(x))
+#define abs(x) ((x)<0?-(x):(x))
     int dx=fk.x-x;
     int dy=fk.y-y;
     int dz=fk.z-z;
     int d2=dx*dx+dy*dy+dz*dz;
-    if(d2>36){
-    //    async_log("%d [FD]%s far dest %d\n",time(0),name.c_str(),d2);
+    if(d2>36) {
+        //    async_log("%d [FD]%s far dest %d\n",time(0),name.c_str(),d2);
         return 0;
     }
     return 1;
 }
-struct Mc3{
+struct Mc3 {
     float y;
     int airt;
 };
 static unordered_map<string,Mc3> mp;
-static inline bool isinAir(Player& tg,Vec3& fk){
-    int x=round(fk.x);
-    int y=round(fk.y);
-    int z=round(fk.z);
-    //printf("%d\n",y);
-    //printf("get %s\n",tg.getBlockSource()->getBlock({x,y-3,z}).getFullName().c_str());
-    return tg.getBlockSource()->getBlock({x,y-3,z}).getLegacyBlock()->getBlockItemId()==0 && tg.getBlockSource()->getBlock({x,y-4,z}).getLegacyBlock()->getBlockItemId()==0;
+static inline bool isinAir(Player& tg,Vec3& fk) {
+    int x=(fk.x);
+    int y=(fk.y);
+    int z=(fk.z);
+    if(y<=5) return 0;
+    auto& bs=tg.getBlockSource();
+    int fg=1;
+    for(int i=1; i<=3; ++i) {
+        if(bs->getBlock({x,y-i,z}).getLegacyBlock()->getBlockItemId()!=0) {
+            fg=0;
+            break;
+        }
+    }
+    return fg;
 }
-static void flych(Level* lv){
-    //0.5s y=-2
+static void flych(Level* lv) {
     lv->forEachPlayer([&](Player& tg)->bool{
         const string& nm=tg.getName();
         auto x=tg.getPos();
-        if(mp.count(nm)==0) {mp[nm]={x.y,0};return true;}
+        if(mp.count(nm)==0) {
+            mp[nm]= {x.y,0};
+            return true;
+        }
         auto& y=mp[nm];
-        float del=x.y-y.y;
-        if(!tg.isRiding() && !tg.isCreative() && isinAir(tg,x) && del>0){
-            y.airt++;
-            if(y.airt>=3){
-                async_log("%d [FLY] %s fly for %f s delt %f\n",time(0),nm.c_str(),y.airt*0.5,del);
+        int isfl=0;
+        if(!tg.isRiding() && !tg.isGliding() && !tg.isCreative() && isinAir(tg,x)) { //(!tg.isRiding() && !tg.isGliding() && !tg.isCreative() &&)
+            if(x.y-y.y>-2.5) {
+                //is not falling
+                isfl=1;
             }
-        }else{
+        }
+        if(isfl) {
+            y.airt++;
+            if(y.airt>=2) {
+                async_log("%d [FLY]%s is flying!\n",time(0),tg.getName().c_str());
+                // runcmd("kick \""+tg.getName()+"\" anti-flying");
+                runcmd("kill \""+tg.getName()+"\"");
+                y.airt=0;
+            }
+        } else {
             y.airt=0;
         }
         y.y=x.y;
         return true;
     });
 }
-
+static int(*tick_o)(Level*);
+static int tkl;
+static int onTick(Level* a) {
+    int rt=tick_o(a);
+    tkl++;
+    if(tkl%(1*20)==0) //1s
+        flych(a);
+    return rt;
+}
 void bear_init(std::list<string>& modlist) {
     do_patch();
     load();
@@ -344,7 +371,7 @@ void bear_init(std::list<string>& modlist) {
     reg_useitemon(fp(handle_u));
     reg_destroy(fp(handle_dest));
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
-   // tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
+    tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
     printf("[ANTI-BEAR] Loaded\n");
     //reg_destroy(fp(handle_dest2));
     load_helper(modlist);
