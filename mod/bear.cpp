@@ -52,6 +52,8 @@ extern "C" {
 }
 extern void load_helper(std::list<string>& modlist);
 static std::unordered_map<string,int> des_tim;
+void(*deuniqct)(u64);
+void(*deweak)(u64);
 class ISlots {
 public:
     //ItemStack* v[9];
@@ -70,7 +72,9 @@ public:
         if(id>8 || id<0) return false;
         int fg=1;
         if(!from->isNull() && *from!=*((ItemStack*)(filler+id*136))) fg=0;
-        ((ItemStack*)(filler+id*136))->~ItemStack();
+        //((ItemStack*)(filler+id*136))->~ItemStack();
+	deuniqct((u64)(filler+id*136+8));
+	deweak((u64)(filler+id*136));
         new (filler+id*136) ItemStack(*to);
         return fg;
     }
@@ -363,6 +367,10 @@ static int onTick(Level* a) {
     return rt;
 }
 void bear_init(std::list<string>& modlist) {
+//void(*deuniqct)(u64);
+//void(*deweak)(u64);
+deuniqct=(typeof(deuniqct))dlsym(NULL,"_ZNSt10unique_ptrI11CompoundTagSt14default_deleteIS0_EED2Ev");
+deweak=(typeof(deweak))dlsym(NULL,"_ZN7WeakPtrI4ItemED2Ev");
     do_patch();
     load();
     initlog();
@@ -372,7 +380,7 @@ void bear_init(std::list<string>& modlist) {
     reg_destroy(fp(handle_dest));
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
     tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
-    printf("[ANTI-BEAR] Loaded\n");
+    printf("[ANTI-BEAR] Loaded %p\n",(void*)tick_o);
     //reg_destroy(fp(handle_dest2));
     load_helper(modlist);
 }
