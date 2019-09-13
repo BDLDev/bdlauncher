@@ -338,7 +338,7 @@ static void flych(Level* lv) {
         auto& y=mp[nm];
         int isfl=0;
         if(!tg.isRiding() && !tg.isGliding() && !tg.isCreative() && isinAir(tg,x)) { //(!tg.isRiding() && !tg.isGliding() && !tg.isCreative() &&)
-            if(x.y-y.y>-1.5) {
+            if(x.y-y.y>0) {
                 //is not falling
                 isfl=1;
             }
@@ -347,8 +347,8 @@ static void flych(Level* lv) {
             y.airt++;
             if(y.airt>=3) {
                 async_log("[FLY]%s is flying!\n",tg.getName().c_str());
-                runcmd("kick \""+tg.getName()+"\" anti-flying");
-                // runcmd("kill \""+tg.getName()+"\"");
+                //runcmd("kick \""+tg.getName()+"\" anti-flying");
+                 runcmd("kill \""+tg.getName()+"\"");
                 y.airt=0;
             }
         } else {
