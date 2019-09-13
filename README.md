@@ -1,6 +1,6 @@
 # bdlauncher
 
-BedRockServer launcher with mods support (1.12)
+BedRockServer launcher with mods support (1.12 & 1.12.1)
 <br>QQ group 955765957
 
 # How to:
@@ -12,12 +12,15 @@ cp out/*.so mods
 cd mods
 
 nano mod.list
+输入
 opti.so
 base.so
 bear.so
 money.so
 land.so
 tp.so
+
+(必须按这个顺序)
 
 cp a.so ..
 cd ..
@@ -32,9 +35,9 @@ sh all.sh
 # DOC:
 <pre>
 opti.so
-实验性服务器优化（安装后建议删除worlds文件夹，否则老世界的新chunk会出现地形bug）
+关闭RSA加密(其他优化请参见https://github.com/Sysca11/Rocket)
 base.so
-基础插件（required）
+基础插件（required,必须安装）
 bear.so
 ban支持 服务器log
 money.so
@@ -68,7 +71,7 @@ op可以/money add 钱数
 
 /tpa ac 同意
 /tpa de 拒绝
-/tpa rand 随机传送到野外，可能卡区块，卡了就退了重进
+
 领地：
 /land start 选择起点（你站的地方）
 /land end 选择终点
@@ -100,7 +103,13 @@ op：
 /ban 名字 [seconds]
 /unban 名字
 可选时间（秒）
-/shop add 名字 数量 金钱
+/shop add 名字 物品 数量 金钱
 数量小于0是卖
+例如
+/shop add test coal -1 100
+每次/shop buy test 会消耗一个煤，获得100金钱
+/shop add test2 coal 1 100
+每次会消耗100金钱，获得一个煤
+
 /shop del 名字
 </pre>
