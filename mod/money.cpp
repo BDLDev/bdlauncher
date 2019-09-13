@@ -208,7 +208,7 @@ static void oncmd2(std::vector<string>& a,CommandOrigin & b,CommandOutput &outp)
         for(auto i:shops) {
             shop& sk=i.second;
             char buf[11451];
-            sprintf(buf,"shopName %s · 物品 %s · 数 %d · 价格 %d",i.first.c_str(),sk.ite.c_str(),sk.amo,sk.mon);
+            sprintf(buf,"店名 %s · 物品 %s · 数量 %d · 价格 %d",i.first.c_str(),sk.ite.c_str(),sk.amo,sk.mon);
             outp.addMessage(string(buf));
         }
         outp.success("done");
