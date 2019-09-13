@@ -208,7 +208,7 @@ static void oncmd2(std::vector<string>& a,CommandOrigin & b,CommandOutput &outp)
         for(auto i:shops) {
             shop& sk=i.second;
             char buf[11451];
-            sprintf(buf,"买家 %s · 物品 %s · 库存 %d · 价格 %d",i.first.c_str(),sk.ite.c_str(),sk.amo,sk.mon);
+            sprintf(buf,"shopName %s · 物品 %s · 数 %d · 价格 %d",i.first.c_str(),sk.ite.c_str(),sk.amo,sk.mon);
             outp.addMessage(string(buf));
         }
         outp.success("done");
@@ -222,12 +222,12 @@ static void oncmd2(std::vector<string>& a,CommandOrigin & b,CommandOutput &outp)
             int mam=-sp.amo;
             auto res=runcmd((string("clear ")+b.getName()+string(" ")+sp.ite+string(" 0 ")+std::to_string(sp.amo-1)));
             if(!res.isSuccess()) {
-                outp.error("不足");
+                outp.error("物品不足");
                 return;
             }
             res=runcmd((string("clear ")+b.getName()+string(" ")+sp.ite+string(" 0 1")));
             if(!res.isSuccess()) {
-                outp.error("不足");
+                outp.error("物品不足");
                 return;
             }
             add_money(b.getName(),mam);

@@ -21,8 +21,9 @@ public:
 //  operator bool(void) const;
   //~ItemStack();
   inline ~ItemStack() { asm("call _ZN9ItemStackD2Ev"); };
-  int getId() const;
+  short getId() const;
   float getDestroySpeed(Block const&) const;
   std::string toString() const;
   bool operator!=(ItemStack const &) const;
+  bool isOffhandItem() const;
 };

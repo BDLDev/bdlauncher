@@ -72,9 +72,8 @@ public:
         if(id>8 || id<0) return false;
         int fg=1;
         if(!from->isNull() && *from!=*((ItemStack*)(filler+id*136))) fg=0;
-        //((ItemStack*)(filler+id*136))->~ItemStack();
-	deuniqct((u64)(filler+id*136+8));
-	deweak((u64)(filler+id*136));
+        deuniqct((u64)(filler+id*136+8));
+        deweak((u64)(filler+id*136));
         new (filler+id*136) ItemStack(*to);
         return fg;
     }
@@ -155,27 +154,20 @@ static void initlog() {
     logsz=lseek(logfd,0,SEEK_END);
 }
 static void async_log(const char* fmt,...) {
-    char buf[65535];
-    /*struct aiocb ac;
-    memset(&ac,0,sizeof(ac));
-    ac.aio_fildes=logfd;
-    ac.aio_buf=buf;*/
+    char buf[10240];
+    auto x=time(0);
     va_list vl;
-    va_start(vl,fmt);/*
-    ac.aio_nbytes=vsprintf(buf,fmt,vl);
-    va_end(vl);
-    ac.aio_offset=logsz;
-    logsz+=ac.aio_nbytes;*/
-    int s=vsprintf(buf,fmt,vl);
+    va_start(vl,fmt);
+    auto tim=strftime(buf,128,"[%Y-%m-%d %H:%M:%S] ",localtime(&x));
+    int s=vsprintf(buf+tim,fmt,vl)+tim;
     write(1,buf,s);
     write(logfd,buf,s);
     va_end(vl);
-    //aio_write(&ac);
 }
 
 static u64 handleLogin(u64 t,NetworkIdentifier& a, Certificate& b) {
     string pn=ExtendedCertificate::getIdentityName(b);
-    async_log("%d [JOIN]%s joined game\n",time(0),pn.c_str());
+    async_log("[JOIN]%s joined game\n",pn.c_str());
     if(isBanned(pn)) {
         string ban("§c你在当前服务器的黑名单内!");
         getMC()->getNetEventCallback()->disconnectClient(a,ban,false);
@@ -188,29 +180,36 @@ static int(*iori)(const InventoryTransactionManager*,InventoryAction const&);
 int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
     //printf("player %s sid %d src %s from %s to %s\n",thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
     auto& x=b.getSource();
-    if((x.getType()==100 && x.getFlags()==0 && x.getContainerId()!=23) || (x.getType()==0 && x.getFlags()==0 && x.getContainerId()==119)) {
-        string name=thi->getPlayer()->getName();
-        //printf("early\n");
+    auto id1=x.getType();
+    auto id2=x.getFlags();
+    auto id3=x.getContainerId();
+    const string& name=thi->getPlayer()->getName();
+    if((id1==0 /*&& id2==0*/ && id3==119) && b.getToItem()->getId()!=0){
+        if(!b.getToItem()->isOffhandItem()){
+            async_log("检测到作弊玩家： %s offhand %s\n",thi->getPlayer()->getName().c_str(),b.getToItem()->toString().c_str());
+            runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品"));
+            runcmd(string("ban \"")+name+"\" 60");
+            return iori(thi,b);
+        }
+    }
+    if((id1==100 && id2==0 && id3!=23) || (id1==0 /*&& id2==0*/ && id3==119)) {
         if(!PSlot.count(name)) PSlot[name]=new ISlots();
         ISlots* is=PSlot[name];
-        // printf("check\n");
         if(!is->onChg(b.getSid(),b.getFromItem(),b.getToItem())) {
-            async_log("%d 检测到作弊玩家： %s sid %d src %s from %s to %s\n",time(0),thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
-            //async_log("%d 检测到作弊玩家： %s\n",time(0),name.c_str());
+            async_log("检测到作弊玩家： %s sid %d src %s from %s to %s\n",thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
             runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品 "+b.getFromItem()->toString()+"请管理员手动检察该玩家的行为"));
             //runcmd(string("kick \"")+name+"\" §c使用外挂刷物品");
-            runcmd(string("ban \"")+name+"\" 60");
+            runcmd(string("ban \"")+name+"\" 90");
             //sendText(thi->getPlayer(),"toolbox detected");
             //return 0;
         }
-        //printf("done\n");
     }
     return iori(thi,b);
 }
 static int (*cori)(void*,Player const&,string&);
 static int hkc(void* a,Player & b,string& c) {
     int ret=cori(a,b,c);
-    async_log("%d *[CHAT]%s:%s\n",time(0),b.getName().c_str(),c.c_str());
+    async_log("*[CHAT]%s:%s\n",b.getName().c_str(),c.c_str());
     return ret;
 }
 
@@ -226,7 +225,7 @@ extern "C" ssize_t recvfrom_hook(int socket, void * buffer, size_t length,
     if(rt && ((char*)buffer)[0]==0x5) {
         char buf[1024];
         inet_ntop(AF_INET,&(((sockaddr_in*)address)->sin_addr),buf,*address_len);
-        async_log("%d %s send conn\n",time(0),buf);
+        async_log("%s send conn\n",buf);
     }
     return rt;
 }
@@ -240,6 +239,7 @@ static void do_patch() {
     cori=(typeof(cori))MyHook(fp(dlsym(NULL,"_ZN20ServerNetworkHandler19_displayGameMessageERK6PlayerRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE")),fp(hkc));
 }
 static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
+    ARGSZ(1)
     if((int)b.getPermissionsLevel()>0) {
         banlist[a[0]]=a.size()==1?0:(time(0)+atoi(a[1].c_str()));
         runcmd(string("kick \"")+a[0]+"\" §c你号没了");
@@ -248,6 +248,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     }
 }
 static void oncmd2(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
+    ARGSZ(1)
     if((int)b.getPermissionsLevel()>0) {
         banlist.erase(a[0]);
         save();
@@ -264,12 +265,12 @@ static int handle_u(GameMode* a0,ItemStack * a1,BlockPos const& a2,unsigned char
 #define check(a) strstr(buf,a)!=NULL
     //mob_spawner与spawn_egg因无法检测而修改为spawn
     if(check("barrier") || check("bedrock") || check("spawn")) {
-        async_log("%d [ITEM]%s 使用高危物品(banned) %s pos: %d %d %d\n",time(0),sn.c_str(),buf,a2.x,a2.y,a2.z);
+        async_log("[ITEM]%s 使用高危物品(banned) %s pos: %d %d %d\n",sn.c_str(),buf,a2.x,a2.y,a2.z);
         sendText2(a0->getPlayer(),"§c无法使用违禁物品");
         return 0;
     }
     if(check("tnt") || check("lava")) {
-        async_log("%d [ITEM]%s 使用危险物品(warn) %s pos: %d %d %d\n",time(0),sn.c_str(),buf,a2.x,a2.y,a2.z);
+        async_log("[ITEM]%s 使用危险物品(warn) %s pos: %d %d %d\n",sn.c_str(),buf,a2.x,a2.y,a2.z);
         return 1;
     }
     return 1;
@@ -337,17 +338,17 @@ static void flych(Level* lv) {
         auto& y=mp[nm];
         int isfl=0;
         if(!tg.isRiding() && !tg.isGliding() && !tg.isCreative() && isinAir(tg,x)) { //(!tg.isRiding() && !tg.isGliding() && !tg.isCreative() &&)
-            if(x.y-y.y>-2.5) {
+            if(x.y-y.y>-1.5) {
                 //is not falling
                 isfl=1;
             }
         }
         if(isfl) {
             y.airt++;
-            if(y.airt>=2) {
-                async_log("%d [FLY]%s is flying!\n",time(0),tg.getName().c_str());
-                // runcmd("kick \""+tg.getName()+"\" anti-flying");
-                runcmd("kill \""+tg.getName()+"\"");
+            if(y.airt>=3) {
+                async_log("[FLY]%s is flying!\n",tg.getName().c_str());
+                runcmd("kick \""+tg.getName()+"\" anti-flying");
+                // runcmd("kill \""+tg.getName()+"\"");
                 y.airt=0;
             }
         } else {
@@ -358,6 +359,7 @@ static void flych(Level* lv) {
     });
 }
 static int(*tick_o)(Level*);
+
 static int tkl;
 static int onTick(Level* a) {
     int rt=tick_o(a);
@@ -366,11 +368,43 @@ static int onTick(Level* a) {
         flych(a);
     return rt;
 }
+struct EnchantmentInstance {
+  int getEnchantType() const;
+  void setEnchantLevel(int);
+};
+
+struct Enchant {
+  enum Type : int {};
+  static std::vector<std::unique_ptr<Enchant>> mEnchants;
+  virtual ~Enchant();
+  virtual bool isCompatibleWith(Enchant::Type type);
+  virtual int getMinCost(int);
+  virtual int getMaxCost(int);
+  virtual int getMinLevel();
+  virtual int getMaxLevel();
+};
+static int(*enc_o)(EnchantmentInstance*);
+static int limitLevel(int input, int max) {
+  if (input < 0)
+    return 0;
+  else if (input > max)
+    return 0;
+  return input;
+}
+static int getEntlvl(EnchantmentInstance* a){
+  auto level=enc_o(a);
+  auto &enchant = Enchant::mEnchants[a->getEnchantType()];
+  auto max      = enchant->getMaxLevel();
+  auto result   = limitLevel(level, max);
+  if (result != level) a->setEnchantLevel(level);
+  return result;
+} 
+
 void bear_init(std::list<string>& modlist) {
 //void(*deuniqct)(u64);
 //void(*deweak)(u64);
-deuniqct=(typeof(deuniqct))dlsym(NULL,"_ZNSt10unique_ptrI11CompoundTagSt14default_deleteIS0_EED2Ev");
-deweak=(typeof(deweak))dlsym(NULL,"_ZN7WeakPtrI4ItemED2Ev");
+    deuniqct=(typeof(deuniqct))dlsym(NULL,"_ZNSt10unique_ptrI11CompoundTagSt14default_deleteIS0_EED2Ev");
+    deweak=(typeof(deweak))dlsym(NULL,"_ZN7WeakPtrI4ItemED2Ev");
     do_patch();
     load();
     initlog();
@@ -380,8 +414,8 @@ deweak=(typeof(deweak))dlsym(NULL,"_ZN7WeakPtrI4ItemED2Ev");
     reg_destroy(fp(handle_dest));
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
     tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
+    enc_o=(typeof(enc_o))MyHook(dlsym(NULL,"_ZNK19EnchantmentInstance15getEnchantLevelEv"),fp(getEntlvl));
     printf("[ANTI-BEAR] Loaded %p\n",(void*)tick_o);
-    //reg_destroy(fp(handle_dest2));
     load_helper(modlist);
 }
 

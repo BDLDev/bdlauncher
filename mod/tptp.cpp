@@ -119,16 +119,6 @@ static void oncmd_suic(std::vector<string>& a,CommandOrigin const & b,CommandOut
     KillActor(b.getEntity());
     outp.success("§e你死了");
 }
-static void oncmd_dim(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
-    ARGSZ(1)
-    int pl=(int)b.getPermissionsLevel();
-    string name=b.getName();
-    Player* dst=NULL;
-    dst=getplayer_byname(name);
-    if(pl<1) return;
-    TeleportA(*dst,b.getWorldPosition(), {atoi(a[0].c_str())});
-    outp.success("okay");
-}
 static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     int pl=(int)b.getPermissionsLevel();
     string name=b.getName();
@@ -193,29 +183,6 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         if(dst)
             sendText(dst,"§c[Teleport] "+name+" 已拒绝传送请求");
     }
-    /* 导致服务端崩溃
-        if(a[0]=="rand"){
-            if(pl>0){
-                if(a[1]!="")
-                    name=a[1];
-            }else{
-                int s=wild_limit[name];
-                if(s==3){
-                    outp.error("limit!\n");
-                    return;
-                }
-                s++;
-                wild_limit[name]=s;
-            }
-            //* random *
-            int y=72+rand()%10;
-            int x=rand()%80000-40000;
-            int z=rand()%80000-40000;
-            Player* py=getplayer_byname(name);
-            if(py) TeleportA(*py,{x,y,z},{b.getEntity()->getDimensionId()});
-            outp.success("okay");
-        }
-    */
     if(a[0]=="help") {
         outp.error("传送系统指令列表:\n/tpa f 玩家名 ——让玩家传送到你\n/tpa t 玩家名 ——传送你到玩家\n/tpa ac ——同意\n/tpa de ——拒绝");
     }
@@ -328,7 +295,6 @@ void tp_init(std::list<string>& modlist) {
     register_cmd("tpa",(void*)oncmd,"传送系统");
     register_cmd("home",(void*)oncmd_home,"家");
     register_cmd("warp",(void*)oncmd_warp,"地标");
-    register_cmd("chdim",(void*)oncmd_dim);
     srand(time(0));
     load_helper(modlist);
 }
