@@ -199,7 +199,7 @@ int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
             async_log("检测到作弊玩家： %s sid %d src %s from %s to %s\n",thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
             runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品 "+b.getFromItem()->toString()+"请管理员手动检察该玩家的行为"));
             //runcmd(string("kick \"")+name+"\" §c使用外挂刷物品");
-            runcmd(string("ban \"")+name+"\" 90");
+            runcmd(string("ban \"")+name+"\" 15");
             //sendText(thi->getPlayer(),"toolbox detected");
             //return 0;
         }
@@ -288,7 +288,7 @@ static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
     int x(a1.x),y(a1.y),z(a1.z); //fixed
     Block& bk=a0->getPlayer()->getBlockSource()->getBlock(a1);
     int id=bk.getLegacyBlock()->getBlockItemId();
-    if(name==lastn && clock()-lastcl<1000000*0.1) {
+    if(name==lastn && clock()-lastcl<1000000*0.08) {
         lastcl=clock();
         // async_log("%d [FD]%s fast dest %d delta %f\n",time(0),name.c_str(),id,((float)(clock()-lastcl))/1000000);
         return 0;
@@ -399,7 +399,11 @@ static int getEntlvl(EnchantmentInstance* a){
   if (result != level) a->setEnchantLevel(level);
   return result;
 } 
-
+static char(*wtf_o)(char*,char);
+char wtf(char* x,char a){
+    //printf("get %d\n",a);
+    return wtf_o(x,a);
+}
 void bear_init(std::list<string>& modlist) {
 //void(*deuniqct)(u64);
 //void(*deweak)(u64);
@@ -415,6 +419,7 @@ void bear_init(std::list<string>& modlist) {
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
     tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
     enc_o=(typeof(enc_o))MyHook(dlsym(NULL,"_ZNK19EnchantmentInstance15getEnchantLevelEv"),fp(getEntlvl));
+    //wtf_o=(typeof(wtf_o))MyHook(dlsym(NULL,"_ZN8GameRule17setAllowInCommandEb"),fp(wtf));
     printf("[ANTI-BEAR] Loaded %p\n",(void*)tick_o);
     load_helper(modlist);
 }
