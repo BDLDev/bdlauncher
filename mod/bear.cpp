@@ -57,19 +57,19 @@ void(*deweak)(u64);
 class ISlots {
 public:
     //ItemStack* v[9];
-    char filler[136*9];
+    char filler[136*10];
     ISlots() {
-        for(int i=0; i<9; ++i) {
+        for(int i=0; i<10; ++i) {
             new (filler+i*136) ItemStack();
         }
     }
     ~ISlots() {
-        for(int i=0; i<9; ++i) {
+        for(int i=0; i<10; ++i) {
 //			delete (v[i]);
         }
     }
     bool onChg(int id,ItemStack* from,ItemStack* to) {
-        if(id>8 || id<0) return false;
+        if(id>9 || id<0) return false;
         int fg=1;
         if(!from->isNull() && *from!=*((ItemStack*)(filler+id*136))) fg=0;
         deuniqct((u64)(filler+id*136+8));
@@ -195,7 +195,7 @@ int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
     if((id1==100 && id2==0 && id3!=23) || (id1==0 /*&& id2==0*/ && id3==119)) {
         if(!PSlot.count(name)) PSlot[name]=new ISlots();
         ISlots* is=PSlot[name];
-        if(!is->onChg(b.getSid(),b.getFromItem(),b.getToItem())) {
+        if(!is->onChg(id3==119?9:b.getSid(),b.getFromItem(),b.getToItem())) {
             async_log("检测到作弊玩家： %s sid %d src %s from %s to %s\n",thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
             runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品 "+b.getFromItem()->toString()+"请管理员手动检察该玩家的行为"));
             //runcmd(string("kick \"")+name+"\" §c使用外挂刷物品");
@@ -338,7 +338,7 @@ static void flych(Level* lv) {
         auto& y=mp[nm];
         int isfl=0;
         if(!tg.isRiding() && !tg.isGliding() && !tg.isCreative() && isinAir(tg,x)) { //(!tg.isRiding() && !tg.isGliding() && !tg.isCreative() &&)
-            if(x.y-y.y>0) {
+            if(x.y-y.y>=0) {
                 //is not falling
                 isfl=1;
             }
@@ -417,7 +417,7 @@ void bear_init(std::list<string>& modlist) {
     reg_useitemon(fp(handle_u));
     reg_destroy(fp(handle_dest));
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
-    tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
+    //tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
     enc_o=(typeof(enc_o))MyHook(dlsym(NULL,"_ZNK19EnchantmentInstance15getEnchantLevelEv"),fp(getEntlvl));
     //wtf_o=(typeof(wtf_o))MyHook(dlsym(NULL,"_ZN8GameRule17setAllowInCommandEb"),fp(wtf));
     printf("[ANTI-BEAR] Loaded %p\n",(void*)tick_o);
