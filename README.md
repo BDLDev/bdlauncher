@@ -1,6 +1,7 @@
 # bdlauncher
-
-BedRockServer launcher with mods support (1.12)
+Only for Linux Servers
+只支持Linux服务器
+BedrockServer launcher with mods support (1.12)
 <br>QQ group 955765957
 
 # How to:
@@ -21,6 +22,14 @@ tp.so
 
 cp a.so ..
 cd ..
+LD_LIBRARY_PATH=. LD_PRELOAD=a.so ./bedrock_server
+</pre>
+</pre>
+或者
+git clone https://github.com/sysca11/bdlauncher
+mkdir mods
+cp -a ./bdlauncher/out/* ./mods
+cp -a ./bdlauncher/mod.list ./mods
 LD_LIBRARY_PATH=. LD_PRELOAD=a.so ./bedrock_server
 </pre>
 # 编译:
