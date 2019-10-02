@@ -30,7 +30,7 @@ git clone https://github.com/sysca11/bdlauncher
 mkdir mods
 cp -a ./bdlauncher/out/* ./mods
 cp -a ./bdlauncher/mod.list ./mods
-LD_LIBRARY_PATH=. LD_PRELOAD=a.so ./bedrock_server
+LD_LIBRARY_PATH=. LD_PRELOAD=./mods/a.so ./bedrock_server
 </pre>
 
 # 编译:
