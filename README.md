@@ -30,7 +30,7 @@ wget https://minecraft.azureedge.net/bin-linux/bedrock-server-1.12.1.1.zip
 unzip bedrock-server-1.12.1.1.zip
 #前两步会下载1.12.1bds
 #看情况可以跳过
-git clone https://github.com/sysca11/bdlauncher
+git clone https://github.com/sysca11/bdlauncher --depth=1
 mkdir mods
 cp -a ./bdlauncher/out/* ./mods
 cp -a ./bdlauncher/mod.list ./mods
