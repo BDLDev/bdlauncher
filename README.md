@@ -41,8 +41,10 @@ sh all.sh
 </pre>
 # DOC:
 <pre>
+
 opti.so
-实验性服务器优化（安装后建议删除worlds文件夹，否则老世界的新chunk会出现地形bug）
+实验性服务器优化
+（更多优化请参见https://github.com/sysca11/rocket)
 base.so
 基础插件（required）
 bear.so
@@ -53,6 +55,8 @@ land.so
 领地
 tp.so
 tpa home支持
+第三方插件
+https://github.com/thirteenc13/bdlauncher-mods
 </pre>
 <pre>
 所有玩家名带空格的，可以写成"bla bla"
