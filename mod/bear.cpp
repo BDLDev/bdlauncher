@@ -170,6 +170,7 @@ static u64 handleLogin(u64 t,NetworkIdentifier& a, Certificate& b) {
     async_log("[JOIN]%s joined game\n",pn.c_str());
     if(isBanned(pn)) {
         string ban("§c你在当前服务器的黑名单内!");
+        async_log("[JOIN] 去世玩家 %s 尝试登陆\n",pn.c_str());
         getMC()->getNetEventCallback()->disconnectClient(a,ban,false);
         return 0;
     }
