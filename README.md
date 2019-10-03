@@ -66,6 +66,11 @@ https://github.com/thirteenc13/bdlauncher-mods
 所有玩家名带空格的，可以写成"bla bla"
 例如
 /money query "114514 1919810"
+
+!!!活塞推容器会导致容器消失，这是防熊插件的防刷物特性
+!!!领地插件为了保护耕地，会让耕地块不会被踩坏
+
+
 经济
 初始50块
 /money query 查钱
