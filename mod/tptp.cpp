@@ -113,7 +113,7 @@ struct tpreq {
     string name;
 };
 static unordered_map<string,tpreq> tpmap;
-static unordered_map<string,int> wild_limit;
+//static unordered_map<string,int> wild_limit;
 static void oncmd_suic(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     //b.getEntity()->kill();
     KillActor(b.getEntity());
@@ -127,7 +127,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     if(dnm!="")
         dst=getplayer_byname2(dnm);
     if(dst)
-        dnm=dst . getName();
+        dnm=dst->getName();
     ARGSZ(1)
     if(a[0]=="f") {
         //from
