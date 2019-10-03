@@ -401,9 +401,9 @@ static int getEntlvl(EnchantmentInstance* a){
   return result;
 } 
 static char(*wtf_o)(char*,char);
-char wtf(char* x,char a){
-    //printf("get %d\n",a);
-    return wtf_o(x,a);
+static char wtf(char* x,char a){
+    //enable commands without enabing level cheat!!
+    return wtf_o(x,1);
 }
 void bear_init(std::list<string>& modlist) {
 //void(*deuniqct)(u64);
@@ -420,7 +420,7 @@ void bear_init(std::list<string>& modlist) {
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
     //tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
     enc_o=(typeof(enc_o))MyHook(dlsym(NULL,"_ZNK19EnchantmentInstance15getEnchantLevelEv"),fp(getEntlvl));
-    //wtf_o=(typeof(wtf_o))MyHook(dlsym(NULL,"_ZN8GameRule17setAllowInCommandEb"),fp(wtf));
+    wtf_o=(typeof(wtf_o))MyHook(dlsym(NULL,"_ZN8GameRule17setAllowInCommandEb"),fp(wtf));
     printf("[ANTI-BEAR] Loaded %p\n",(void*)tick_o);
     load_helper(modlist);
 }

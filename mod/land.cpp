@@ -18,6 +18,7 @@
 #include"base.h"
 #include<cmath>
 #include<deque>
+#include<dlfcn.h>
 using std::string;
 using std::deque;
 #define min(a,b) ((a)<(b)?(a):(b))
@@ -437,7 +438,7 @@ static int handle_useion(GameMode* a0,ItemStack & a1,BlockPos const& a2,unsigned
     }
     return 1;
 }
-
+static int dummy(){return 0;}
 void land_init(std::list<string>& modlist) {
     printf("[LAND] loaded!\n");
     load();
@@ -446,5 +447,6 @@ void land_init(std::list<string>& modlist) {
     //reg_build(fp(handle_bui));
     reg_useitemon(fp(handle_useion));
     reg_attack(fp(handle_atk));
+MyHook(fp(dlsym(NULL,"_ZNK9FarmBlock15transformOnFallER11BlockSourceRK8BlockPosP5Actorf")),fp(dummy));
     load_helper(modlist);
 }
