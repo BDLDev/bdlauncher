@@ -26,6 +26,10 @@ LD_LIBRARY_PATH=. LD_PRELOAD=a.so ./bedrock_server
 </pre>
 <pre>
 或者
+wget https://minecraft.azureedge.net/bin-linux/bedrock-server-1.12.1.1.zip
+unzip bedrock-server-1.12.1.1.zip
+#前两步会下载1.12.1bds
+#看情况可以跳过
 git clone https://github.com/sysca11/bdlauncher
 mkdir mods
 cp -a ./bdlauncher/out/* ./mods
