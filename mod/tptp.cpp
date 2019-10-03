@@ -124,7 +124,8 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     string name=b.getName();
     string dnm=a.size()==2?a[1]:"";
     Player* dst=NULL;
-    if(dnm!="")
+    if(dst)
+        dnm=dst.getName();
         dst=getplayer_byname2(dnm);
     ARGSZ(1)
     if(a[0]=="f") {
