@@ -110,7 +110,8 @@ op：
 /ban 名字 [seconds]
 /unban 名字
 可选时间（秒）
-/shop add 名字 数量 金钱
+/shop add 名字 物品 数量 金钱
+如 /shop add dia diamond 1 50
 数量小于0是卖
 /shop del 名字
 </pre>
