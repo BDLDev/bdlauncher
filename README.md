@@ -1,6 +1,6 @@
 # bdlauncher
 <br>Only for Linux Servers
-只支持Linux服务器
+只支持Linux服务器<br>
 BedrockServer launcher with mods support (1.12)
 <br>QQ group 955765957
 
@@ -8,28 +8,11 @@ BedrockServer launcher with mods support (1.12)
 <pre>
 快速安装
 (In your server folder)在你的服务器目录
-mkdir mods
-cp out/*.so mods
-cd mods
-
-nano mod.list
-opti.so
-base.so
-bear.so
-money.so
-land.so
-tp.so
-
-cp a.so ..
-cd ..
-LD_LIBRARY_PATH=. LD_PRELOAD=a.so ./bedrock_server
-</pre>
-<pre>
-或者
 wget https://minecraft.azureedge.net/bin-linux/bedrock-server-1.12.1.1.zip
 unzip bedrock-server-1.12.1.1.zip
 #前两步会下载1.12.1bds
 #看情况可以跳过
+
 git clone https://github.com/sysca11/bdlauncher --depth=1
 mkdir mods
 cp -a ./bdlauncher/out/* ./mods
@@ -39,12 +22,15 @@ LD_LIBRARY_PATH=. LD_PRELOAD=./mods/a.so ./bedrock_server
 
 # 编译:
 <pre>
-sh cmp.sh
+sh cmp.sh #编译mod加载器
 cd mod
-sh all.sh
+sh all.sh #编译mod
+#输出结果在out文件夹
 </pre>
 # DOC:
 <pre>
+mods/mod.list是插件列表，条目顺序是插件加载顺序，不建议修改
+如果要禁用插件，或者增加插件，直接删除对应行或给最后一行添加即可
 
 opti.so
 实验性服务器优化
