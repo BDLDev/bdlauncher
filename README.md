@@ -110,7 +110,13 @@ op：
 /unban 名字
 可选时间（秒）
 /shop add 名字 物品 数量 金钱
-如 /shop add dia diamond 1 50
+如 /shop add 玩家买钻石 diamond 1 50
 数量小于0是卖
 /shop del 名字
+</pre>
+# How it works:
+<pre>
+Thanks to https://github.com/Menooker/PFishHook
+ and bedrock_server with optimization level 0 
+,we can easily hook functions.
 </pre>
