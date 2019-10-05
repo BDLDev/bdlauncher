@@ -56,16 +56,17 @@ void(*deuniqct)(u64);
 void(*deweak)(u64);
 class ISlots {
 public:
-    //ItemStack* v[9];
     char filler[136*10];
-    ISlots() {
-        for(int i=0; i<10; ++i) {
+    ISlots(Player* x) {
+        for(int i=0; i<9; ++i) {
             new (filler+i*136) ItemStack();
         }
+	new (filler+9*136) ItemStack(x->getOffhandSlot());
     }
     ~ISlots() {
         for(int i=0; i<10; ++i) {
-//			delete (v[i]);
+        	deuniqct((u64)(filler+i*136+8));
+        	deweak((u64)(filler+i*136));
         }
     }
     bool onChg(int id,ItemStack* from,ItemStack* to) {
@@ -170,7 +171,6 @@ static u64 handleLogin(u64 t,NetworkIdentifier& a, Certificate& b) {
     async_log("[JOIN]%s joined game\n",pn.c_str());
     if(isBanned(pn)) {
         string ban("§c你在当前服务器的黑名单内!");
-        async_log("[JOIN] 去世玩家 %s 尝试登陆\n",pn.c_str());
         getMC()->getNetEventCallback()->disconnectClient(a,ban,false);
         return 0;
     }
@@ -189,20 +189,17 @@ int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
         if(!b.getToItem()->isOffhandItem()){
             async_log("检测到作弊玩家： %s offhand %s\n",thi->getPlayer()->getName().c_str(),b.getToItem()->toString().c_str());
             runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品"));
-            runcmd(string("ban \"")+name+"\" 60");
+            runcmd(string("ban \"")+name+"\" 120");
             return iori(thi,b);
         }
     }
-    if((id1==100 && id2==0 && id3!=23) || (id1==0 /*&& id2==0*/ && id3==119)) {
-        if(!PSlot.count(name)) PSlot[name]=new ISlots();
+    if((id1==100 && id2==0 && id3!=23) || (id1==0 && id3==119)) {
+        if(!PSlot.count(name)) PSlot[name]=new ISlots(thi->getPlayer());
         ISlots* is=PSlot[name];
         if(!is->onChg(id3==119?9:b.getSid(),b.getFromItem(),b.getToItem())) {
             async_log("检测到作弊玩家： %s sid %d src %s from %s to %s\n",thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
             runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品 "+b.getFromItem()->toString()+"请管理员手动检察该玩家的行为"));
-            //runcmd(string("kick \"")+name+"\" §c使用外挂刷物品");
-            runcmd(string("ban \"")+name+"\" 15");
-            //sendText(thi->getPlayer(),"toolbox detected");
-            //return 0;
+            runcmd(string("ban \"")+name+"\" 25");
         }
     }
     return iori(thi,b);
@@ -230,9 +227,6 @@ extern "C" ssize_t recvfrom_hook(int socket, void * buffer, size_t length,
     }
     return rt;
 }
-/*
-extern "C" char* GetELFAddr();
-*/
 static void do_patch() {
     ori=(typeof(ori))MyHook(fp(dlsym(NULL,"_ZNK5Block13movedByPistonER11BlockSourceRK8BlockPos")),fp(hk));
     hori=(typeof(hori))MyHook(fp(dlsym(NULL,"_ZN20ServerNetworkHandler22_onClientAuthenticatedERK17NetworkIdentifierRK11Certificate")),fp(handleLogin));
@@ -241,6 +235,7 @@ static void do_patch() {
 }
 static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     ARGSZ(1)
+    auto x=getplayer_byname(b.getName());
     if((int)b.getPermissionsLevel()>0) {
         banlist[a[0]]=a.size()==1?0:(time(0)+atoi(a[1].c_str()));
         runcmd(string("kick \"")+a[0]+"\" §c你号没了");
@@ -250,6 +245,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
 }
 static void oncmd2(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     ARGSZ(1)
+    auto x=getplayer_byname(b.getName());
     if((int)b.getPermissionsLevel()>0) {
         banlist.erase(a[0]);
         save();
@@ -401,13 +397,15 @@ static int getEntlvl(EnchantmentInstance* a){
   return result;
 } 
 static char(*wtf_o)(char*,char);
-static char wtf(char* x,char a){
-    //enable commands without enabing level cheat!!
+char wtf(char* x,char a){
     return wtf_o(x,1);
 }
+static int handle_left(ServerNetworkHandler* a0,ServerPlayer* a1,bool a2){
+	async_log("[LEFT] %s left game\n",a1->getName().c_str());
+	PSlot.erase(a1->getName());
+	return 1;
+}
 void bear_init(std::list<string>& modlist) {
-//void(*deuniqct)(u64);
-//void(*deweak)(u64);
     deuniqct=(typeof(deuniqct))dlsym(NULL,"_ZNSt10unique_ptrI11CompoundTagSt14default_deleteIS0_EED2Ev");
     deweak=(typeof(deweak))dlsym(NULL,"_ZN7WeakPtrI4ItemED2Ev");
     do_patch();
@@ -417,6 +415,7 @@ void bear_init(std::list<string>& modlist) {
     register_cmd("unban",fp(oncmd2),"解除封禁");
     reg_useitemon(fp(handle_u));
     reg_destroy(fp(handle_dest));
+    reg_player_left(fp(handle_left));
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
     //tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
     enc_o=(typeof(enc_o))MyHook(dlsym(NULL,"_ZNK19EnchantmentInstance15getEnchantLevelEv"),fp(getEntlvl));

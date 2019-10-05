@@ -1,4 +1,34 @@
 idxx=0
+print(r'''
+#include<cstdio>
+#include<list>
+#include<forward_list>
+#include<string>
+#include<unordered_map>
+#include"../cmdhelper.h"
+#include"../myhook.h"
+#include<vector>
+#include"minecraft/level/Level.h"
+#include"minecraft/actor/Player.h"
+#include"minecraft/actor/ItemActor.h"
+#include"minecraft/core/GameMode.h"
+#include"minecraft/packet/TextPacket.h"
+#include"minecraft/packet/SetDisplayObjectivePacket.h"
+#include"minecraft/item/ItemStack.h"
+#include"minecraft/actor/PlayerInventoryProxy.h"
+#include"minecraft/item/Item.h"
+#include "minecraft/core/typeid.h"
+#include"seral.hpp"
+#include<signal.h>
+#include <sys/stat.h>
+#include<unistd.h>
+#include <sys/stat.h>
+#include<dlfcn.h>
+using std::string;
+using std::list;
+#include"base.h"
+'''
+)
 def codeg(me_name,ev_name,args):
     global idxx
     idxx=idxx+1
@@ -52,3 +82,5 @@ codeg('GameMode::useItem','useitem',('GameMode*','ItemStack &'))
 codeg('GameMode::useItemOn','useitemon',('GameMode*','ItemStack &','BlockPos const&','unsigned char','Vec3 const&','Block const*'))
 codeg('GameMode::buildBlock','build',('GameMode*','BlockPos const&','unsigned char'))
 codeg('GameMode::destroyBlock','destroy',('GameMode*','BlockPos const&','unsigned char'))
+codeg('ServerNetworkHandler::_onPlayerLeft','player_left',('ServerNetworkHandler*','ServerPlayer*','bool'))
+codeg('ServerNetworkHandler::_sendAdditionalLevelData','player_join',('ServerNetworkHandler*','ServerPlayer*','NetworkIdentifier*'))

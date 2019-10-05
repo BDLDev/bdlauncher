@@ -25,6 +25,7 @@ using std::deque;
 #define max(a,b) ((a)>(b)?(a):(b))
 #define dbg_printf(...) {}
 //#define dbg_printf printf
+static int dummy(){return 0;}
 extern "C" {
     void land_init(std::list<string>& modlist);
 }
@@ -117,29 +118,35 @@ struct lc_ent {
     int x,z,dim;
     land* v;
 };
-std::list<lc_ent> cpool;
+lc_ent cpool_2[100];
+std::list<int> cpool;
+static void cache_init(){
+	for(int i=0;i<100;++i) cpool_2[i].dim=4,cpool.push_back(i);
+}
 static void ccache() {
     cpool.clear();
+    cache_init();
 }
 static bool cache_fetch(land** res,int x,int z,int dim) {
     int fg=0;
-    lc_ent *found;
-    for(auto &i :cpool) {
+    int& found=fg; //dummy
+    for(auto &i_ :cpool) {
+	auto const &i=cpool_2[i_];
         if(i.x==x && i.z==z && i.dim==dim) {
             *res=i.v;
-            found=&i;
+            found=i_;
             fg=1;
             break;
         }
     }
-    if(fg) std::swap(cpool.front(),*found);
+    if(fg) std::swap(cpool.front(),found);
     return fg;
 }
 static land* cache_push(const lc_ent& en) {
-    if(cpool.size()==100) {
-        cpool.pop_back();
-    }
-    cpool.push_front(en);
+    int x=cpool.back();
+    cpool.pop_back();
+    cpool_2[x]=en;
+    cpool.push_front(x);
     return en.v;
 }
 land* getLand(int x,int z,int dim) {
@@ -438,15 +445,16 @@ static int handle_useion(GameMode* a0,ItemStack & a1,BlockPos const& a2,unsigned
     }
     return 1;
 }
-static int dummy(){return 0;}
+
 void land_init(std::list<string>& modlist) {
     printf("[LAND] loaded!\n");
     load();
+    cache_init();
+    MyHook(fp(dlsym(NULL,"_ZNK9FarmBlock15transformOnFallER11BlockSourceRK8BlockPosP5Actorf")),fp(dummy));
     register_cmd("land",(void*)oncmd,"领地系统");
     reg_destroy(fp(handle_dest));
     //reg_build(fp(handle_bui));
     reg_useitemon(fp(handle_useion));
     reg_attack(fp(handle_atk));
-MyHook(fp(dlsym(NULL,"_ZNK9FarmBlock15transformOnFallER11BlockSourceRK8BlockPosP5Actorf")),fp(dummy));
     load_helper(modlist);
 }

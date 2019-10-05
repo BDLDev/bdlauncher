@@ -18,7 +18,7 @@ class TickingArea;
 class CompoundTag;
 class Dimension;
 class ItemActor;
-
+class ItemStack;
 class Actor {
 public:
   MakeAccessor(getActorDefinitionDescriptor, std::unique_ptr<ActorDefinitionDescriptor>, 192);
@@ -40,6 +40,7 @@ public:
   int getDimensionId() const;
   Vec3& getPos() const;	
   bool isRiding() const;
+  ItemStack& getOffhandSlot() const;
   template <typename T> T *tryGetComponent();
 
   virtual ~Actor();

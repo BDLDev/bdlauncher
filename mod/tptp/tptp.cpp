@@ -13,7 +13,6 @@
 #include <sys/stat.h>
 #include<unistd.h>
 #include <sys/stat.h>
-#include"money.h"
 #include"base.h"
 #include<cmath>
 #include<cstdlib>
@@ -113,7 +112,7 @@ struct tpreq {
     string name;
 };
 static unordered_map<string,tpreq> tpmap;
-//static unordered_map<string,int> wild_limit;
+static unordered_map<string,int> wild_limit;
 static void oncmd_suic(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     //b.getEntity()->kill();
     KillActor(b.getEntity());
@@ -126,8 +125,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     Player* dst=NULL;
     if(dnm!="")
         dst=getplayer_byname2(dnm);
-    if(dst)
-        dnm=dst->getName();
+    if(dst) dnm=dst->getName();
     ARGSZ(1)
     if(a[0]=="f") {
         //from

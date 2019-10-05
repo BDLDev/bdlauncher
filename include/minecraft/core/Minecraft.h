@@ -27,12 +27,15 @@ class StructureManager;
 class Timer;
 class Level;
 class NetworkIdentifier;
+class ServerPlayer;
 class ServerNetworkHandler{
 public:
 void disconnectClient(NetworkIdentifier const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool); //def false?
 NetworkHandler* getNH() const{
 	return *((NetworkHandler **)this+8);
 }
+void _onPlayerLeft(ServerPlayer*, bool);
+void _sendAdditionalLevelData(ServerPlayer&, NetworkIdentifier const&);
 };
 class Minecraft : public IEntityRegistryOwner {
 public:
