@@ -2,7 +2,14 @@
 
 #include <string>
 
-class BinaryStream;
+class BinaryStream{
+public:
+void writeFloat(float);
+void writeString();
+void writeVarInt(int);
+var writeVarInt64(long);
+var writeSignedInt(int);
+};
 class ReadOnlyBinaryStream;
 
 class Packet {
