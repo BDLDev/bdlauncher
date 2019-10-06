@@ -14,6 +14,7 @@
 #include"money.h"
 #include<dlfcn.h>
 using std::string;
+using std::to_string;
 extern "C" {
     void money_init(std::list<string>& modlist);
 }
@@ -180,66 +181,121 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             }
         }
     }
-    if(a[0]=="help") {
-        outp.error("经济系统命令列表:\n/money query ——查询自己余额\n/money pay 玩家ID 余额 ——给玩家打钱");
+    if(a[0]=="py") {
+        ARGSZ(3)
+        string pl;
+        int cou;
+        pl=b.getName();
+        cou=atoi(a[2].c_str());
+        if(a[1]=="f" && cou>0 && cou<10000) {
+            if(runcmd(string("clear \"")+pl.c_str()+"\" emerald 0 "+a[2]).isSuccess()) {
+                add_money(pl,cou*300);
+                char msg[1000];
+                sprintf(msg,"§e[Money system] 您成功使用了 %d 绿宝石换取了 %d 余额",cou,cou*300);
+                outp.success(string(msg));
+                return;
+            } else {
+                outp.error("[Money system] 绿宝石数量不足，交换失败");
+                return;
+            }
+        }
+        if(a[1]=="t" && cou>0 && cou<10000) {
+            if(red_money(pl,cou*300)) {
+                runcmd(string("give \"")+pl.c_str()+"\" emerald "+a[2]);
+                char msg[1000];
+                sprintf(msg,"§e[Money system] 您成功使用了 %d 余额换取了 %d 绿宝石",cou*300,cou);
+                outp.success(string(msg));
+                return;
+            } else {
+                outp.error("[Money system] 余额不足，交换失败");
+                return;
+            }
+        }
+    }
+     if(a[0]=="help") {
+        outp.error("经济系统命令列表:\n/money query ——查询自己余额\n/money pay 玩家ID 余额 ——给玩家打钱\n/money py f 数量 ——将指定数量的绿宝石转换为余额\n/monet py t 数量 ——将余额转换为指定数量的绿宝石\n1绿宝石=300余额");
     }
 }
+
 static void oncmd2(std::vector<string>& a,CommandOrigin & b,CommandOutput &outp) {
     ARGSZ(1)
     if(a[0]=="add" && (int)b.getPermissionsLevel()>0) {
         ARGSZ(5)
         shop sk;
-        sk.ite=a[2];
-        sk.amo=atoi(a[3].c_str());
-        sk.mon=atoi(a[4].c_str());
+        sk.ite=a[2]; //物品英文名
+        sk.amo=atoi(a[3].c_str()); //数量
+        sk.mon=atoi(a[4].c_str()); //价格
+        if(sk.amo==0) {
+            outp.error("[Shop] 你开心就好");
+            return;
+        }
         shops[a[1]]=sk;
         shopmod=1;
         //save();
-        outp.success("添加成功");
+        outp.success("§e[Shop] 添加项目: 项目名: "+a[1]+"  物品英文名: "+a[2]+ "  数量: "+a[3]+"  价格: "+a[4]);
     }
     if(a[0]=="del" && (int)b.getPermissionsLevel()>0) {
         ARGSZ(2)
         shops.erase(a[1]);
         shopmod=1;
         // save();
-        outp.success("删除成功");
+        outp.success("§e[Shop] 删除了物品: "+a[1]);
     }
     if(a[0]=="ls") {
+        outp.success("§e商店项目列表:");
         for(auto i:shops) {
             shop& sk=i.second;
             char buf[11451];
-            sprintf(buf,"shopName %s · 物品 %s · 数 %d · 价格 %d",i.first.c_str(),sk.ite.c_str(),sk.amo,sk.mon);
+            sprintf(buf,"§e项目名: %s  物品英文名: %s  数量: %d  价格: %d",i.first.c_str(),sk.ite.c_str(),sk.amo,sk.mon);
             outp.addMessage(string(buf));
         }
-        outp.success("done");
+        outp.success("§eTip: 数量为负数的是回收商店");
     }
-    if(a[0]=="buy") {
+    if(a[0]=="buy") { //购买商店
         ARGSZ(2)
-        if(!shops.count(a[1])) outp.error("不存在的商店");
-        const shop& sp=shops[a[1]];
-        if(sp.amo<0) {
-            //sell
-            int mam=-sp.amo;
-            auto res=runcmd((string("clear ")+b.getName()+string(" ")+sp.ite+string(" 0 ")+std::to_string(sp.amo-1)));
-            if(!res.isSuccess()) {
-                outp.error("物品不足");
-                return;
-            }
-            res=runcmd((string("clear ")+b.getName()+string(" ")+sp.ite+string(" 0 1")));
-            if(!res.isSuccess()) {
-                outp.error("物品不足");
-                return;
-            }
-            add_money(b.getName(),mam);
-        } else {
-            if(!red_money(b.getName(),sp.amo)) {
-                outp.error("金币不足");
-                return;
-            }
-            runcmd(("give "+b.getName()+" "+sp.ite+" "+std::to_string(sp.amo)));
+        if(!shops.count(a[1])) { //如果商店不存在物品
+            outp.error("§e[Shop] 商店不存在此项目");
+            return;
         }
+        const shop& sp=shops[a[1]];
+        if(sp.amo>0) { //判断物品数量是否大于0，否则发送提示
+            if(red_money(b.getName(),sp.mon)) { //扣除金钱，如果失败则返回金币不足
+                runcmd(("give "+b.getName()+" "+sp.ite+" "+to_string(sp.amo)));
+                outp.success("§e[Shop] 成功购买了 "+to_string(sp.amo)+" 个 "+sp.ite);   
+            } else {
+                outp.error("[Shop] 金币不足");
+            }
+        } else {
+            outp.error("[Shop] 你应该使用/shop sell");
+        }
+        return;
+    }
+    if(a[0]=="sell") { //出售商店
+        ARGSZ(2)
+        if(!shops.count(a[1])) { //如果商店不存在物品
+            outp.error("§e[Shop] 商店不存在此项目");
+            return;
+        }
+        const shop& sp=shops[a[1]];
+        if(sp.amo<0) { //判断物品数量是否小于0，否则发送提示
+            auto res=runcmd((string("clear ")+b.getName()+string(" ")+sp.ite+string(" 0 ")+to_string(sp.amo*-1)));
+            if(res.isSuccess()) {
+                add_money(b.getName(),sp.mon);
+                outp.success("§e[Shop] 成功出售了 "+to_string(sp.amo*-1)+" 个 "+sp.ite);
+                return;
+            } else {
+                outp.error("[Shop] 物品不足");
+            }
+        } else {
+            outp.error("[Shop] 你应该使用/shop buy");
+        }
+        return;
+    }
+    if(a[0]=="help") {
+        outp.error("§e商店指令列表:\n/shop buy 项目名 ——购买指定项目中的物品\n/shop sell 项目名 ——将指定项目中的物品出售\n/shop ls ——查看项目列表");
     }
 }
+
 void money_init(std::list<string>& modlist) {
     printf("[MONEY&SHOP] loaded!\n");
     load();
