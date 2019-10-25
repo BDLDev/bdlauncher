@@ -3,7 +3,8 @@
 只支持Linux服务器<br>
 BedrockServer launcher with mods support (1.12)
 <br>
-
+<br>QQ group 955765957
+<br>
 # How to:
 <pre>
 快速安装
