@@ -73,7 +73,7 @@ void sendTransfer(Player* a,const string& ip,short port){
     TransferPacket pk(ip,port);
     ((ServerPlayer*)a)->sendNetworkPacket(fcast(Packet,pk));
 }
-void sendPacket(Player* a,void(*cb)(void*),void* arg){
+void sendPacket(Player* a,void(*cb)(void*,char*),void* arg){
 	char pk[1024];
 	void(*pp)(char*)=(typeof(pp))dlsym(NULL,"_ZN6PacketC2Ev");
 	pp(pk);

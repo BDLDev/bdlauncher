@@ -193,10 +193,10 @@ int hki(InventoryTransactionManager const* thi,InventoryAction const& b) {
             return iori(thi,b);
         }
     }
-    if((id1==100 && id2==0 && id3!=23) || (id1==0 && id3==119)) {
+    if((id1==100 && id2==0 && id3!=23) /*|| (id1==0 && id3==119)*/) {
         if(!PSlot.count(name)) PSlot[name]=new ISlots(thi->getPlayer());
         ISlots* is=PSlot[name];
-        if(!is->onChg(id3==119?9:b.getSid(),b.getFromItem(),b.getToItem())) {
+        if(!is->onChg(/*id3==119?9:*/b.getSid(),b.getFromItem(),b.getToItem())) {
             async_log("检测到作弊玩家： %s sid %d src %s from %s to %s\n",thi->getPlayer()->getName().c_str(),b.getSid(),b.getSource().toStr().c_str(),b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
             runcmd(string("say §c检测到玩家 "+name+" 疑似使用外挂刷物品 "+b.getFromItem()->toString()+"请管理员手动检察该玩家的行为"));
             runcmd(string("ban \"")+name+"\" 25");
@@ -416,7 +416,7 @@ void bear_init(std::list<string>& modlist) {
     reg_useitemon(fp(handle_u));
     reg_destroy(fp(handle_dest));
     reg_player_left(fp(handle_left));
-    rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
+//    rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
     //tick_o=(typeof(tick_o))MyHook(dlsym(NULL,"_ZN5Level4tickEv"),fp(onTick));
     enc_o=(typeof(enc_o))MyHook(dlsym(NULL,"_ZNK19EnchantmentInstance15getEnchantLevelEv"),fp(getEntlvl));
     wtf_o=(typeof(wtf_o))MyHook(dlsym(NULL,"_ZN8GameRule17setAllowInCommandEb"),fp(wtf));
