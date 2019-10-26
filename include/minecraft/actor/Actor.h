@@ -42,6 +42,6 @@ public:
   bool isRiding() const;
   ItemStack& getOffhandSlot() const;
   template <typename T> T *tryGetComponent();
-
+  void setPos(Vec3 const&);
   virtual ~Actor();
 };

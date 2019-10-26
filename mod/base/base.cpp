@@ -49,6 +49,7 @@ static TeleportCommand cmd_p;
 
 extern void load_helper(list<string>& modlist);
 void TeleportA(Actor& a,Vec3 b,AutomaticID<Dimension,int> c) {
+    a.setPos(b);
     cmd_p.teleport(a,b,nullptr,c);
     cmd_p.teleport(a,b,nullptr,c);
 }

@@ -1,0 +1,1 @@
+_ZNK15TeleportCommand8teleportER5Actor4Vec3PS2_11AutomaticIDI9DimensioniE
