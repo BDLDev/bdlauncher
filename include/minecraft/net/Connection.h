@@ -17,4 +17,5 @@ class ConnectionRequest{
 class ExtendedCertificate{
 	public:
 	static string getIdentityName(Certificate const&);
+	static string getXuid(Certificate const&);
 };
