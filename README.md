@@ -66,6 +66,9 @@ land.so
 领地
 tp.so
 tpa home支持
+antixray.so
+反透视，对服务器要求高
+若卡顿请到mods/mod.list删除antixray.so行来禁用
 第三方插件
 https://github.com/thirteenc13/bdlauncher-mods
 </pre>
@@ -74,7 +77,7 @@ https://github.com/thirteenc13/bdlauncher-mods
 例如
 /money query "114514 1919810"
 
-!!!anticheat会禁止推动容器方块，新版本已经解决了容器消失问题
+!!!anticheat.so会禁止推动容器方块，新版本容器推不动（旧版推了会消失）
 !!!领地插件为了保护耕地，会让耕地块不会被踩坏
 
 
@@ -136,6 +139,7 @@ op：
 </pre>
 # How it works:
 <pre>
-Thanks to https://github.com/Menooker/PFishHook and bedrock_server with optimization level 0 ,we can easily hook functions.
+感谢PFishhook作者 Thanks to https://github.com/Menooker/PFishHook 
+bedrock_server with optimization level 0 ,we can easily hook functions.
 </pre>
 
