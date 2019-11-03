@@ -1,7 +1,7 @@
 # bdlauncher
 <br>Only for Linux Servers
 只支持Linux服务器<br>
-BedrockServer launcher with mods support (1.12)
+BedrockServer launcher with mods support (1.13 only)
 <br>
 <br>QQ group 955765957
 <br>
@@ -9,10 +9,6 @@ BedrockServer launcher with mods support (1.12)
 <pre>
 快速安装
 (In your server folder)在你的服务器目录
-wget https://minecraft.azureedge.net/bin-linux/bedrock-server-1.12.1.1.zip
-unzip bedrock-server-1.12.1.1.zip
-#前两步会下载1.12.1bds
-#看情况可以跳过
 
 git clone https://github.com/sysca11/bdlauncher --depth=1
 mkdir mods
@@ -54,7 +50,7 @@ https://github.com/thirteenc13/bdlauncher-mods
 例如
 /money query "114514 1919810"
 
-!!!活塞推容器会导致容器消失，这是防熊插件的防刷物特性
+!!!anticheat会禁止推动容器方块，新版本已经解决了容器消失问题
 !!!领地插件为了保护耕地，会让耕地块不会被踩坏
 
 
@@ -78,7 +74,6 @@ op可以/money add 钱数
 
 /tpa ac 同意
 /tpa de 拒绝
-/tpa rand 随机传送到野外，可能卡区块，卡了就退了重进
 领地：
 /land start 选择起点（你站的地方）
 /land end 选择终点
