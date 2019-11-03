@@ -7,14 +7,38 @@ BedrockServer launcher with mods support (1.13 only)
 <br>
 # How to:
 <pre>
-快速安装
-(In your server folder)在你的服务器目录
+#快速安装
+#(In your server folder)在你的服务器目录
 
+#安装原版服务端
+wget https://minecraft.azureedge.net/bin-linux/bedrock-server-1.13.0.34.zip
+unzip bedrock-server-1.13.0.34.zip
+
+#安装mod及loader
 git clone https://github.com/sysca11/bdlauncher --depth=1
 mkdir mods
 cp -a ./bdlauncher/out/* ./mods
 cp -a ./bdlauncher/mod.list ./mods
 LD_LIBRARY_PATH=. LD_PRELOAD=./mods/a.so ./bedrock_server
+</pre>
+<pre>
+#快速升级
+#升级bds
+wget https://minecraft.azureedge.net/bin-linux/bedrock-server-1.13.0.34.zip
+mv server.properties server.propertie
+mv whitelist.json whitelist.jso
+unzip bedrock-server-1.13.0.34.zip
+rm -rf whitelist.json
+rm -rf server.properties
+mv server.propertie server.properties
+mv whitelist.jso whitelist.json
+
+#升级bdlauncher
+git clone https://github.com/sysca11/bdlauncher --depth=1
+mkdir mods
+cp -a ./bdlauncher/out/* ./mods
+cp -a ./bdlauncher/mod.list ./mods
+
 </pre>
 
 # 编译:
@@ -31,11 +55,11 @@ mods/mod.list是插件列表，条目顺序是插件加载顺序，不建议修�
 
 opti.so
 实验性服务器优化
-（更多优化请参见https://github.com/sysca11/rocket)
+（Rocket1.13暂时无法使用，更多优化请参见https://github.com/sysca11/rocket)
 base.so
 基础插件（required）
 bear.so
-ban支持 服务器log
+/ban支持 服务器log
 money.so
 经济 商店
 land.so
