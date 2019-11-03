@@ -5,10 +5,8 @@
 #include<unordered_map>
 #include"../cmdhelper.h"
 #include<vector>
-#include"minecraft/level/Level.h"
-#include"minecraft/actor/Player.h"
-#include"minecraft/actor/ItemActor.h"
-#include"minecraft/core/GameMode.h"
+#include<Loader.h>
+#include<MC.h>
 #include"seral.hpp"
 #include <sys/stat.h>
 #include<unistd.h>

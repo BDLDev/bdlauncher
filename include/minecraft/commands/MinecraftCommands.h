@@ -11,7 +11,7 @@ class CommandOrigin;
 class CommandRegistry;
 class CommandOutput;
 class Packet;
-
+/*
 class MinecraftCommands {
 public:
   MCRESULT executeCommand(std::shared_ptr<CommandContext>, bool) const;
@@ -27,4 +27,4 @@ public:
   void setOpPermissionLevel(CommandPermissionLevel);
   void setOutputSender(std::unique_ptr<CommandOutputSender>);
   void setRegistryNetworkUpdateCallback(std::function<void(Packet const &)>) const;
-};
+};*/

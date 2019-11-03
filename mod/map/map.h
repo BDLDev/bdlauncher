@@ -10,7 +10,9 @@ class MapItemSavedData{
 	void setPixel(unsigned int v, unsigned int x, unsigned int y); //use 0xffrrggbb
 	void save(LevelStorage&);
 };
+/*
 class MapItem{
 	public:
 	static ActorUniqueID getMapId(ItemStack const&);
 };
+*/

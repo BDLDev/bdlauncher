@@ -1,14 +1,13 @@
 #pragma once
 #include<string>
 #include<unordered_map>
+#include<MC.h>
 class Player;
 class Actor;
 class Vec3;
 //class AutomaticID<Dimension,int>;
 class Dimension;
-#include"minecraft/core/types.h"
-using std::string;
-using std::unordered_map;
+struct MCRESULT;
 void reg_attack(void* a);
 void reg_pickup(void* a);
 void reg_useitem(void* a);

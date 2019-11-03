@@ -7,16 +7,7 @@
 #include"../cmdhelper.h"
 #include"../myhook.h"
 #include<vector>
-#include"minecraft/level/Level.h"
-#include"minecraft/actor/Player.h"
-#include"minecraft/actor/ItemActor.h"
-#include"minecraft/core/GameMode.h"
-#include"minecraft/packet/TextPacket.h"
-#include"minecraft/packet/SetDisplayObjectivePacket.h"
-#include"minecraft/item/ItemStack.h"
-#include"minecraft/actor/PlayerInventoryProxy.h"
-#include"minecraft/item/Item.h"
-#include "minecraft/core/typeid.h"
+#include<MC.h>
 #include"seral.hpp"
 #include<signal.h>
 #include <sys/stat.h>

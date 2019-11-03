@@ -5,11 +5,8 @@
 #include<unordered_map>
 #include"../cmdhelper.h"
 #include<vector>
-#include"minecraft/level/Level.h"
-#include"minecraft/actor/Player.h"
-#include"minecraft/actor/ItemActor.h"
-#include"minecraft/core/GameMode.h"
-#include"minecraft/item/ItemStack.h"
+#include<Loader.h>
+#include<MC.h>
 #include"seral.hpp"
 #include <sys/stat.h>
 #include<unistd.h>
@@ -186,7 +183,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         }
         land tmp;
         tmp.x=xx,tmp.y=yy,tmp.dx=xx2-xx+1,tmp.dy=yy2-yy+1;
-        int price=10*tmp.size();
+        int price=1*tmp.size();
         char buf[1000];
         sprintf(buf,"§e[Land system] 选择完毕，该区域价格 %d,使用“/land buy”购买",price);
         outp.success(string(buf));
@@ -202,7 +199,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         tmp.x=xx,tmp.y=yy,tmp.dx=xx2-xx+1,tmp.dy=yy2-yy+1;
         tmp.addown(name);
         tmp.dim_perm=(b.getEntity()->getDimensionId()<<4)|PERMP;
-        int price=10*tmp.size();
+        int price=1*tmp.size();
         if(pl>0 || red_money(name,price)) {
             lands.push_front(tmp);
             ccache();
@@ -217,15 +214,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         if(act==NULL) return;
         int dim=act->getDimensionId();
         int x=round(b.getWorldPosition().x);
-        int y=round(b.getWorldPosition().z); //fix
-        /* for(auto const& i:lands){
-             if(i.inland(x,y,dim) && i.canpop(name)){
-                 char buf[1000];
-                 sprintf(buf,"This is %s's land\n",i.owner.c_str());
-                 outp.success(string(buf));
-                 return;
-             }
-         }*/
+        int y=round(b.getWorldPosition().z); 
         land* i=getLand(x,y,dim);
         if(i && i->canpop(name)) {
             char buf[1000];
@@ -380,26 +369,6 @@ static int handle_atk(Player* a0,Actor & a1) {
     }
     return 1;
 }
-/*
-int handle_bui(GameMode* a0,BlockPos const& a1,unsigned char a2){
-    int pl=a0->getPlayer()->getPlayerPermissionLevel();
-    if(pl==2){
-        //op
-        return 1;
-    }
-    string& name=a0->getPlayer()->getName();
-    int dim=a0->getPlayer()->getDimensionId();
-    int x(a1.x),y(a1.y),z(a1.z);
-    dbg_printf("bui handle dim %d %d %d %d",dim,x,y,z);
-            if(i&&!i->checkown(name)){
-                if(!i->canbuild(name)){
-                    return 0;
-                }else{
-                    return 1;
-                }
-            }
-    return 1;
-}*/
 static int handle_useion(GameMode* a0,ItemStack & a1,BlockPos const& a2,unsigned char a3,Vec3 const& a4,Block const* a5) {
     int pl=a0->getPlayer()->getPlayerPermissionLevel();
     if(pl>1) {
@@ -409,34 +378,14 @@ static int handle_useion(GameMode* a0,ItemStack & a1,BlockPos const& a2,unsigned
     const string& name=a0->getPlayer()->getName();
     int dim=a0->getPlayer()->getDimensionId();
     int x(a2.x),y(a2.z),z(a2.z); //fixed
-    /*
-    char fku[555];
-        sprintf(fku,"use handle %d %d a3 %d\n",x,z,a3);
-    sendText(a0->getPlayer(),string(fku));
-    */
     const int Z[]= {-1,1,0,0};
     const int X[]= {0,0,-1,1};
     if(a3>1 && a3<6) x+=X[a3-2],y+=Z[a3-2];
-    /*for(auto const& i:lands){
-        if(i.inland(x,y,dim)){
-            if(!i.canuse(name)){
-                return 0;
-            }else{
-                if(a1.isNull() || i.checkown(name))
-                    return 1;
-                else
-                {
-                    return 0;
-                }
-
-            }
-        }
-    }*/
     land* i=getLand(x,y,dim);
     if(i&&!i->checkown(name)) {
         if(!i->canuse(name)) {
             char buf[1000];
-            sprintf(buf,"§c你不能在 %s 的领地与方块互交",i->owner.c_str());
+            sprintf(buf,"§c你不能在 %s 的领地与方块interact",i->owner.c_str());
             sendText2(a0->getPlayer(),string(buf));
             return 0;
         } else {
@@ -453,7 +402,6 @@ void land_init(std::list<string>& modlist) {
     MyHook(fp(dlsym(NULL,"_ZNK9FarmBlock15transformOnFallER11BlockSourceRK8BlockPosP5Actorf")),fp(dummy));
     register_cmd("land",(void*)oncmd,"领地系统");
     reg_destroy(fp(handle_dest));
-    //reg_build(fp(handle_bui));
     reg_useitemon(fp(handle_useion));
     reg_attack(fp(handle_atk));
     load_helper(modlist);

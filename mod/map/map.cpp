@@ -5,8 +5,8 @@
 #include"../cmdhelper.h"
 #include"base.h"
 #include<vector>
-#include"minecraft/level/Level.h"
-#include"minecraft/actor/Player.h"
+#include<Loader.h>
+#include<MC.h>
 #include"seral.hpp"
 #include <sys/stat.h>
 #include<unistd.h>
@@ -40,7 +40,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     if((int)b.getPermissionsLevel()<1) return;
     string datname=a[0];
     Player& pl=*(Player*)b.getEntity();
-    MapItemSavedData& data=getMC()->getLevel()->getMapSavedData(pl.getCarriedItem());
+    MapItemSavedData& data=getMC()->getLevel()->getMapSavedData(pl.getCarriedItem().getUserData());
     loaddata(datname.c_str());
     for(int y=0;y<128;++y)
     for(int x=0;x<128;++x)

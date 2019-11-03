@@ -1,11 +1,10 @@
 #pragma once
-#include "../core/Minecraft.h"
 #include<string>
 #include "CommandRegistry.h"
 class CommandOrigin;
 class CommandOutput;
 class PermissionsFile;
-
+struct Minecraft;
 class Command {
   char filler[32];
 

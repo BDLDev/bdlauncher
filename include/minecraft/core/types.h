@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <string>
-
+/*
 enum class MCCATEGORY : char {};
 typedef uint64_t u64;
 struct MCRESULT {
@@ -23,141 +23,14 @@ struct MCRESULT {
   int getFullCode() const;
   bool isSuccess() const;
 };
-
+*/
 enum class CommandPermissionLevel : unsigned char {};
 enum class CommandOutputType : char {};
 
-struct Vec3 {
-  float x, y, z;
-
-  static Vec3 ZERO;
-
-  float const &operator[](int idx) const;
-  float &operator[](int idx);
-};
+struct Vec3;
 
 struct BlockPos;
 class Actor;
-
-struct ChunkPos {
-  int x, z;
-  ChunkPos();
-  ChunkPos(int, int);
-  ChunkPos(BlockPos const &);
-  ChunkPos(Vec3 const &);
-
-  static ChunkPos INVALID;
-  static ChunkPos MAX;
-  static ChunkPos MIN;
-  static ChunkPos const &max(ChunkPos const &, ChunkPos const &);
-  static ChunkPos const &min(ChunkPos const &, ChunkPos const &);
-
-  ChunkPos &operator=(ChunkPos const &);
-  bool operator==(ChunkPos const &) const;
-  bool operator!=(ChunkPos const &) const;
-  ChunkPos const &operator+(ChunkPos const &) const;
-  ChunkPos const &operator+(int) const;
-  ChunkPos const &operator-(ChunkPos const &) const;
-  ChunkPos const &operator-(int) const;
-
-  float distanceToSqr(Actor const &);
-  float distanceToSqr(ChunkPos const &);
-  BlockPos getMiddleBlockPosition(int);
-  int getMiddleBlockX();
-  int getMiddleBlockZ();
-  size_t hashCode();
-};
-
-struct Facing {
-  enum Direction : char { DOWN, UP, NORTH, SOUTH, WEST, EAST };
-  enum Rotation { NONE, CounterClockWise, Opposite, ClockWise };
-  static char const *toString(Direction);
-};
-
-struct BlockPos {
-  int x, y, z;
-
-  static BlockPos MAX;
-  static BlockPos MIN;
-  static BlockPos ONE;
-  static BlockPos ZERO;
-  static BlockPos const &max(BlockPos const &, BlockPos const &);
-  static BlockPos const &min(BlockPos const &, BlockPos const &);
-
-  bool operator==(BlockPos const &) const;
-  bool operator!=(BlockPos const &) const;
-  BlockPos operator+(BlockPos const &) const;
-  BlockPos operator+(int) const;
-  BlockPos operator-(BlockPos const &) const;
-  BlockPos operator-(int) const;
-  BlockPos operator-() const;
-  BlockPos operator*(int)const;
-  BlockPos const &operator=(BlockPos const &);
-  BlockPos const &operator+=(BlockPos const &);
-  BlockPos const &operator-=(BlockPos const &);
-  BlockPos const &operator*=(int);
-
-  BlockPos above() const;
-  BlockPos above(int) const;
-  BlockPos below() const;
-  BlockPos below(int) const;
-  BlockPos east() const;
-  BlockPos east(int) const;
-  BlockPos south() const;
-  BlockPos south(int) const;
-  BlockPos west() const;
-  BlockPos west(int) const;
-  BlockPos north() const;
-  BlockPos north(int) const;
-  BlockPos neighbor(Facing::Direction);
-
-  void set(BlockPos const &);
-  void set(int, int, int);
-
-  Vec3 center() const;
-  float distSqr(BlockPos const &);
-  float distSqr(float, float, float);
-};
-
-enum class AbilitiesIndex : unsigned short {
-  build,
-  mine,
-  doorsandswitches,
-  opencontainers,
-  attackplayers,
-  attackmobs,
-  op,
-  teleport,
-  invulnerable,
-  flying,
-  mayfly,
-  instabuild,
-  lightning,
-  flySpeed,
-  walkSpeed,
-  mute,
-  worldbuilder,
-  noclip,
-};
-
-namespace mce {
-struct UUID;
-}
-
-struct ActorUniqueID {
-  int64_t data;
-
-  static ActorUniqueID fromClientId(int64_t);
-  static ActorUniqueID fromUUID(mce::UUID const &);
-  size_t getHash() const;
-  operator bool() const;
-  operator int64_t() const;
-
-  bool operator!=(ActorUniqueID const &) const;
-  bool operator==(ActorUniqueID const &) const;
-  bool operator<(ActorUniqueID const &) const;
-  ActorUniqueID &operator++();
-};
 
 enum class ItemAcquisitionMethod : int {
   unknown = -1,

@@ -1,13 +1,4 @@
-/*_ZNK5Block13movedByPistonER11BlockSourceRK8BlockPos
-movedByPiston(Block *this, BlockSource *a2, const BlockPos *a3)
-_ZNK9Blacklist9isBlockedERKNS_5EntryE
-Blacklist::isBlocked(Blacklist *this, const Blacklist::Entry *a2)
-filler [84+32]
-mce::UUID //16
-string name?//32
-string emp?//32
-int dur; //4
-*/
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -19,15 +10,8 @@ int dur; //4
 #include<unordered_map>
 #include"../cmdhelper.h"
 #include<vector>
-#include"minecraft/level/Level.h"
-#include"minecraft/actor/Player.h"
-#include"minecraft/actor/ItemActor.h"
-#include"minecraft/core/GameMode.h"
-#include"minecraft/item/ItemStack.h"
-#include"minecraft/block/BlockSource.h"
-#include"minecraft/block/Block.h"
-#include"minecraft/net/Connection.h"
-#include"minecraft/net/NetworkIdentifier.h"
+#include<Loader.h>
+#include<MC.h>
 #include"seral.hpp"
 #include<unistd.h>
 #include<cstdarg>
@@ -229,6 +213,163 @@ void notifyCheat(const string& name,CheatType x){
         break;
     }
 }
+
+THook(void*,_ZN5BlockC2EtR7WeakPtrI11BlockLegacyE,Block* a,unsigned short x,void* c){
+	auto ret=original(a,x,c);
+	auto* leg=a->getLegacyBlock();
+	if(a->isContainerBlock()) leg->addBlockProperty({0x1000000LL});
+	return ret;
+}
+
+unordered_map<string,clock_t> lastchat;
+bool ChatLimit(ServerPlayer* p){
+    auto last=lastchat.find(p->getRealNameTag());
+    if(last!=lastchat.end()){
+    auto old=last->second;
+    auto now=clock();
+    last->second=now;
+    if(now-old<CLOCKS_PER_SEC*0.25) return false;
+    return true;
+    }else{
+        lastchat.insert({p->getRealNameTag(),clock()});
+        return true;
+    }
+}
+
+THook(void*,_ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK10TextPacket,ServerNetworkHandler* sh,NetworkIdentifier const& iden,Packet* pk){
+    ServerPlayer* p=sh->_getServerPlayer(iden,pk->getClientSubId());
+    if(p){
+        if(ChatLimit(p))
+        return original(sh,iden,pk);
+    }
+    return nullptr;
+}
+THook(void*,_ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK20CommandRequestPacket,ServerNetworkHandler* sh,NetworkIdentifier const& iden,Packet* pk){
+    ServerPlayer* p=sh->_getServerPlayer(iden,pk->getClientSubId());
+    if(p){
+        if(ChatLimit(p))
+        return original(sh,iden,pk);
+    }
+    return nullptr;
+}
+THook(void*,_ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK24SpawnExperienceOrbPacket,ServerNetworkHandler* sh,NetworkIdentifier const& iden,Packet* pk){
+    return nullptr;
+}
+THook(void*,_ZNK15StartGamePacket5writeER12BinaryStream,void* this_,void* a){
+    access(this_,uint,40)=114514;
+    return original(this_,a);
+}
+
+int limitLevel(int input, int max) {
+  if (input < 0)
+    return 0;
+  else if (input > max)
+    return 0;
+  return input;
+}
+struct Enchant {
+  enum Type : int {};
+  static std::vector<std::unique_ptr<Enchant>> mEnchants;
+  virtual ~Enchant();
+  virtual bool isCompatibleWith(Enchant::Type type);
+  virtual int getMinCost(int);
+  virtual int getMaxCost(int);
+  virtual int getMinLevel();
+  virtual int getMaxLevel();
+  virtual bool canEnchant(int) const;
+};
+
+struct EnchantmentInstance {
+  enum Enchant::Type type;
+  int level;
+  int getEnchantType() const;
+  int getEnchantLevel() const;
+  void setEnchantLevel(int);
+};
+//将外挂附魔无效
+THook(int, _ZNK19EnchantmentInstance15getEnchantLevelEv, EnchantmentInstance* thi) {
+  int level2 =  thi->level;
+  auto &enchant = Enchant::mEnchants[thi->type];
+  auto max      = enchant->getMaxLevel();
+  auto result   = limitLevel(level2, max);
+  if (result != level2) thi->level = result;
+  return result;
+}
+typedef unsigned long IHash;
+IHash MAKE_IHASH(ItemStack* a){
+    return  (((unsigned long)a->getUserData()->hash())&0xffffffffffff0000ull) ^ a->getIdAuxEnchanted();
+}
+struct VirtInv{
+    unordered_map<IHash,int> items;
+    bool bad;
+    VirtInv(Player& p){
+        bad=0;
+    }
+    void setBad(){
+        bad=1;
+    }
+    void addItem(IHash item,int count){
+        if(item==0) return;
+        int prev=items[item];
+        items[item]=prev+count;
+    }
+    void takeItem(IHash item,int count){
+        addItem(item,-count);
+    }
+    bool checkup(){
+        if(bad) return 1;
+        for(auto &i:items){
+            if(i.second<0){
+                return false;
+            }
+        }
+        return true;
+    }
+    void clear(){
+        items.clear();
+        bad=false;
+    }
+};
+/*
+unordered_map<string,VirtInv*> player_inv;
+THook(void*,_ZN27InventoryTransactionManager17addExpectedActionERK15InventoryAction,InventoryTransactionManager* itm,InventoryAction& b){
+    const string& name=itm->getPlayer()->getRealNameTag();
+    auto& x=b.getSource();
+    auto id1=x.getType();
+    auto id2=x.getFlags();
+    auto id3=x.getContainerId();
+    printf("wtf %d %d %d %s %s\n",id1,id2,id3,b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
+    if((id1==0 && id3==119) && b.getToItem()->getId()!=0){
+        //move item to offhand
+        if(!b.getToItem()->isOffhandItem()){
+            VirtInv* pinv=player_inv.count(name)?player_inv[name]:(player_inv[name]=new VirtInv(*itm->getPlayer()));
+            pinv->setBad();
+        }
+    }else{
+        if(id1==100 && id2==0){
+            //from virtual inv,need to sanitize fromItem!
+            VirtInv* pinv=player_inv.count(name)?player_inv[name]:(player_inv[name]=new VirtInv(*itm->getPlayer()));
+            auto x=b.getFromItem();
+            auto y=b.getToItem();
+            pinv->takeItem(MAKE_IHASH(x),x->getStackSize());
+            pinv->addItem(MAKE_IHASH(y),y->getStackSize());
+        }
+    }
+    return original(itm,b);
+}
+THook(void*,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi,Player &player, bool b){
+    const string& name=player.getRealNameTag();
+    VirtInv* pinv=player_inv.count(name)?player_inv[name]:(player_inv[name]=new VirtInv(player));
+    if(!pinv->checkup()){
+        notifyCheat(name,INV);
+        pinv->clear();
+        return nullptr;
+    }
+    //pinv->clear();
+    return original(_thi,player,b);
+}
+*/
+
 void bear_init(std::list<string>& modlist) {
     do_patch();
     load();

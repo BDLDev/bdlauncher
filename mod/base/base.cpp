@@ -1,27 +1,12 @@
-#include<cstdio>
-#include<list>
-#include<forward_list>
-#include<string>
-#include<unordered_map>
 #include"../cmdhelper.h"
 #include"../myhook.h"
+#include<Loader.h>
+#include<MC.h>
 #include<vector>
-#include"minecraft/level/Level.h"
-#include"minecraft/actor/Player.h"
-#include"minecraft/actor/ItemActor.h"
-#include"minecraft/core/GameMode.h"
-#include"minecraft/packet/TextPacket.h"
-#include"minecraft/packet/SetDisplayObjectivePacket.h"
-#include"minecraft/item/ItemStack.h"
-#include"minecraft/actor/PlayerInventoryProxy.h"
-#include"minecraft/item/Item.h"
-#include "minecraft/core/typeid.h"
-#include"seral.hpp"
+#include<seral.hpp>
 #include<signal.h>
 #include <sys/stat.h>
 #include<unistd.h>
-#include <sys/stat.h>
-#include<dlfcn.h>
 using std::string;
 using std::list;
 #include"base.h"
@@ -51,7 +36,7 @@ extern void load_helper(list<string>& modlist);
 void TeleportA(Actor& a,Vec3 b,AutomaticID<Dimension,int> c) {
     a.setPos(b);
     cmd_p.teleport(a,b,nullptr,c);
-    cmd_p.teleport(a,b,nullptr,c);
+cmd_p.teleport(a,b,nullptr,c);
 }
 void KillActor(Actor* a) {
     (*((void(**)(Actor*))((*(char**)a)+0x708)))(a);
@@ -61,7 +46,7 @@ Player* getplayer_byname(const string& name) {
     Level* lv=mc->getLevel();
     Player* rt=NULL;
     lv->forEachPlayer([&](Player& tg)->bool{
-        if(tg.getName()==name) {
+        if(tg.getRealNameTag()==name) {
             rt=&tg;
             return false;
         }
@@ -71,15 +56,7 @@ Player* getplayer_byname(const string& name) {
 }
 #define fcast(a,b) (*((a*)(&b)))
 void sendTransfer(Player* a,const string& ip,short port){
-    TransferPacket pk(ip,port);
-    ((ServerPlayer*)a)->sendNetworkPacket(fcast(Packet,pk));
-}
-void sendPacket(Player* a,void(*cb)(void*,char*),void* arg){
-	char pk[1024];
-	void(*pp)(char*)=(typeof(pp))dlsym(NULL,"_ZN6PacketC2Ev");
-	pp(pk);
-	cb(arg,pk);
-	((ServerPlayer*)a)->sendNetworkPacket(fcast(Packet,pk));
+
 }
 void readcfg(const string& fname,unordered_map<string,string>& out){    
     FILE* a=fopen(fname.c_str(),"r");
@@ -102,9 +79,9 @@ Player* getplayer_byname2(const string& name) {
     Level* lv=mc->getLevel();
     Player* rt=NULL;
     lv->forEachPlayer([&](Player& tg)->bool{
-        string bf=tg.getName();
+        string bf=tg.getRealNameTag();
 #define min(a,b) ((a)<(b)?(a):(b))
-        int sz=min(tg.getName().size(),name.size());
+        int sz=min(bf.size(),name.size());
         int eq=1;
         for(int i=0; i<sz; ++i) {
             if(tolower(bf[i])!=tolower(name[i])) {
@@ -169,6 +146,9 @@ static void mylex(std::string& oper,std::vector<std::string>& out) {
         }
     }
 }
+THook(void*,_ZN15CommandRegistry15registerCommandERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPKc22CommandPermissionLevel11CommandFlagSB_,uintptr_t a1,uintptr_t a2,uintptr_t a3,uintptr_t a4,uintptr_t a5,uintptr_t a6){
+	return original(a1,a2,a3,a4,a5,0x40);
+}
 struct ACmd : Command {
     CommandMessage msg;
     void* callee;
@@ -198,7 +178,7 @@ static ACmd* chelper(void* fn) {
 
 static void handle_regcmd(CommandRegistry& t) {
     for(auto const& i:reqs) {
-        t.registerCommand(i.name,i.desc.c_str(),(CommandPermissionLevel)0,(CommandFlag)0,(CommandFlag)32);
+        t.registerCommand(i.name,i.desc.c_str(),(CommandPermissionLevel)0,(CommandFlag)0,(CommandFlag)0x40);
         t.registerOverload2(i.name.c_str(),wr_ret_uni((u64)i.fn,(char*)chelper),CommandParameterData(type_id<CommandRegistry, CommandMessage>(), &CommandRegistry::parse<CommandMessage>, "operation", (CommandParameterDataType)0, nullptr, offsetof(ACmd, msg), false, -1));
     }
     reqs.clear();

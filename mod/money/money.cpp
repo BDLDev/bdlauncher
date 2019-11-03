@@ -5,7 +5,8 @@
 #include"../cmdhelper.h"
 #include"base.h"
 #include<vector>
-#include"minecraft/level/Level.h"
+#include<Loader.h>
+#include<MC.h>
 #include"seral.hpp"
 #include <sys/stat.h>
 #include<unistd.h>
