@@ -39,7 +39,7 @@ void TeleportA(Actor& a,Vec3 b,AutomaticID<Dimension,int> c) {
 cmd_p.teleport(a,b,nullptr,c);
 }
 void KillActor(Actor* a) {
-    (*((void(**)(Actor*))((*(char**)a)+0x708)))(a);
+    a->kill();
 }
 Player* getplayer_byname(const string& name) {
     Minecraft* mc=getMC();

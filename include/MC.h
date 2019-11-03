@@ -332,6 +332,7 @@ class Actor {
         long getRuntimeID() const;
 	void setPos(const Vec3&);
     u64 pickUpItem(ItemActor &);	
+	void kill();
 };
 class Mob : public Actor {
     public:
