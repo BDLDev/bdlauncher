@@ -182,39 +182,8 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             }
         }
     }
-    if(a[0]=="py") {
-        ARGSZ(3)
-        string pl;
-        int cou;
-        pl=b.getName();
-        cou=atoi(a[2].c_str());
-        if(a[1]=="f" && cou>0 && cou<10000) {
-            if(runcmd(string("clear \"")+pl.c_str()+"\" emerald 0 "+a[2]).isSuccess()) {
-                add_money(pl,cou*300);
-                char msg[1000];
-                sprintf(msg,"§e[Money system] 您成功使用了 %d 绿宝石换取了 %d 余额",cou,cou*300);
-                outp.success(string(msg));
-                return;
-            } else {
-                outp.error("[Money system] 绿宝石数量不足，交换失败");
-                return;
-            }
-        }
-        if(a[1]=="t" && cou>0 && cou<10000) {
-            if(red_money(pl,cou*300)) {
-                runcmd(string("give \"")+pl.c_str()+"\" emerald "+a[2]);
-                char msg[1000];
-                sprintf(msg,"§e[Money system] 您成功使用了 %d 余额换取了 %d 绿宝石",cou*300,cou);
-                outp.success(string(msg));
-                return;
-            } else {
-                outp.error("[Money system] 余额不足，交换失败");
-                return;
-            }
-        }
-    }
      if(a[0]=="help") {
-        outp.error("经济系统命令列表:\n/money query ——查询自己余额\n/money pay 玩家ID 余额 ——给玩家打钱\n/money py f 数量 ——将指定数量的绿宝石转换为余额\n/monet py t 数量 ——将余额转换为指定数量的绿宝石\n1绿宝石=300余额");
+        outp.error("经济系统命令列表:\n/money query ——查询自己余额\n/money pay 玩家ID 余额 ——给玩家打钱");
     }
 }
 
