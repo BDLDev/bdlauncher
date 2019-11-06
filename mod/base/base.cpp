@@ -36,10 +36,11 @@ extern void load_helper(list<string>& modlist);
 void TeleportA(Actor& a,Vec3 b,AutomaticID<Dimension,int> c) {
     a.setPos(b);
     cmd_p.teleport(a,b,nullptr,c);
-cmd_p.teleport(a,b,nullptr,c);
+    cmd_p.teleport(a,b,nullptr,c);
 }
 void KillActor(Actor* a) {
-    a->kill();
+    //a->kill();
+    (*(void ( **)(void*))(*(uintptr_t *)a + 1816LL))(a);
 }
 Player* getplayer_byname(const string& name) {
     Minecraft* mc=getMC();

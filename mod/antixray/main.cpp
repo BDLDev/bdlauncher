@@ -62,15 +62,6 @@ void cache_push(unsigned long hash,unordered_set<int>* v){
 }
 void calcChunk(shared_ptr<LevelChunk> chunk,ChunkPos& cpos,NetworkChunkPublisher& thi,list<std::pair<int,Block*> >&undolist){
     auto hash=chunk->getPosition()->hash();
-    /*
-    auto it=anti_cache.find(hash);
-    if(it==anti_cache.end()){
-        unordered_set<int> ore_list;
-        reCalcChunk(chunk,ore_list);
-        anti_cache.insert({hash,ore_list});
-        it=anti_cache.find(hash);
-    }
-    auto& ores=it->second;*/
     unordered_set<int>* Pores=cache_fetch(hash);
     if(!Pores){
         unordered_set<int>* ore_list=new unordered_set<int>();

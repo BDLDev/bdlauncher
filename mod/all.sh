@@ -4,4 +4,6 @@ cd bear;sh cmp.sh;cd ..;
 cd land;sh cmp.sh;cd ..;
 cd money;sh cmp.sh;cd ..;
 cd tptp;sh cmp.sh;cd ..;
-cd map;sh cmp.sh;cd ..;
+#cd map;sh cmp.sh;cd ..;
+cd gui;sh cmp.sh;cd ..;
+cd antixray;sh cmp.sh;cd ..;

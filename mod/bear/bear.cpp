@@ -252,9 +252,13 @@ THook(void*,_ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK20CommandReq
     }
     return nullptr;
 }
+
+/*
 THook(void*,_ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK24SpawnExperienceOrbPacket,ServerNetworkHandler* sh,NetworkIdentifier const& iden,Packet* pk){
-    return nullptr;
-}
+    	printf("hook\n");
+	return nullptr;
+}*/
+
 THook(void*,_ZNK15StartGamePacket5writeER12BinaryStream,void* this_,void* a){
     access(this_,uint,40)=114514;
     return original(this_,a);

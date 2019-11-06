@@ -17,7 +17,7 @@ using std::unordered_set;
 using std::list;
 using std::shared_ptr;
 using std::unique_ptr;
-#define access(ptr,type,off) *((type*)(((uintptr_t)ptr)+off))
+#define access(ptr,type,off) (*((type*)(((uintptr_t)ptr)+off)))
 #define fcast(type,x) (*((type*)&x))
 #ifndef fp
 #define fp(x) ((void*)x)
