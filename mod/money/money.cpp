@@ -230,7 +230,7 @@ static void oncmd2(std::vector<string>& a,CommandOrigin & b,CommandOutput &outp)
         const shop& sp=shops[a[1]];
         if(sp.amo>0) { //判断物品数量是否大于0，否则发送提示
             if(red_money(b.getName(),sp.mon)) { //扣除金钱，如果失败则返回金币不足
-                runcmd(("give "+b.getName()+" "+sp.ite+" "+to_string(sp.amo)));
+                runcmd(("give \""+b.getName()+"\" "+sp.ite+" "+to_string(sp.amo)));
                 outp.success("§e[Shop] 成功购买了 "+to_string(sp.amo)+" 个 "+sp.ite);   
             } else {
                 outp.error("[Shop] 金币不足");
@@ -248,7 +248,7 @@ static void oncmd2(std::vector<string>& a,CommandOrigin & b,CommandOutput &outp)
         }
         const shop& sp=shops[a[1]];
         if(sp.amo<0) { //判断物品数量是否小于0，否则发送提示
-            auto res=runcmd((string("clear ")+b.getName()+string(" ")+sp.ite+string(" 0 ")+to_string(sp.amo*-1)));
+            auto res=runcmd((string("clear \"")+b.getName()+string("\" ")+sp.ite+string(" 0 ")+to_string(sp.amo*-1)));
             if(res.isSuccess()) {
                 add_money(b.getName(),sp.mon);
                 outp.success("§e[Shop] 成功出售了 "+to_string(sp.amo*-1)+" 个 "+sp.ite);
