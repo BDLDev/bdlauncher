@@ -191,6 +191,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     if(a[0]=="buy") {
         if(startpos.count(name)+endpos.count(name)!=2) {
             outp.error("[Land system] 请选择开始和结束点");
+            return;
         }
         Vec3 pa=startpos[name];
         Vec3 pb=endpos[name];
@@ -200,6 +201,12 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         tmp.addown(name);
         tmp.dim_perm=(b.getEntity()->getDimensionId()<<4)|PERMP;
         int price=1*tmp.size();
+        if(price<0) {//阻止钻空子
+            outp.error("[Land system] 别想钻空子");
+            startpos.erase(name);
+            endpos.erase(name);
+            return;
+        }
         if(pl>0 || red_money(name,price)) {
             lands.push_front(tmp);
             ccache();
@@ -299,7 +306,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     }
 
     if(a[0]=="help") {
-        outp.error("领地系统指令列表:\n/land start ——选择起点（你站的地方）\n/land end ——选择终点\n/land buy ——选点之后买地（1格10块）\n/land trust 玩家ID ——添加访客\n/land untrust 玩家ID ——删除访客\n/land sell ——卖地\n/land query ——查看当前领地主人\n/land perm 数字 ——指定具体权限(详细看github)");
+        outp.error("领地系统指令列表:\n/land start ——选择起点（你站的地方）\n/land end ——选择终点\n/land buy ——选点之后买地（1格1金币）\n/land trust 玩家ID ——添加访客\n/land untrust 玩家ID ——删除访客\n/land sell ——卖地\n/land query ——查看当前领地主人\n/land perm 数字 ——指定具体权限(详细看github)");
     }
 }
 
