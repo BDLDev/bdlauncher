@@ -15,8 +15,8 @@ extern "C" {
 extern void load_helper(std::list<string>& modlist);
 struct CMD{
     string cond,run;
-    bool execute(const string& name){
-        if(execute_cmdchain(cond,name)) {execute_cmdchain(run,name);return true;}
+    bool execute(const string& name,bool chained=true){
+        if(execute_cmdchain(cond,name,chained)) {execute_cmdchain(run,name,false);return true;}
         return false;
     }
 };
@@ -57,11 +57,11 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     }
 }
 void join(ServerPlayer* sp){
-    joinHook.execute(sp->getName());
+    joinHook.execute(sp->getName(),false);
 }
 void tick(int tk){
     for(auto& i:timers){
-        if(i.chk(tk)) i.run.execute("");
+        if(i.chk(tk)) i.run.execute("",false);
     }
 }
 int tkl;
