@@ -1,0 +1,11 @@
+[
+{"type":"timer",
+"time":20,"shift":10,
+"cmd":"say timer!"},
+{"type":"join",
+"cmd":"say %name% hellp"},
+{"type":"define",
+"name":"STOP SERVER AS OP",
+"cond":"",
+"cmd":"stop"}
+]
