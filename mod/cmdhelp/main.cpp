@@ -38,8 +38,8 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             if(defcmds.count(s))
                 defcmds[s].execute(nm);
         });
-        x->setTitle("cmds");
-        x->setContent("choose a cmd to run\n");
+        x->setTitle("Commands-命令列表");
+        x->setContent("选择一个命令来执行\n");
         for(auto& i:defcmds){
             x->addButton(i.first,i.first);
         }
@@ -102,7 +102,7 @@ void load(){
 }
 void cmdhelp_init(std::list<string>& modlist){
     load();
-    register_cmd("c",fp(oncmd),"show cmds gui or run cmd");
+    register_cmd("c",fp(oncmd),"显示CMD GUI或运行CMD");
     register_cmd("reload_cmd",fp(load),"reload cmds",1);
     reg_player_join(join);
     printf("[CMDHelp] loaded!\n");
