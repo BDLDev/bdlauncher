@@ -7,5 +7,10 @@
 {"type":"define",
 "name":"STOP SERVER AS OP",
 "cond":"",
-"cmd":"stop"}
+"cmd":"stop"},
+{"type":"define",
+"name":"buy",
+"cond":"money rd %name% 100",
+"cmd":"!give %name% diamond 1,tell %name% lol;give %name% dirt 1,tell %name% fucku"
+}
 ]
