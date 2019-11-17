@@ -116,18 +116,18 @@ static void oncmd_suic(std::vector<string>& a,CommandOrigin const & b,CommandOut
     outp.success("§e你死了");
 }
 void sendTPForm(const string& from,int type,ServerPlayer* sp){
-    string cont=from+" wants to "+(type?"邀请对方到你这":"请求到对方地点");
+    string cont="§e"+from+(type?"想传送你到对方":"想传送到你")+"\n";
     string name=sp->getName();
     auto lis=new list<pair<string,std::function<void()> > >();
     lis->push_back({
-        "Accept",[name]{
+        "同意",[name]{
             auto x=getMC()->getLevel()->getPlayer(name);
             if(x)
                 runcmdAs("tpa ac",x);
         }
     });
     lis->push_back({
-        "Deny",[name]{
+        "拒绝",[name]{
             auto x=getMC()->getLevel()->getPlayer(name);
             if(x)
                 runcmdAs("tpa de",x);
@@ -137,7 +137,7 @@ void sendTPForm(const string& from,int type,ServerPlayer* sp){
 }
 void sendTPChoose(ServerPlayer* sp,const string& type){
     string name=sp->getName();
-    gui_ChoosePlayer(sp,"choose a player to send","TP Req",[name,type](const string& dest){
+    gui_ChoosePlayer(sp,"§e选择目标玩家","TP Req",[name,type](const string& dest){
         auto xx=getMC()->getLevel()->getPlayer(name);
             if(xx)
             runcmdAs("tpa "+type+" "+SafeStr(dest),xx);
@@ -185,7 +185,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     if(a[0]=="gui"){
         auto lis=new list<pair<string,std::function<void()> > >();
         lis->push_back({
-            "To a player",[name]{
+            "传送到玩家",[name]{
                 auto x=getMC()->getLevel()->getPlayer(name);
                 if(x)
                 {
@@ -194,7 +194,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             }
         });
         lis->push_back({
-            "A player to you",[name]{
+            "传送玩家到你",[name]{
                 auto x=getMC()->getLevel()->getPlayer(name);
                 if(x)
                 {
@@ -202,7 +202,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
                 }
             }
         });
-        gui_Buttons((ServerPlayer*)b.getEntity(),"发生传送请求","发生传送请求",lis);
+        gui_Buttons((ServerPlayer*)b.getEntity(),"发送传送请求","发送传送请求",lis);
     }
     if(a[0]=="ac") {
         //accept
@@ -232,7 +232,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             sendText(dst,"§c[Teleport] "+name+" 已拒绝传送请求");
     }
     if(a[0]=="help") {
-        outp.error("传送系统指令列表:\n/tpa f 玩家名 ——让玩家传送到你\n/tpa t 玩家名 ——传送你到玩家\n/tpa ac ——同意\n/tpa de ——拒绝");
+        outp.error("传送系统指令列表:\n/tpa gui gui传送\n/tpa f 玩家名 ——让玩家传送到你\n/tpa t 玩家名 ——传送你到玩家\n/tpa ac ——同意\n/tpa de ——拒绝");
     }
 }
 
@@ -296,18 +296,18 @@ static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOut
         for(int i=0; i<myh.cnt; ++i) {
             string warpname=myh.vals[i].name;
             lis->push_back({
-                "Go to "+warpname,
+                "到 "+warpname,
                 [warpname,name]()->void{
                     auto x=getMC()->getLevel()->getPlayer(name);
                     if(x)
-                        runcmdAs("回家 "+SafeStr(warpname),x);
+                        runcmdAs("home go "+SafeStr(warpname),x);
                 }
             });
         }
-        gui_Buttons((ServerPlayer*)b.getEntity(),"回家","家",lis);
+        gui_Buttons((ServerPlayer*)b.getEntity(),"回家\n","家",lis);
     }
     if(a[0]=="help") {
-        outp.error("家指令列表:\n/home add 名字 ——添加一个家\n/home ls ——查看你的所有家\n/home go 名字 ——回家");
+        outp.error("家指令列表:\n/home gui gui回家\n/home add 名字 ——添加一个家\n/home ls ——查看你的所有家\n/home go 名字 ——回家");
     }
 }
 static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
@@ -357,7 +357,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
                 }
             });
         }
-        gui_Buttons((ServerPlayer*)b.getEntity(),"前往地标","warp",lis);
+        gui_Buttons((ServerPlayer*)b.getEntity(),"前往地标\n","warp",lis);
     }
     //go
     for(auto const& i:wps) {

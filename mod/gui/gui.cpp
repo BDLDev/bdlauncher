@@ -88,7 +88,6 @@ THook(void*,_ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK23ModalFormR
             player_forms.erase(p->getName());
         }*/
         int id=access(pk,int,36);
-        //printf("id %d\n",id);
         if(id_forms.count(id)){
             id_forms[id]->process(access(pk,string,40));
             delete id_forms[id];
@@ -130,16 +129,6 @@ void gui_Buttons(ServerPlayer* sp,const string& text,const string& title,const l
         fm->addButton(i.first,i.first);
     }
     sendForm(*sp,fm);
-}
-static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
-    ServerPlayer& sp=*(ServerPlayer*)b.getEntity();
-    //Form* x=new Form([](const string& x)->void{});
-    //x->setContent("nmsl")->setTitle("kksk")->addButton("nm","sl")->setID(114514);
-    //sendForm(sp,x);
-            SimpleInput* xx=new SimpleInput("ms",[](const string& x)->void{printf("get %s\n",x.c_str());});
-            xx->setID(111);
-            xx->addInput("nmsl!");
-            sendForm(sp,xx);
 }
 void gui_init(std::list<string>& modlist) {
     //register_cmd("gui",fp(oncmd),"gui handler");

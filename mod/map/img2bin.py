@@ -1,7 +1,11 @@
+#!/usr/bin/python2
 import PIL.Image
 import struct
-a=PIL.Image.open("/home/cpera/bd/sxc.jpeg")
-b=a.resize((128,256),PIL.Image.LANCZOS)
+import sys
+a=PIL.Image.open(sys.argv[1])
+SIZE1=int(sys.argv[2]) #width
+SIZE2=int(sys.argv[3])
+b=a.resize((SIZE1,SIZE2),PIL.Image.LANCZOS)
 def writeit(a,woff,hoff):
 	res=""
 	for i in range(128): #y
@@ -12,7 +16,7 @@ def writeit(a,woff,hoff):
 	f.write(res)
 	f.close()
 cnt=0
-for i in range(1):
-	for j in range(2):
+for i in range(int(SIZE1/128)):
+	for j in range(int(SIZE2/128)):
 		writeit(cnt,i*128,j*128)
 		cnt=cnt+1

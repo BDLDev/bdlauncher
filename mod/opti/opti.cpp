@@ -36,6 +36,9 @@ THook(void*,_ZN13CircuitSystem8evaluateEP11BlockSource,void* a,void* b){
     }
     return nullptr;
 }
+void fast_math(){
+    asm("stmxcsr -0x4(%rsp)\norl $0x8040,-0x4(%rsp)\nldmxcsr -0x4(%rsp)");
+}
 void load(){
     using namespace rapidjson;
     Document dc;
@@ -48,21 +51,12 @@ void load(){
         printf("[OPTI] Config JSON ERROR!\n");
         exit(1);
     }
+    if(dc["FastMath"].GetBool()){
+        fast_math();
+        printf("[OPTI] FastMath\n");
+    }
     //1.13.1 26581604 1.13.2 26587812
     RedStoneMUL=dc["RedStoneMUL"].GetInt();
-    /*
-    float* patch=(float*)(dc["pAddr"].GetUint64());
-    if(patch!=nullptr){
-        void* pp=dlsym(NULL,"_ZN10LevelChunk4tickER11BlockSourceRK4Tick");
-        patch=(float*)((ulong)pp+(ulong)patch);
-        printf("%p\n",patch);
-        if(*patch!=9216){
-            printf("[OPTI] Warning!!!Broken patch dected.Wont Patch it!\n");
-        }else{
-            mprotect((void*)ROUND_PAGE_DOWN((ulong)patch),(ROUND_PAGE_UP((ulong)patch)-ROUND_PAGE_DOWN((ulong)patch)),PROT_WRITE|PROT_READ|PROT_EXEC);
-            *patch=dc["pVal"].GetInt();
-        }
-    }*/
     float* pp=(float*)(((uintptr_t)dlsym(NULL,"_ZN10LevelChunk4tickER11BlockSourceRK4Tick"))+26580000);
     //to +10000 bytes 26590000
     int newSpawnDist=dc["pVal"].GetInt();

@@ -108,7 +108,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         set_money(dst,amo);
         char buf[1024];
         sprintf(buf,"§e[Money system] 成功将 %s 的余额设置为 %d",dst.c_str(),get_money(dst));
-        outp.addMessage(string(buf));
+        outp.success(string(buf));
     }
     if(a[0]=="add") {
         if((int)b.getPermissionsLevel()<1) return;
@@ -125,7 +125,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         add_money(dst,amo);
         char buf[1024];
         sprintf(buf,"§e[Money system] 往 %s 的账户上添加了 %d",dst.c_str(),amo);
-        outp.addMessage(string(buf));
+        outp.success(string(buf));
     }
     if(a[0]=="reduce" || a[0]=="rd") {
         if((int)b.getPermissionsLevel()<1) return;
@@ -140,7 +140,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             amo=atoi(a[1].c_str());
         }
         if(red_money(dst,amo)) {
-            outp.addMessage("§e[Money system] 扣除完毕");
+            outp.success("§e[Money system] 扣除完毕");
         }
         else {
             outp.error("[Money system] 对方余额不足");
@@ -161,7 +161,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
                 add_money(pl2,mon);
                 char msg[1000];
                 sprintf(msg,"§e[Money system] 你给了 %s %d 余额",pl2.c_str(),mon);
-                outp.addMessage(string(msg));
+                outp.success(string(msg));
             } else {
                 outp.error("[Money system] Sorry，转账失败，请检查你的余额是否足够。");
             }

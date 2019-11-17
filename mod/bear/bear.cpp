@@ -308,7 +308,7 @@ THook(int, _ZNK19EnchantmentInstance15getEnchantLevelEv, EnchantmentInstance* th
 }
 typedef unsigned long IHash;
 IHash MAKE_IHASH(ItemStack* a){
-    return  (((unsigned long)a->getUserData()->hash())&0xffffffffffff0000ull) ^ a->getIdAuxEnchanted();
+    return  ((*(a->getUserData()))->hash()&0xffffffffffff0000ull) ^ a->getIdAuxEnchanted();
 }
 struct VirtInv{
     unordered_map<IHash,int> items;

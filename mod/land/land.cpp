@@ -328,7 +328,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     }
     if(a[0]=="trustgui"){
         string name=b.getName();
-        gui_ChoosePlayer((ServerPlayer*)b.getEntity(),"choose a player to trust","Land Req",[name](const string& dest){
+        gui_ChoosePlayer((ServerPlayer*)b.getEntity(),"§e选择要信任的玩家","Land Req",[name](const string& dest){
             auto xx=getMC()->getLevel()->getPlayer(name);
                 if(xx)
                 runcmdAs("land trust "+SafeStr(dest),xx);
@@ -366,7 +366,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     }
 
     if(a[0]=="help") {
-        outp.error("领地系统指令列表:\n/land start ——选择起点（你站的地方）\n/land end ——选择终点\n/land buy ——选点之后买地（1格10块）\n/land trust 玩家ID ——添加访客\n/land untrust 玩家ID ——删除访客\n/land sell ——卖地\n/land query ——查看当前领地主人\n/land perm 数字 ——指定具体权限(详细看github)");
+        outp.error("领地系统指令列表:\n/land start ——选择起点\n/land end ——选择终点\n/land prebuy 查看价格\n/land exit 退出选点模式\n/land buy ——选点之后买地\n/land trust 玩家ID ——添加访客\n/land trustgui trust的gui\n/land untrust 玩家ID ——删除访客\n/land sell ——卖地\n/land query ——查看当前领地主人\n/land perm 数字 ——指定具体权限(详细看github)");
     }
 }
 
@@ -436,11 +436,11 @@ static bool handle_useion(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPo
     if(choose_state[a0->getPlayer()->getName()]!=0){
         if(choose_state[a0->getPlayer()->getName()]==1){
             startpos[a0->getPlayer()->getName()]={a2->x,a2->y,a2->z};
-            sendText(a0->getPlayer(),"选择点 A");
+            sendText(a0->getPlayer(),"已选择点 A /land exit 退出选点模式");
         }
         if(choose_state[a0->getPlayer()->getName()]==2){
             endpos[a0->getPlayer()->getName()]={a2->x,a2->y,a2->z};
-            sendText(a0->getPlayer(),"选择点 B");
+            sendText(a0->getPlayer(),"已选择点 B /land prebuy 查看价格 /land buy 买地 /land exit 退出选点模式");
         }
         return 0;
     }
@@ -455,7 +455,7 @@ static bool handle_useion(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPo
     if(i&&!i->checkown(name)) {
         if(!i->canuse(name)) {
             char buf[1000];
-            sprintf(buf,"§c你不能在 %s 的领地与方块互交",i->owner.c_str());
+            sprintf(buf,"§c你不能在 %s 的领地与方块交互",i->owner.c_str());
             sendText2(a0->getPlayer(),string(buf));
             return 0;
         } else {

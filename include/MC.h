@@ -287,7 +287,7 @@ struct CompoundTag{
     UNK_64 putFloat(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, float);
     UNK_64 putInt64(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, long);
     UNK_64 putShort(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, short);
-    UNK_64 hash() const;
+    unsigned long int hash() const;
     string toString() const;
 };
 struct NbtIo{
