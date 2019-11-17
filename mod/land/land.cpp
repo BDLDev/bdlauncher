@@ -180,7 +180,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     ARGSZ(1)
     if(a[0]=="start") {
         choose_state[name]=1;
-        outp.success("§e[Land system] click ground to choose point A，输入/land end选择另一个点");
+        outp.success("§e[Land system] 点地选择点 A，输入/land end选择另一个点");
     }
     if(a[0]=="end") {
         if(!startpos.count(name)){
@@ -188,7 +188,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             return;
         }
         choose_state[name]=2;
-        outp.success("§e[Land system] click ground to choose point B");
+        outp.success("§e[Land system] 点地选择点 B");
     }
     if(a[0]=="exit"){
         choose_state.erase(name);
@@ -219,7 +219,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         tmp.x=xx,tmp.y=yy,tmp.dx=xx2-xx+1,tmp.dy=yy2-yy+1;
         unsigned long price=LAND_PRICE*tmp.size();
         if(price>420000000){
-            outp.error("[Land system] too big land");
+            outp.error("[Land system] 我不给你圈那么大一块");
             startpos.erase(name);
             endpos.erase(name);
             return;
@@ -255,7 +255,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         tmp.dim_perm=(b.getEntity()->getDimensionId()<<4)|PERMP;
         unsigned long price=LAND_PRICE*tmp.size();
         if(price>420000000){
-            outp.error("[Land system] too big land");
+            outp.error("[Land system] 我不给你圈那么大");
             startpos.erase(name);
             endpos.erase(name);
             return;
@@ -343,7 +343,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         if(i&&(i->checkown(name)||pl>0)) {
             i->rmown(a[1]);
             //save();
-            outp.success("§e[Land system] 已取消玩家 "+a[1]+" 的信任");
+            outp.success("§e[Land system] 已取消对玩家 "+a[1]+" 的信任");
             return;
         } else {
             outp.error("[Land system] 这不是你的领地");
@@ -436,11 +436,11 @@ static bool handle_useion(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPo
     if(choose_state[a0->getPlayer()->getName()]!=0){
         if(choose_state[a0->getPlayer()->getName()]==1){
             startpos[a0->getPlayer()->getName()]={a2->x,a2->y,a2->z};
-            sendText(a0->getPlayer(),"chose point A");
+            sendText(a0->getPlayer(),"选择点 A");
         }
         if(choose_state[a0->getPlayer()->getName()]==2){
             endpos[a0->getPlayer()->getName()]={a2->x,a2->y,a2->z};
-            sendText(a0->getPlayer(),"chose point B");
+            sendText(a0->getPlayer(),"选择点 B");
         }
         return 0;
     }
@@ -455,7 +455,7 @@ static bool handle_useion(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPo
     if(i&&!i->checkown(name)) {
         if(!i->canuse(name)) {
             char buf[1000];
-            sprintf(buf,"§c你不能在 %s 的领地与方块interact",i->owner.c_str());
+            sprintf(buf,"§c你不能在 %s 的领地与方块互交",i->owner.c_str());
             sendText2(a0->getPlayer(),string(buf));
             return 0;
         } else {
