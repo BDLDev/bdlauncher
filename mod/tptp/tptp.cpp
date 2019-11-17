@@ -116,7 +116,7 @@ static void oncmd_suic(std::vector<string>& a,CommandOrigin const & b,CommandOut
     outp.success("§e你死了");
 }
 void sendTPForm(const string& from,int type,ServerPlayer* sp){
-    string cont=from+" wants to "+(type?"teleport to you":"teleport you to him");
+    string cont=from+" wants to "+(type?"邀请对方到你这":"请求到对方地点");
     string name=sp->getName();
     auto lis=new list<pair<string,std::function<void()> > >();
     lis->push_back({
@@ -133,7 +133,7 @@ void sendTPForm(const string& from,int type,ServerPlayer* sp){
                 runcmdAs("tpa de",x);
         }
     });
-    gui_Buttons(sp,cont,"TP Request",lis);
+    gui_Buttons(sp,cont,"TP 请求",lis);
 }
 void sendTPChoose(ServerPlayer* sp,const string& type){
     string name=sp->getName();
@@ -202,7 +202,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
                 }
             }
         });
-        gui_Buttons((ServerPlayer*)b.getEntity(),"Make TP request","Make TP request",lis);
+        gui_Buttons((ServerPlayer*)b.getEntity(),"发生传送请求","发生传送请求",lis);
     }
     if(a[0]=="ac") {
         //accept
@@ -300,11 +300,11 @@ static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOut
                 [warpname,name]()->void{
                     auto x=getMC()->getLevel()->getPlayer(name);
                     if(x)
-                        runcmdAs("home go "+SafeStr(warpname),x);
+                        runcmdAs("回家 "+SafeStr(warpname),x);
                 }
             });
         }
-        gui_Buttons((ServerPlayer*)b.getEntity(),"Go to home","home",lis);
+        gui_Buttons((ServerPlayer*)b.getEntity(),"回家","家",lis);
     }
     if(a[0]=="help") {
         outp.error("家指令列表:\n/home add 名字 ——添加一个家\n/home ls ——查看你的所有家\n/home go 名字 ——回家");
@@ -349,7 +349,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
         for(auto const& i:wps) {
             string warpname=i.name;
             lis->push_back({
-                "Go to "+warpname,
+                "前往 "+warpname,
                 [warpname,nam]()->void{
                     auto x=getMC()->getLevel()->getPlayer(nam);
                     if(x)
@@ -357,7 +357,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
                 }
             });
         }
-        gui_Buttons((ServerPlayer*)b.getEntity(),"Go to warp","warp",lis);
+        gui_Buttons((ServerPlayer*)b.getEntity(),"前往地标","warp",lis);
     }
     //go
     for(auto const& i:wps) {
