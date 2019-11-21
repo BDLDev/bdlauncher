@@ -1,5 +1,6 @@
 static string sname("Server");
 BDL_EXPORT MCRESULT runcmd(const string& a) {
+    //printf("runcmd %s\n",a.c_str());
     return getMC()->getCommands()->requestCommandExecution(std::unique_ptr<CommandOrigin>((CommandOrigin*)new ServerCommandOrigin(sname,*(ServerLevel*)getMC()->getLevel(),(CommandPermissionLevel)5)),a,4,1);
 }
 struct PlayerCommandOrigin{

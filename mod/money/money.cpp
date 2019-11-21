@@ -16,6 +16,8 @@
 #include<dlfcn.h>
 #include"rapidjson/document.h"
 #include<fstream>
+#include"../gui/gui.h"
+
 using std::string;
 using std::to_string;
 extern "C" {
@@ -126,6 +128,9 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         char buf[1024];
         sprintf(buf,"§e[Money system] 往 %s 的账户上添加了 %d",dst.c_str(),amo);
         outp.success(string(buf));
+                auto dstp=getplayer_byname(dst);
+                if(dstp)
+                    sendText(dstp,"you get "+std::to_string(amo)+" money");
     }
     if(a[0]=="reduce" || a[0]=="rd") {
         if((int)b.getPermissionsLevel()<1) return;
@@ -141,6 +146,9 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         }
         if(red_money(dst,amo)) {
             outp.success("§e[Money system] 扣除完毕");
+                auto dstp=getplayer_byname(dst);
+                if(dstp)
+                    sendText(dstp,"you used "+std::to_string(amo)+" money");
         }
         else {
             outp.error("[Money system] 对方余额不足");
@@ -154,18 +162,34 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         pl=b.getName();
         pl2=a[1];
         mon=atoi(a[2].c_str());
-        if(mon<=0||mon>10000) {
-            outp.error("[Money system] 输入数值过大或过小(最大转账数10000，更大请分次转)");
+        if(mon<=0||mon>50000) {
+            outp.error("[Money system] 输入数值过大或过小(最大转账数50000，更大请分次转)");
         } else {
             if(red_money(pl,mon)) {
                 add_money(pl2,mon);
                 char msg[1000];
                 sprintf(msg,"§e[Money system] 你给了 %s %d 余额",pl2.c_str(),mon);
                 outp.success(string(msg));
+                auto dstp=getplayer_byname(pl2);
+                if(dstp)
+                    sendText(dstp,"you get "+std::to_string(mon)+" money");
             } else {
                 outp.error("[Money system] Sorry，转账失败，请检查你的余额是否足够。");
             }
         }
+    }
+    if(a[0]=="paygui"){
+        string nm=b.getName();
+        gui_ChoosePlayer((ServerPlayer*)b.getEntity(),"Choose a player to pay","Money System",[nm](const string& chosen){
+            auto p=getplayer_byname(nm);
+            if(p){
+                gui_GetInput((ServerPlayer*)p,"How much to pay to "+chosen+"?","Money System",[chosen,nm](const string& mon){
+                    auto p=getplayer_byname(nm);
+                    if(p)
+                        runcmdAs("money pay \""+chosen+"\" "+mon,p);
+                });
+            }
+        });
     }
      if(a[0]=="help") {
         outp.error("经济系统命令列表:\n/money query ——查询自己余额\n/money pay 玩家ID 余额 ——给玩家打钱");
@@ -173,7 +197,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
 }
 
 void money_init(std::list<string>& modlist) {
-    printf("[MONEY] loaded!\n");
+    printf("[MONEY] loaded! V2019-11-21\n");
     load();
     loadcfg();
     register_cmd("money",(void*)oncmd,"经济系统");

@@ -34,33 +34,31 @@ void split_string(const std::string& s, std::vector<std::string>& v, const std::
   if(pos1 != s.length())
     v.push_back(s.substr(pos1));
 }
-void execute_cmd_random(const vector<string>& chain){
+bool execute_cmd_random(const vector<string>& chain){
     int rd=rand()%chain.size();
-    execute_cmdchain(chain[rd],"",false);
+    return execute_cmdchain(chain[rd],"",false);
 }
 bool execute_cmdchain(const string& chain_,const string& sp,bool chained){
-    string chain=chain_;
+    string chain=chain_;   
     if(sp.size()){
-        vector<string> exp;
-        string tmp;
-        const string& name=sp[0]=='"'?sp:SafeStr(sp);
-        split_string(chain,exp,"%name%");
-        int expsz=exp.size();
-        int totsz=0;
-        for(auto& i:exp){
-            tmp+=i;
-            totsz++;
-            if(totsz<expsz){
-                tmp+=name;
+        char buf[8192];
+        const char* src=chain_.data();
+        int bufsz=0;
+        for(int i=0;i<chain_.size();++i){
+            if(memcmp(src+i,"%name%",6)==0){
+                memcpy(buf+bufsz,sp.data(),sp.size());
+		        bufsz+=sp.size();
+                i+=5;
+            }else{
+                buf[bufsz++]=src[i];
             }
         }
-        chain=tmp;
+        chain=string(buf,bufsz);
     }
     if(chain[0]=='!'){
         vector<string> dst;
         split_string(chain.substr(1),dst,";");
-        execute_cmd_random(dst);
-        return true;
+        return execute_cmd_random(dst);
     }
     vector<string> dst;
     split_string(chain,dst,",");
@@ -178,7 +176,7 @@ int getMobCount(){
 }
 void base_init(list<string>& modlist)
 {
-    printf("[MOD/BASE] loaded!\n");  
+    printf("[MOD/BASE] loaded! V2019-11-21\n");  
     srand(time(0));  	
     set_int_handler(fp(autostop));		
     load_helper(modlist);

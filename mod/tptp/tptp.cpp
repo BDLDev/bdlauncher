@@ -91,7 +91,7 @@ static void save() {
     mem2file("data/tp/wps.db",bf,sz);
 }
 static void load() {
-    register_shutdown(fp(save));
+    //register_shutdown(fp(save));
     mkdir("data",S_IRWXU);
     mkdir("data/tp",S_IRWXU);
     char* buf;
@@ -252,7 +252,7 @@ static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOut
         }
         myh.vals[myh.cnt]=Vpos(pos.x,pos.y,pos.z,b.getEntity()->getDimensionId(),homen);
         myh.cnt++;
-        //save();
+        save();
         outp.success("§e[Teleport] 已添加家");
     }
     if(a[0]=="del") {
@@ -267,7 +267,7 @@ static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOut
             }
         }
         myh=tmpn;
-        //save();
+        save();
         outp.success("§e[Teleport] 已删除家");
     }
     if(a[0]=="go") {
@@ -320,7 +320,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
         if(pl<1) return;
         ARGSZ(2)
         wps.push_front(Vpos(pos.x,pos.y,pos.z,b.getEntity()->getDimensionId(),a[1]));
-        //save();
+        save();
         outp.success("§e§e[Teleport] 已添加Warp");
         return;
     }
@@ -328,7 +328,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
         if(pl<1) return;
         ARGSZ(2)
         wps.remove_if([a](const Vpos& b)->bool{return b.name==a[1];});
-        //save();
+        save();
         outp.success("§e§e[Teleport] 已删除Warp");
         return;
     }
@@ -370,7 +370,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
 }
 
 void tp_init(std::list<string>& modlist) {
-    printf("[TPs] loaded!\n");
+    printf("[TPs] loaded! V2019-11-21\n");
     load();
     register_cmd("suicide",(void*)oncmd_suic,"自杀");
     register_cmd("tpa",(void*)oncmd,"传送系统");

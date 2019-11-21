@@ -8,6 +8,7 @@
 #include<forward_list>
 #include<string>
 #include<unordered_map>
+#include<unordered_set>
 #include"../cmdhelper.h"
 #include<vector>
 #include<Loader.h>
@@ -27,6 +28,8 @@
 #include <fcntl.h>
 using std::string;
 using std::unordered_map;
+using std::unordered_set;
+
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
 #define dbg_printf(...) {}
@@ -160,28 +163,37 @@ static void oncmd2(std::vector<string>& a,CommandOrigin const & b,CommandOutput 
 }
 //add custom
 using std::unordered_set;
-unordered_set<string> banitems,warnitems;
-static bool handle_u(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPos const* dstPos,Block const* a5) {
-    if(a0->getPlayer()->getPlayerPermissionLevel()>1) return 1;
-    string sn=a0->getPlayer()->getName();
+unordered_set<short> banitems,warnitems;
+
+bool checkItemInternal(ItemStack* a1,unordered_set<string>& s){
     char buf[1024];
     strcpy(buf,a1->toString().c_str());
     for(int i=0; buf[i]; ++i){
         buf[i]=tolower(buf[i]);
     }
     string sbuf(buf,strlen(buf));
-    for(auto& i:banitems){
+    for(auto& i:s){
         if(sbuf.find(i)!=string::npos){
-        async_log("[ITEM] %s 使用高危物品(banned) %s pos: %d %d %d\n",sn.c_str(),buf,a2->x,a2->y,a2->z);
-        sendText2(a0->getPlayer(),"§c无法使用违禁物品");
-        return 0;
+            return true;
         }
     }
-    for(auto& i:warnitems){
-        if(sbuf.find(i)!=string::npos){
-        async_log("[ITEM] %s 使用危险物品(warn) %s pos: %d %d %d\n",sn.c_str(),buf,a2->x,a2->y,a2->z);
+    return false;
+}
+bool dbg_player;
+static bool handle_u(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPos const* dstPos,Block const* a5) {
+    if(dbg_player){
+        sendText(a0->getPlayer(),"you use id "+std::to_string(a1->getId()));
+    }
+    if(a0->getPlayer()->getPlayerPermissionLevel()>1) return 1;
+    string sn=a0->getPlayer()->getName();
+    if(banitems.count(a1->getId())){
+        async_log("[ITEM] %s 使用高危物品(banned) %s pos: %d %d %d\n",sn.c_str(),a1->toString().c_str(),a2->x,a2->y,a2->z);
+        sendText2(a0->getPlayer(),"§c无法使用违禁物品");
+        return 0;
+    }
+    if(warnitems.count(a1->getId())){
+        async_log("[ITEM] %s 使用危险物品(warn) %s pos: %d %d %d\n",sn.c_str(),a1->toString().c_str(),a2->x,a2->y,a2->z);
         return 1;
-        }
     }
     return 1;
 }
@@ -308,7 +320,11 @@ THook(int, _ZNK19EnchantmentInstance15getEnchantLevelEv, EnchantmentInstance* th
 }
 typedef unsigned long IHash;
 IHash MAKE_IHASH(ItemStack* a){
-    return  ((*(a->getUserData()))->hash()&0xffffffffffff0000ull) ^ a->getIdAuxEnchanted();
+    IHash res= a->getIdAuxEnchanted();
+    if(*a->getUserData()){
+        res^=(*(a->getUserData()))->hash()<<24;
+    }
+    return res;
 }
 struct VirtInv{
     unordered_map<IHash,int> items;
@@ -380,6 +396,48 @@ THook(void*,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi,Player 
     return original(_thi,player,b);
 }
 */
+
+unordered_set<string> ab_players;
+/*
+THook(void*,_ZN27InventoryTransactionManager17addExpectedActionERK15InventoryAction,InventoryTransactionManager* itm,InventoryAction* b){
+    const string& name=itm->getPlayer()->getName();
+    auto& x=b.getSource();
+    auto id1=x.getType();
+    auto id2=x.getFlags();
+    auto id3=x.getContainerId();
+    auto fitem=b.getFromItem();
+    auto titem=b.getToItem();
+    if(checkItemInternal(fitem,banitems) || checkItemInternal(titem,banitems)){
+        ab_players.insert(name);
+        async_log("[ITEM] %s 使用高危物品(banned) %s %s\n",name.c_str(),fitem->toString().c_str(),titem->toString().c_str());
+    }
+
+}*/
+bool InvAbnormal(const string& nm){
+    if(ab_players.erase(nm)) return true; else return false;
+}
+THook(unsigned long,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi,Player &player, bool b){
+    const string& name=player.getName();
+    auto& a=*((unordered_map<InventorySource,vector<InventoryAction> >*)_thi);
+    for(auto& i:a){
+    for(auto& j:i.second){
+        if(i.first.getContainerId()==119){
+            //offhand chk
+            if((!j.getToItem()->isNull() && !j.getToItem()->isOffhandItem()) || (!j.getFromItem()->isNull() && !j.getFromItem()->isOffhandItem())){
+                notifyCheat(name,INV);
+                return 6;
+            }
+        }
+        if(banitems.count(j.getFromItem()->getId()) || banitems.count(j.getToItem()->getId())){
+            async_log("[ITEM] %s 使用高危物品(banned) %s %s\n",name.c_str(),j.getFromItem()->toString().c_str(),j.getToItem()->toString().c_str());
+            sendText2(&player,"§c无法使用违禁物品");
+            return 6;
+        }
+        //printf("get %d %s %s hash %ld %ld\n",i.first.getContainerId(),j.getFromItem()->toString().c_str(),j.getToItem()->toString().c_str(),MAKE_IHASH(j.getFromItem()),MAKE_IHASH(j.getToItem()));
+    }
+    }
+    return original(_thi,player,b);
+}
 char buf[1024*1024];
 using namespace rapidjson;
 void load_config(){
@@ -400,19 +458,13 @@ void load_config(){
     FExpOrb=d["FSpwanExp"].GetBool();
     FDest=d["FDestroyCheck"].GetBool();
     FChatLimit=d["FChatLimit"].GetBool();
-    string x=d["banitems"].GetString();
-    using std::vector;
-    vector<string> ite;
-    split_string(x,ite,",");
-    for(auto& i:ite){
-        printf("[ANTIBEAR] adding banitem %s\n",i.c_str());
-        banitems.insert(i);
+    auto&& x=d["banitems"].GetArray();
+    for(auto& i:x){
+        banitems.insert((short)i.GetInt());
     }
-    x=d["warnitems"].GetString();
-    ite.clear();
-    split_string(x,ite,",");
-    for(auto& i:ite){
-        warnitems.insert(i);
+    auto&& y=d["warnitems"].GetArray();
+    for(auto& i:y){
+        warnitems.insert((short)i.GetInt());
     }
 }
 string lastn;
@@ -455,6 +507,9 @@ static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
     }
     return 1;
 }
+void toggle_dbg(){
+    dbg_player=!dbg_player;
+}
 void bear_init(std::list<string>& modlist) {
     load();
     load2();
@@ -462,12 +517,13 @@ void bear_init(std::list<string>& modlist) {
     register_cmd("ban",fp(oncmd),"封禁玩家",1);
     register_cmd("unban",fp(oncmd2),"解除封禁",1);
     register_cmd("reload_bear",fp(load_config),"Reload Configs for antibear",1);
+    register_cmd("bear_dbg",fp(toggle_dbg),"toggle debug item",1);
     reg_useitemon(handle_u);
     reg_player_left(handle_left);
     reg_chat(hkc);
     load_config();
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
-    printf("[ANTI-BEAR] Loaded\n");
+    printf("[ANTI-BEAR] Loaded V2019-11-21\n");
     load_helper(modlist);
 }
 

@@ -27,31 +27,34 @@ struct Timer{
         return tk%tim==sft;
     }
 };
-unordered_map<string,CMD> defcmds;
+struct CMDForm{
+    unordered_map<string,CMD> cmds;
+    string content;
+    string title;
+    void sendTo(ServerPlayer& sp){
+        string nm=sp.getName();
+        Form* x=new Form([this,nm](const string& s)->void{
+            //printf("handle %s %s\n",nm.c_str(),s.c_str());
+            if(cmds.count(s))
+                cmds[s].execute(nm);
+        });
+        x->setContent(content);
+        x->setTitle(title);
+        for(auto& i:cmds)
+            x->addButton(i.first,i.first);
+        sendForm(sp,x);
+    }
+};
+unordered_map<string,CMDForm> forms;
 list<Timer> timers;
 CMD joinHook;
 static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     auto nm=b.getName();
-    if(a.size()==0){
-        //show gui
-        Form* x=new Form([nm](const string& s)->void{
-            if(defcmds.count(s))
-                defcmds[s].execute(nm);
-        });
-        x->setTitle("Commands-命令列表");
-        x->setContent("选择一个命令来执行\n");
-        for(auto& i:defcmds){
-            x->addButton(i.first,i.first);
-        }
-        sendForm(*((ServerPlayer*)b.getEntity()),x);
-        return;
-    }
-    if(defcmds.count(a[0])){
-        if(defcmds[a[0]].execute(nm)){
-            outp.success("success");
-        }else{
-            outp.error("error");
-        }
+    if(a.size()==0) a.push_back("root");
+    if(forms.count(a[0])){
+        auto& fm=forms[a[0]];
+        fm.sendTo(*(ServerPlayer*)b.getEntity());
+        outp.success("gui showed");
     }else{
         outp.error("cant find");
     }
@@ -74,7 +77,7 @@ char buf[8*1024*1024];
 using namespace rapidjson;
 void load(){
     timers.clear();
-    defcmds.clear();
+    forms.clear();
     Document dc;
     ifstream ff;
     ff.open("config/cmd.json",ios::in);
@@ -89,11 +92,22 @@ void load(){
         auto typ=string(x["type"].GetString());
         if(typ=="join"){
             joinHook={"",string(x["cmd"].GetString())};
-            continue;
         }
-        if(typ=="define"){
-            defcmds.insert({string(x["name"].GetString()),(CMD){string(x["cond"].GetString()),string(x["cmd"].GetString())}});
-            continue;
+        if(typ=="form"){
+            auto&& buttons=x["buttons"];
+            auto&& cont=x["text"];
+            auto&& title=x["title"];
+	auto&& name=x["name"];
+            assert(buttons.IsArray());
+            CMDForm cf;
+            cf.title=title.GetString();
+            cf.content=cont.GetString();
+            for(auto& i:buttons.GetArray()){
+                assert(i.IsArray());
+                auto&& but=i.GetArray();
+                cf.cmds.insert({but[0].GetString(),{but[1].GetString(),but[2].GetString()}});
+            }
+	forms.insert({name.GetString(),cf});
         }
         if(typ=="timer"){
             timers.push_back({x["time"].GetInt(),x["shift"].GetInt(),{"",x["cmd"].GetString()}});
@@ -102,9 +116,9 @@ void load(){
 }
 void cmdhelp_init(std::list<string>& modlist){
     load();
-    register_cmd("c",fp(oncmd),"显示CMD GUI或运行CMD");
+    register_cmd("c",fp(oncmd),"显示CMD GUI");
     register_cmd("reload_cmd",fp(load),"reload cmds",1);
     reg_player_join(join);
-    printf("[CMDHelp] loaded!\n");
+    printf("[CMDHelp] loaded! V2019-11-21\n");
     load_helper(modlist);
 }

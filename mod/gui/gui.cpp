@@ -132,6 +132,6 @@ void gui_Buttons(ServerPlayer* sp,const string& text,const string& title,const l
 }
 void gui_init(std::list<string>& modlist) {
     //register_cmd("gui",fp(oncmd),"gui handler");
-    printf("[GUI] Loaded\n");
+    printf("[GUI] Loaded V2019-11-21\n");
     load_helper(modlist);
 }

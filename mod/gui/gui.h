@@ -29,6 +29,8 @@ struct Form:BaseForm{
         dc.AddMember("buttons",x,dc.GetAllocator());
     }
     void process(const string& d){
+        //printf("gui get %s\n",d.c_str());
+        if(d[0]=='n') return;
         int idx=atoi(d.c_str());
         cb(labels[idx]);
     }
@@ -80,6 +82,7 @@ struct SimpleInput:BaseForm{
         /*dc.Parse(d.c_str());
         if(!dc.IsArray()) return;
         cb(string(dc.GetArray().Begin()->GetString()));*/
+        if(d[0]=='n') return;
         cb(string(d.substr(2,d.size()-5)));
     }
     int getid(){

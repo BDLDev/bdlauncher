@@ -145,7 +145,7 @@ struct TMCache{
         pools[1].clear();
     }
 };
-static TMCache<std::tuple<int,int,int>,128 > tcache;
+static TMCache<std::tuple<int,int,int>,160 > tcache;
 static void ccache() {
     tcache.clear();
 }
@@ -198,6 +198,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         choose_state.erase(name);
         if(startpos.count(name)+endpos.count(name)!=2) {
             outp.error("[Land system] 请选择开始和结束点");
+            return;
         }
         Vec3 pa=startpos[name];
         Vec3 pb=endpos[name];
@@ -218,7 +219,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         land tmp;
         tmp.x=xx,tmp.y=yy,tmp.dx=xx2-xx+1,tmp.dy=yy2-yy+1;
         unsigned long price=LAND_PRICE*tmp.size();
-        if(price>420000000){
+        if(price>100000000 || price<=0 || xx2-xx+1>16384 || yy2-yy+1>16384){
             outp.error("[Land system] 我不给你圈那么大一块");
             startpos.erase(name);
             endpos.erase(name);
@@ -232,6 +233,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         choose_state.erase(name);
         if(startpos.count(name)+endpos.count(name)!=2) {
             outp.error("[Land system] 请选择开始和结束点");
+            return;
         }
         Vec3 pa=startpos[name];
         Vec3 pb=endpos[name];
@@ -254,7 +256,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         tmp.addown(name);
         tmp.dim_perm=(b.getEntity()->getDimensionId()<<4)|PERMP;
         unsigned long price=LAND_PRICE*tmp.size();
-        if(price>420000000){
+        if(price>100000000 || price<=0 || xx2-xx+1>16384 || yy2-yy+1>16384 ){
             outp.error("[Land system] 我不给你圈那么大");
             startpos.erase(name);
             endpos.erase(name);
@@ -263,7 +265,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         if(pl>0 || red_money(name,price)) {
             lands.push_front(tmp);
             ccache();
-            //save();
+            save();
             outp.success("§e[Land system] 购买成功");
             startpos.erase(name);
             endpos.erase(name);
@@ -305,7 +307,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
                 return n.dim_perm==114514;
             });
             ccache();
-            //save();
+            save();
             return;
         } else {
             outp.error("[Land system] 这不是你的领地");
@@ -319,7 +321,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         land* i=getLand(x,y,dim);
         if(i&&(i->checkown(name)||pl>0)) {
             i->addown(a[1]);
-            //save();
+            save();
             outp.success("§e[Land system] 已信任玩家 "+a[1]);
             return;
         } else {
@@ -340,13 +342,13 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         int x=round(b.getWorldPosition().x);
         int y=round(b.getWorldPosition().z); //fix
         land* i=getLand(x,y,dim);
-        if(i&&(i->checkown(name)||pl>0)) {
+        if(i&&(i->checkown(name)||pl>0)&&i->checkown(a[1])) {
             i->rmown(a[1]);
-            //save();
+            save();
             outp.success("§e[Land system] 已取消对玩家 "+a[1]+" 的信任");
             return;
         } else {
-            outp.error("[Land system] 这不是你的领地");
+            outp.error("[Land system] 这不是你的领地 or the player doesnt own the land");
         }
     }
     if(a[0]=="perm") {
@@ -358,7 +360,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         if(i&&(i->checkown(name)||pl>0)) {
             i->dim_perm-=(i->dim_perm&15);
             i->dim_perm|=atoi(a[1].c_str());
-            //save();
+            save();
             outp.success("§e[Land system] 权限更改 "+a[1]);
         } else {
             outp.error("[Land system] 这不是你的领地");
@@ -378,7 +380,7 @@ static void save() {
 static void load() {
     mkdir("data",S_IRWXU);
     mkdir("data/land",S_IRWXU);
-    register_shutdown(fp(save));
+    //register_shutdown(fp(save));
     char* buf;
     int sz;
     struct stat tmp;
@@ -450,23 +452,47 @@ static bool handle_useion(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPo
     }
     const string& name=a0->getPlayer()->getName();
     int dim=a0->getPlayer()->getDimensionId();
-    int x(dstPos->x),y(dstPos->z);
+    int x(dstPos->x),y(dstPos->z);  //FIX:check both blockpos
     land* i=getLand(x,y,dim);
+    int prevent=0;
     if(i&&!i->checkown(name)) {
         if(!i->canuse(name)) {
             char buf[1000];
             sprintf(buf,"§c你不能在 %s 的领地与方块交互",i->owner.c_str());
             sendText2(a0->getPlayer(),string(buf));
-            return 0;
+            prevent|=1;
         } else {
-            return i->checkown(name) || a1->isNull();
+             prevent|=!a1->isNull();
         }
+    }
+    x=a2->x;y=a2->z;
+    i=getLand(x,y,dim);
+    if(i&&!i->checkown(name)) {
+        if(!i->canuse(name)) {
+            char buf[1000];
+            sprintf(buf,"§c你不能在 %s 的领地与方块交互",i->owner.c_str());
+            sendText2(a0->getPlayer(),string(buf));
+            prevent|=1;
+        } else {
+             prevent|=!a1->isNull();
+        }
+    }
+    return !prevent;
+}
+static bool handle_popitem(ServerPlayer& sp,BlockPos& bpos){
+    int x(bpos.x),y(bpos.z);
+    land* i=getLand(x,y,sp.getDimensionId());
+    auto nm=sp.getName();
+    if(i&&!i->checkown(nm)&&!i->canuse(nm)) {
+        char buf[1000];
+        sprintf(buf,"§c你不能在 %s 的领地与方块交互",i->owner.c_str());
+        sendText2(&sp,string(buf));
+        return 0;
     }
     return 1;
 }
-
 void land_init(std::list<string>& modlist) {
-    printf("[LAND] loaded!\n");
+    printf("[LAND] loaded! V2019-11-21\n");
     load();
     loadcfg();
     MyHook(fp(dlsym(NULL,"_ZNK9FarmBlock15transformOnFallER11BlockSourceRK8BlockPosP5Actorf")),fp(dummy));
@@ -475,5 +501,6 @@ void land_init(std::list<string>& modlist) {
     reg_destroy(handle_dest);
     reg_useitemon(handle_useion);
     reg_attack(handle_atk);
+    reg_popItem(handle_popitem);
     load_helper(modlist);
 }

@@ -350,3 +350,20 @@ THook(void*,_ZN8GameMode9useItemOnER9ItemStackRK8BlockPoshRK4Vec3PK5Block,GameMo
 void reg_useitemon(std::function<bool(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPos const* dstPos,Block const* a5)> x){
     useion_hook.push_back(x);
 }
+list<std::function<bool(ServerPlayer&,BlockPos&)> > popItem_hook;
+THook(void*,_ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK23ItemFrameDropItemPacket,ServerNetworkHandler* sh,NetworkIdentifier const& iden,Packet* pk){
+    ServerPlayer* p=sh->_getServerPlayer(iden,pk->getClientSubId());
+    if(p){
+        //+0x24
+        auto& bpos=access(pk,BlockPos,0x24);
+        int fg=1;
+        for(auto& i:popItem_hook){
+            if(!i(*p,bpos)) fg=0;
+        }
+        if(fg) return original(sh,iden,pk);
+    }
+    return nullptr;
+}
+void reg_popItem(std::function<bool(ServerPlayer&,BlockPos&)> x){
+    popItem_hook.push_back(x);
+}

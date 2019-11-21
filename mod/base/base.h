@@ -48,7 +48,7 @@ BDL_EXPORT void reg_chat(std::function<bool(ServerPlayer const* a0,string& paylo
 BDL_EXPORT void reg_player_join(std::function<void(ServerPlayer *)>);
 BDL_EXPORT void reg_player_left(std::function<void(ServerPlayer *)>);
 BDL_EXPORT void reg_pickup(std::function<bool(Actor* a0,ItemActor * a1)>);
-
+BDL_EXPORT void reg_popItem(std::function<bool(ServerPlayer&,BlockPos&)>);
 BDL_EXPORT int getPlayerCount();
 BDL_EXPORT int getMobCount();
 

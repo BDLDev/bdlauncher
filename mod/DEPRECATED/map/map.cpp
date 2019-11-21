@@ -19,7 +19,9 @@
 
 using std::string;
 extern "C" {
-    void map_init(std::list<string>& modlist);
+    BDL_EXPORT void map_init(std::list<string>& modlist);
+    void _ZN28ClientboundMapItemDataPacketC2ER16MapItemSavedDataR5Level(void* thi,MapItemSavedData *a2, Level *a3);
+	void _ZN28ClientboundMapItemDataPacketD2Ev(void*);
 }
 extern void load_helper(std::list<string>& modlist);
 static unsigned int getrgb(unsigned char r,unsigned char g,unsigned char b){
@@ -35,23 +37,29 @@ static void loaddata(const char* fn){
         datam[i]|=0xff000000;
     }
 }
+extern "C"{
+    Packet* _ZNK16MapItemSavedData17getFullDataPacketEv(MapItemSavedData*,char*);
+};
 static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     ARGSZ(1)
     string datname=a[0];
     Player& pl=*(Player*)b.getEntity();
-    auto x=pl.getCarriedItem().getUserData();
-    MapItemSavedData& data=getMC()->getLevel()->getMapSavedData(unique_ptr<CompoundTag>(x));
+    auto xx=pl.getCarriedItem().getUserData();
+    MapItemSavedData& data=getMC()->getLevel()->getMapSavedData(unique_ptr<CompoundTag>(*xx));
     loaddata(datname.c_str());
     for(int y=0;y<128;++y)
     for(int x=0;x<128;++x)
         data.setPixel(datam[y*128+x],x,y);
     data.setLocked();
     data.save(*getMC()->getLevel()->getLevelStorage());
-    auto x=data.getFullDataPacket();
-    b.getDimension()->forEachPlayer([&](Player& p)->bool{
-        ((ServerPlayer*)&p)->sendNetworkPacket(*x);
+    outp.success("okay!rejoin server to see new map");
+    /*char filler[16384];
+    _ZN28ClientboundMapItemDataPacketC2ER16MapItemSavedDataR5Level(filler,&data,getMC()->getLevel());
+    getMC()->getLevel()->forEachPlayer([&](Player& p)->bool{
+        ((ServerPlayer*)&p)->sendNetworkPacket(*(Packet*)filler);
         return true;
     });
+_ZN28ClientboundMapItemDataPacketD2Ev(filler);*/
 }
 void map_init(std::list<string>& modlist) {
     printf("[CustomMap] loaded!\n");

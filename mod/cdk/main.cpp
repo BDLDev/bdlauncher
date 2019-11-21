@@ -83,6 +83,6 @@ void cdk_init(std::list<string>& modlist){
     load();
     register_cmd("cdk",fp(oncmd),"use a cdk");
     register_cmd("reload_cdk",fp(load),"reload cdks",1);
-    printf("[CDK] loaded!\n");
+    printf("[CDK] loaded! V2019-11-21\n");
     load_helper(modlist);
 }
