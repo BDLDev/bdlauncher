@@ -1,7 +1,7 @@
 # cmdhelp.so
 /c打开预设命令列表  
 /reload_cmd 重载配置  
-
+<pre>
 配置文件 cmd.json  
 [  
 {"type":"timer",  
@@ -18,17 +18,30 @@ time为秒数，shift为余数，开服时间除time余shift时执行
 /×  
 这是进服指令  
 cmd为指令序列（参见base-cmd.md)  
-×/  
-{"type":"define",  
-"name":"STOP SERVER AS OP use 100 money",  
-"cond":"money rd %name% 100",  
-"cmd":"stop"}  
-/×  
-这是预设指令  
-name 预设指令名（/c显示的）  
-cond为指令序列，当且仅当cond执行成功时，才以服务器控制台权限执行cmd  
-cmd为指令序列（参见base-cmd.md)  
-可以用来做商店 
-×/  
+×/
+[
+{"type":"timer",
+"time":5000,"shift":10,
+"cmd":"say timer!"},
+{"type":"join",
+"cmd":"say %name% hellp"},
+/*text为gui内容，title为标题，name为指定的名字，通过/c 名字打开gui,默认主菜单名字root*/
+{"type":"form",
+"text":"this is main menu",
+"title":"Main menu",
+"name":"root",
+"buttons":[["kill me","money rd %name% 10","kill %name%"],
+["open submenu","","execute %name% ~ ~ ~ c sub1"],
+["buy sth","money rd %name% 10","give %name% diamond 10"],
+["sell dirt","clear %name% dirt 0 9,clear %name dirt 0 1","money add %name% 1,tell %name% dirt is cheapppp"],
+["magic","money rd %name% 10","!money add %name% 1;money add %name% 20"]]}, /*magic 为等概率随机执行两个指令 可以指定多个*/
+{"type":"form",
+"text":"sub menu",
+"title":"sub",
+"name":"sub1",
+"buttons":[["me","","say %name% 114514"],["back","","execute %name% ~ ~ ~ c root"]]},
+{"type":"menuitem","itemid":3}  /*物品id为3点地打开菜单*/
 ]
+]
+</pre>
 

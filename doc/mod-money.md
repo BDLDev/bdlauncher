@@ -8,6 +8,9 @@ op指令
 /money add Steve 10000  
 /money rd Steve 10000 扣钱，如果扣钱成功，会触发success，可以做链式命令方块或者cmdchain内cond使用  
 
+GUI指令  
+/money paygui  
+
 /reload_money 重载配置  
 配置文件 money.json  
 init_money:玩家初始金钱  
