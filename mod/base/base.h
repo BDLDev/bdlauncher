@@ -49,8 +49,15 @@ BDL_EXPORT void reg_player_join(std::function<void(ServerPlayer *)>);
 BDL_EXPORT void reg_player_left(std::function<void(ServerPlayer *)>);
 BDL_EXPORT void reg_pickup(std::function<bool(Actor* a0,ItemActor * a1)>);
 BDL_EXPORT void reg_popItem(std::function<bool(ServerPlayer&,BlockPos&)>);
+BDL_EXPORT void reg_mobhurt(function<bool(Mob&,ActorDamageSource const&,int&)> x);
+BDL_EXPORT void reg_mobdie(function<void(Mob&,ActorDamageSource const&)> x);
+
 BDL_EXPORT int getPlayerCount();
 BDL_EXPORT int getMobCount();
+
+BDL_EXPORT NetworkIdentifier* getPlayerIden(ServerPlayer& sp);
+BDL_EXPORT ServerPlayer* getuser_byname(const string& a);
+BDL_EXPORT void forceKickPlayer(ServerPlayer& sp);
 
 #define ARGSZ(b) if(a.size()<b){outp.error("check your arg");return;}
 #define SafeStr(a) ("\""+(a)+"\"")

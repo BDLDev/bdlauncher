@@ -32,7 +32,7 @@ static void async_log(const char* fmt,...) {
     write(logfd,buf,s);
     va_end(vl);
 }
-void save();
+static void save();
 unordered_map<string,string> cdks;
 static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     ARGSZ(1)
@@ -46,7 +46,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
 }
 using namespace rapidjson;
 char buf[1024*1024*4];
-void load(){
+static void load(){
     cdks.clear();
     Document dc;
     ifstream ff;
@@ -61,7 +61,7 @@ void load(){
         cdks.insert({i.name.GetString(),i.value.GetString()});
     }
 }
-void save(){
+static void save(){
     Document dc;
     dc.SetObject();
     Value v(kStringType),vv(kStringType);
@@ -83,6 +83,6 @@ void cdk_init(std::list<string>& modlist){
     load();
     register_cmd("cdk",fp(oncmd),"use a cdk");
     register_cmd("reload_cdk",fp(load),"reload cdks",1);
-    printf("[CDK] loaded! V2019-11-21\n");
+    printf("[CDK] loaded! V2019-11-23\n");
     load_helper(modlist);
 }

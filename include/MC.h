@@ -73,6 +73,9 @@ struct ItemStack;
 struct ItemActor;
 struct CommandContext;
 enum class MCCATEGORY : char {};
+struct ActorUniqueID{
+    unsigned long id;
+};
 typedef uint64_t u64;
 struct MCRESULT {
   bool success;        // 0
@@ -96,6 +99,7 @@ class MinecraftCommands {
 public:
   MCRESULT requestCommandExecution(std::unique_ptr<CommandOrigin>, std::string const &, int, bool) const;
 };
+class Actor;
 struct Level{
     void* getPacketSender() const;
     UNK_64 save();
@@ -105,6 +109,8 @@ struct Level{
     MapItemSavedData& getMapSavedData(std::unique_ptr<CompoundTag, std::default_delete<CompoundTag> > const&);
     int getUserCount() const;
     int getTickedMobCountPrevious() const;
+    std::vector<std::unique_ptr<ServerPlayer> >& getUsers();
+    Actor* fetchEntity(ActorUniqueID, bool) const;
 };
 struct ChunkBlockPos{
     unsigned char x,z;
@@ -204,10 +210,10 @@ class ServerPlayer;
 class NetworkIdentifier;
 struct ServerNetworkHandler{
     ServerPlayer* _getServerPlayer(NetworkIdentifier const&, unsigned char);
-
     void _onPlayerLeft(ServerPlayer*, bool);
-void _sendAdditionalLevelData(ServerPlayer&, NetworkIdentifier const&);
-void disconnectClient(NetworkIdentifier const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool); //def false?
+    void _sendAdditionalLevelData(ServerPlayer&, NetworkIdentifier const&);
+    void disconnectClient(NetworkIdentifier const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool); //def false?
+    void onSubclientLogoff(NetworkIdentifier const&, unsigned char const&);
 };
 struct Minecraft{
     ServerNetworkHandler *getNetworkHandler();
@@ -335,6 +341,7 @@ class TickingArea {
 public:
   BlockSource *getBlockSource();
 };
+class Mob;
 class Actor:public TickingArea {
     public:
         const std::string &getNameTag() const;
@@ -346,9 +353,16 @@ class Actor:public TickingArea {
         ItemStack& getOffhandSlot() const;
         Dimension& getDimension() const;
         long getRuntimeID() const;
+        ActorUniqueID& getUniqueID() const;
 	void setPos(const Vec3&);
     u64 pickUpItem(ItemActor &);	
 	void kill();
+    void setNameTag(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&);
+    Mob* getOwner() const;
+    ServerPlayer* getPlayerOwner() const;
+    int getEntityTypeId() const;
+    int getOwnerEntityType();
+    ActorUniqueID getOwnerId() const;
 };
 class Mob : public Actor {
     public:
@@ -384,6 +398,7 @@ class Player : public Mob {
         std::string getXUID() const { return ExtendedCertificate::getXuid(getCertificate()); }
     uint64_t attack(Actor &);
     bool isCreative(void)const;
+    unsigned char getClientSubId() const;
 };
 class ServerPlayer : public Player {
     public:
@@ -411,9 +426,7 @@ struct InventoryAction {
     InventorySource& getSource(void) const;
     ItemStack* getToItem(void) const;
     ItemStack* getFromItem(void) const;
-    unsigned int getSid() const {
-        return *(unsigned int*)((char*)this+12);
-    };
+    unsigned int getSlot(void) const;
 };
 struct InventoryTransactionManager {
     char filler[40];
@@ -466,3 +479,19 @@ struct TextPacket:Packet{
   static TextPacket createJukeboxPopup(std::string const& txt);
 };
 
+class ActorDamageSource{
+    public:
+    virtual void destruct1()=0;
+    virtual void destruct2()=0;
+    virtual bool isEntitySource()const=0;
+    virtual bool isChildEntitySource()const=0;
+    private:
+     virtual UNK_64 unk1()=0;
+     virtual UNK_64 unk2()=0;
+     virtual UNK_64 unk3()=0;
+     virtual UNK_64 unk4()=0;
+    public:
+     virtual ActorUniqueID getEntityUniqueID()const =0 ;
+     virtual int getEntityType()const=0 ;
+     virtual int getEntityCategories()const=0 ;
+};

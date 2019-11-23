@@ -1,2 +1,2 @@
-g++ -std=gnu++17 -I include/ main.cpp hook.cpp loader.cpp libPFishHook.a -shared -fPIC -ldl -Ofast -o out/a.so
+g++ -std=gnu++17 -I include/ main.cpp hook.cpp loader.cpp libPFishHook.a -shared -fPIC -ldl -O3 -Wl,-z,relro,-z,now  -o out/a.so
 

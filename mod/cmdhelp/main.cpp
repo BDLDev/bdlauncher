@@ -59,10 +59,10 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         outp.error("cant find");
     }
 }
-void join(ServerPlayer* sp){
+static void join(ServerPlayer* sp){
     joinHook.execute(sp->getName(),false);
 }
-void tick(int tk){
+static void tick(int tk){
     for(auto& i:timers){
         if(i.chk(tk)) i.run.execute("",false);
     }
@@ -73,9 +73,10 @@ THook(void*,_ZN5Level4tickEv,Level& a){
     if(tkl%20==0) tick(tkl/20);
     return original(a);
 }
+int menuitem;
 char buf[8*1024*1024];
 using namespace rapidjson;
-void load(){
+static void load(){
     timers.clear();
     forms.clear();
     Document dc;
@@ -90,6 +91,9 @@ void load(){
     for(auto& i:dc.GetArray()){
         auto&& x=i.GetObject();
         auto typ=string(x["type"].GetString());
+        if(typ=="menuitem"){
+            menuitem=x["itemid"].GetInt();
+        }
         if(typ=="join"){
             joinHook={"",string(x["cmd"].GetString())};
         }
@@ -114,11 +118,20 @@ void load(){
         }
     }
 }
+
+static bool handle_u(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPos const* dstPos,Block const* a5){
+    if(a1->getId()==menuitem){
+        runcmdAs("c",a0->getPlayer());
+        return 0;
+    }
+    return 1;
+}
 void cmdhelp_init(std::list<string>& modlist){
     load();
     register_cmd("c",fp(oncmd),"显示CMD GUI");
     register_cmd("reload_cmd",fp(load),"reload cmds",1);
     reg_player_join(join);
+    reg_useitemon(handle_u);
     printf("[CMDHelp] loaded! V2019-11-21\n");
     load_helper(modlist);
 }

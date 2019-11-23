@@ -197,7 +197,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
 }
 
 void money_init(std::list<string>& modlist) {
-    printf("[MONEY] loaded! V2019-11-21\n");
+    printf("[MONEY] loaded! V2019-11-23\n");
     load();
     loadcfg();
     register_cmd("money",(void*)oncmd,"经济系统");

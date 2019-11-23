@@ -412,27 +412,33 @@ static int handle_dest(GameMode* a0,BlockPos const* a1) {
     }
     return 1;
 }
-static bool handle_atk(ServerPlayer* a0,Actor * a1) {
-    int pl=a0->getPlayerPermissionLevel();
-    if(pl>1) {
-        return 1;
-    }
-    const string& name=a0->getName();
-    int dim=a1->getDimensionId();
-    Vec3 vc=a1->getPos();
-    int x(vc.x),y(vc.z); //fixed
-    land* i=getLand(x,y,dim);
-    if(i&&!i->checkown(name)) {
-        if(!i->canatk(name)) {
-            char buf[1000];
-            sprintf(buf,"§c你不可以在 %s 的领地内攻击",i->owner.c_str());
-            sendText2(a0,string(buf));
-            return 0;
-        } else {
+static bool handle_attack(Mob& vi,ActorDamageSource const& src,int& val){
+    int x,y;
+    if(src.isChildEntitySource() || src.isEntitySource()){
+        auto id=src.getEntityUniqueID();
+        auto ent=getMC()->getLevel()->fetchEntity(id,false);
+        if(!ent){
+            printf("[Land] wtf!!! broken euid %ld\n",id.id);
             return 1;
         }
-    }
-    return 1;
+        if(ent->getEntityTypeId()!=1) return 1; //not a player
+        auto& pos=vi.getPos();
+        x=pos.x,y=pos.z;
+        land* i=getLand(x,y,vi.getDimensionId());
+        ServerPlayer* sp=(ServerPlayer*)ent;
+        if(sp->getPlayerPermissionLevel()>1) return 1;
+        string name=sp->getName();
+        if(i && !i->checkown(name)) {
+            if(!i->canatk(name)) {
+                char buf[1000];
+                sprintf(buf,"§c你不可以在 %s 的领地内攻击",i->owner.c_str());
+                sendText2(sp,string(buf));
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+    } return 1;
 }
 static bool handle_useion(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPos const* dstPos,Block const* a5) {
     if(choose_state[a0->getPlayer()->getName()]!=0){
@@ -500,7 +506,7 @@ void land_init(std::list<string>& modlist) {
     register_cmd("reload_land",fp(loadcfg),"reload land cfg",1);
     reg_destroy(handle_dest);
     reg_useitemon(handle_useion);
-    reg_attack(handle_atk);
+    reg_mobhurt(handle_attack);
     reg_popItem(handle_popitem);
     load_helper(modlist);
 }

@@ -367,3 +367,27 @@ THook(void*,_ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK23ItemFrameD
 void reg_popItem(std::function<bool(ServerPlayer&,BlockPos&)> x){
     popItem_hook.push_back(x);
 }
+using std::function;
+list<function<void(Mob&,ActorDamageSource const&)> > mobdie_hook;
+void reg_mobdie(function<void(Mob&,ActorDamageSource const&)> x){
+    mobdie_hook.push_back(x);
+}
+THook(void*,_ZN3Mob3dieERK17ActorDamageSource,Mob& th,ActorDamageSource const& src){
+    for(auto& i:mobdie_hook){
+        i(th,src);
+    }
+    return original(th,src);
+}
+list<function<bool(Mob&,ActorDamageSource const&,int&)> > mobhurt_hook;
+void reg_mobhurt(function<bool(Mob&,ActorDamageSource const&,int&)> x){
+    mobhurt_hook.push_back(x);
+}
+THook(void*,_ZN3Mob5_hurtERK17ActorDamageSourceibb,Mob& th,ActorDamageSource const& src,int val,bool unk,bool unk2){
+    int nprevent=1;
+    //printf("call %ld %ld %d\n",th.getUniqueID().id,src.getEntityUniqueID().id,val);
+    for(auto& i:mobhurt_hook){
+        nprevent&=i(th,src,val);
+    }
+    return nprevent?original(th,src,val,unk,unk2):nullptr;
+}
+

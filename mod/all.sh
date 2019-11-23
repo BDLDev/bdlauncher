@@ -9,3 +9,4 @@ cd gui;sh cmp.sh;cd ..;
 cd cdk;sh cmp.sh;cd ..;
 cd transfer;sh cmp.sh;cd ..;
 cd cmdhelp;sh cmp.sh;cd ..;
+cd killbonus;sh cmp.sh;cd ..;

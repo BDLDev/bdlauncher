@@ -18,6 +18,8 @@
 #include<cstdarg>
 
 #include"base.h"
+#include"../gui/gui.h"
+
 #include<cmath>
 #include<deque>
 #include<dlfcn.h>
@@ -128,7 +130,7 @@ static bool hkc(ServerPlayer const * b,string& c) {
 ssize_t (*rori)(int socket, void * buffer, size_t length,
                 int flags, struct sockaddr * address,
                 socklen_t * address_len);
-extern "C" ssize_t recvfrom_hook(int socket, void * buffer, size_t length,
+static ssize_t recvfrom_hook(int socket, void * buffer, size_t length,
                                  int flags, struct sockaddr * address,
                                  socklen_t * address_len) {
     int rt=rori(socket,buffer,length,flags,address,address_len);
@@ -143,7 +145,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     ARGSZ(1)
     if((int)b.getPermissionsLevel()>0) {
         banlist[a[0]]=a.size()==1?0:(time(0)+atoi(a[1].c_str()));
-        runcmd(string("kick \"")+a[0]+"\" §c你号没了");
+        runcmd(string("skick \"")+a[0]+"\" §c你号没了");
         save();
         auto x=getplayer_byname(a[0]);
         if(x){
@@ -165,25 +167,12 @@ static void oncmd2(std::vector<string>& a,CommandOrigin const & b,CommandOutput 
 using std::unordered_set;
 unordered_set<short> banitems,warnitems;
 
-bool checkItemInternal(ItemStack* a1,unordered_set<string>& s){
-    char buf[1024];
-    strcpy(buf,a1->toString().c_str());
-    for(int i=0; buf[i]; ++i){
-        buf[i]=tolower(buf[i]);
-    }
-    string sbuf(buf,strlen(buf));
-    for(auto& i:s){
-        if(sbuf.find(i)!=string::npos){
-            return true;
-        }
-    }
-    return false;
-}
 bool dbg_player;
 static bool handle_u(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPos const* dstPos,Block const* a5) {
     if(dbg_player){
         sendText(a0->getPlayer(),"you use id "+std::to_string(a1->getId()));
     }
+    //printf("dbg use %s\n",a0->getPlayer()->getCarriedItem().toString().c_str());
     if(a0->getPlayer()->getPlayerPermissionLevel()>1) return 1;
     string sn=a0->getPlayer()->getName();
     if(banitems.count(a1->getId())){
@@ -206,10 +195,10 @@ int FPushBlock,FExpOrb,FDest;
 enum CheatType{
     FLY,NOCLIP,INV,MOVE
 };
-void notifyCheat(const string& name,CheatType x){
+static void notifyCheat(const string& name,CheatType x){
     const char* CName[]={"FLY","NOCLIP","Creative","Teleport"};
     async_log("[%s] detected for %s\n",CName[x],name.c_str());
-    string kick=string("kick \"")+name+"\" §c你号没了";
+    string kick=string("skick \"")+name+"\" §c你号没了";
     switch(x){
         case FLY:
             runcmd(kick);
@@ -237,7 +226,7 @@ THook(void*,_ZN5BlockC2EtR7WeakPtrI11BlockLegacyE,Block* a,unsigned short x,void
 
 unordered_map<string,clock_t> lastchat;
 int FChatLimit;
-bool ChatLimit(ServerPlayer* p){
+static bool ChatLimit(ServerPlayer* p){
     if(!FChatLimit || p->getPlayerPermissionLevel()>1) return true;
     auto last=lastchat.find(p->getRealNameTag());
     if(last!=lastchat.end()){
@@ -283,7 +272,7 @@ THook(void*,_ZNK15StartGamePacket5writeER12BinaryStream,void* this_,void* a){
     return original(this_,a);
 }
 
-int limitLevel(int input, int max) {
+static int limitLevel(int input, int max) {
   if (input < 0)
     return 0;
   else if (input > max)
@@ -319,10 +308,10 @@ THook(int, _ZNK19EnchantmentInstance15getEnchantLevelEv, EnchantmentInstance* th
   return result;
 }
 typedef unsigned long IHash;
-IHash MAKE_IHASH(ItemStack* a){
+static IHash MAKE_IHASH(ItemStack* a){
     IHash res= a->getIdAuxEnchanted();
     if(*a->getUserData()){
-        res^=(*(a->getUserData()))->hash()<<24;
+        res^=(*(a->getUserData()))->hash()<<28;
     }
     return res;
 }
@@ -357,66 +346,9 @@ struct VirtInv{
         bad=false;
     }
 };
-/*
-unordered_map<string,VirtInv*> player_inv;
-THook(void*,_ZN27InventoryTransactionManager17addExpectedActionERK15InventoryAction,InventoryTransactionManager* itm,InventoryAction& b){
-    const string& name=itm->getPlayer()->getRealNameTag();
-    auto& x=b.getSource();
-    auto id1=x.getType();
-    auto id2=x.getFlags();
-    auto id3=x.getContainerId();
-    printf("wtf %d %d %d %s %s\n",id1,id2,id3,b.getFromItem()->toString().c_str(),b.getToItem()->toString().c_str());
-    if((id1==0 && id3==119) && b.getToItem()->getId()!=0){
-        //move item to offhand
-        if(!b.getToItem()->isOffhandItem()){
-            VirtInv* pinv=player_inv.count(name)?player_inv[name]:(player_inv[name]=new VirtInv(*itm->getPlayer()));
-            pinv->setBad();
-        }
-    }else{
-        if(id1==100 && id2==0){
-            //from virtual inv,need to sanitize fromItem!
-            VirtInv* pinv=player_inv.count(name)?player_inv[name]:(player_inv[name]=new VirtInv(*itm->getPlayer()));
-            auto x=b.getFromItem();
-            auto y=b.getToItem();
-            pinv->takeItem(MAKE_IHASH(x),x->getStackSize());
-            pinv->addItem(MAKE_IHASH(y),y->getStackSize());
-        }
-    }
-    return original(itm,b);
-}
-THook(void*,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi,Player &player, bool b){
-    const string& name=player.getRealNameTag();
-    VirtInv* pinv=player_inv.count(name)?player_inv[name]:(player_inv[name]=new VirtInv(player));
-    if(!pinv->checkup()){
-        notifyCheat(name,INV);
-        pinv->clear();
-        return nullptr;
-    }
-    //pinv->clear();
-    return original(_thi,player,b);
-}
-*/
-
-unordered_set<string> ab_players;
-/*
-THook(void*,_ZN27InventoryTransactionManager17addExpectedActionERK15InventoryAction,InventoryTransactionManager* itm,InventoryAction* b){
-    const string& name=itm->getPlayer()->getName();
-    auto& x=b.getSource();
-    auto id1=x.getType();
-    auto id2=x.getFlags();
-    auto id3=x.getContainerId();
-    auto fitem=b.getFromItem();
-    auto titem=b.getToItem();
-    if(checkItemInternal(fitem,banitems) || checkItemInternal(titem,banitems)){
-        ab_players.insert(name);
-        async_log("[ITEM] %s 使用高危物品(banned) %s %s\n",name.c_str(),fitem->toString().c_str(),titem->toString().c_str());
-    }
-
-}*/
-bool InvAbnormal(const string& nm){
-    if(ab_players.erase(nm)) return true; else return false;
-}
+unordered_map<string,IHash> lastitem;
 THook(unsigned long,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi,Player &player, bool b){
+    if(player.getPlayerPermissionLevel()>1) return original(_thi,player,b);
     const string& name=player.getName();
     auto& a=*((unordered_map<InventorySource,vector<InventoryAction> >*)_thi);
     for(auto& i:a){
@@ -433,14 +365,30 @@ THook(unsigned long,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi
             sendText2(&player,"§c无法使用违禁物品");
             return 6;
         }
-        //printf("get %d %s %s hash %ld %ld\n",i.first.getContainerId(),j.getFromItem()->toString().c_str(),j.getToItem()->toString().c_str(),MAKE_IHASH(j.getFromItem()),MAKE_IHASH(j.getToItem()));
+        if(j.getSlot()==50 && i.first.getContainerId()==124){
+            //track this
+            auto hashf=MAKE_IHASH(j.getFromItem()),hasht=MAKE_IHASH(j.getToItem());
+            auto it=lastitem.find(name);
+            if(it==lastitem.end()){
+                lastitem[name]=hasht;
+                continue;
+            }else{
+                if(it->second!=hashf){
+                    async_log("[ITEM] crafting hack detected for %s , %s\n",name.c_str(),j.getFromItem()->toString().c_str());
+                    notifyCheat(name,INV);
+                    return 6;
+                }
+                it->second=hasht;
+            }
+        }
+        //printf("slot %u get %d %s %s hash %ld %ld\n",j.getSlot(),i.first.getContainerId(),j.getFromItem()->toString().c_str(),j.getToItem()->toString().c_str(),MAKE_IHASH(j.getFromItem()),MAKE_IHASH(j.getToItem()));
     }
     }
     return original(_thi,player,b);
 }
 char buf[1024*1024];
 using namespace rapidjson;
-void load_config(){
+static void load_config(){
     banitems.clear();warnitems.clear();
     int fd=open("config/bear.json",O_RDONLY);
     if(fd==-1){
@@ -484,11 +432,11 @@ static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
     if(id==7 || id==416){
         return 0;
     }
-    if(name==lastn && clock()-lastcl<CLOCKS_PER_SEC*(1.0/100)/*10ms*/) {
+    if(name==lastn && clock()-lastcl<CLOCKS_PER_SEC*(10.0/1000)/*10ms*/) {
         lastcl=clock();
         fd_count++; 
-        if(fd_count>=5){
-            fd_count=0;
+        if(fd_count>=4){
+            fd_count=2;
             return 0;
         }
         return 1;
@@ -507,8 +455,29 @@ static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
     }
     return 1;
 }
-void toggle_dbg(){
+static void toggle_dbg(){
     dbg_player=!dbg_player;
+}
+static void kick_cmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
+    ARGSZ(1)
+    if((int)b.getPermissionsLevel()>0) {
+        runcmd("kick \""+a[0]+"\" "+a[1]);
+        auto x=getuser_byname(a[0]);
+        if(x){
+            forceKickPlayer(*x);
+            outp.success("okay!");
+        }else{
+            outp.error("not found!");
+        }
+    }
+}
+static void bangui_cmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
+    string nm=b.getName();
+    gui_ChoosePlayer((ServerPlayer*)b.getEntity(),"ban","ban",[nm](const string& dst){
+        auto sp=getplayer_byname(nm);
+        if(sp)
+            runcmdAs("ban \""+dst+"\"",sp);
+    });
 }
 void bear_init(std::list<string>& modlist) {
     load();
@@ -518,12 +487,14 @@ void bear_init(std::list<string>& modlist) {
     register_cmd("unban",fp(oncmd2),"解除封禁",1);
     register_cmd("reload_bear",fp(load_config),"Reload Configs for antibear",1);
     register_cmd("bear_dbg",fp(toggle_dbg),"toggle debug item",1);
+    register_cmd("skick",fp(kick_cmd),"force kick",1);
+    register_cmd("bangui",fp(bangui_cmd),"封禁玩家GUI",1);
     reg_useitemon(handle_u);
     reg_player_left(handle_left);
     reg_chat(hkc);
     load_config();
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
-    printf("[ANTI-BEAR] Loaded V2019-11-21\n");
+    printf("[ANTI-BEAR] Loaded V2019-11-23\n");
     load_helper(modlist);
 }
 

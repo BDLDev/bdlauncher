@@ -8,6 +8,6 @@
 void* MyHook(void* oldunc, void* newfunc);
 char* wr_jmp(void* addr);
 typedef uint64_t u64;
-char* wr_ret_uni(u64 ret,char* b);
+char* wr_regcmd(void* call,void* arg);
 
 

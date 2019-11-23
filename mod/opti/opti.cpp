@@ -82,6 +82,6 @@ void load(){
 }
 void opti_init(std::list<string>& modlist) {
     load();
-    printf("[OPTI] loaded! V2019-11-21\n");
+    printf("[OPTI] loaded! V2019-11-23\n");
     load_helper(modlist);
 }

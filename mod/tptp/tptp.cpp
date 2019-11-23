@@ -370,7 +370,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
 }
 
 void tp_init(std::list<string>& modlist) {
-    printf("[TPs] loaded! V2019-11-21\n");
+    printf("[TPs] loaded! V2019-11-23\n");
     load();
     register_cmd("suicide",(void*)oncmd_suic,"自杀");
     register_cmd("tpa",(void*)oncmd,"传送系统");

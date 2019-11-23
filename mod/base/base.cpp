@@ -38,9 +38,12 @@ bool execute_cmd_random(const vector<string>& chain){
     int rd=rand()%chain.size();
     return execute_cmdchain(chain[rd],"",false);
 }
-bool execute_cmdchain(const string& chain_,const string& sp,bool chained){
+
+bool execute_cmdchain(const string& chain_,const string& sp_,bool chained){
     string chain=chain_;   
-    if(sp.size()){
+    if(sp_.size()){
+        string sp=sp_;
+        if(sp_[0]!='"') sp="\""+sp_+"\"";
         char buf[8192];
         const char* src=chain_.data();
         int bufsz=0;
@@ -174,9 +177,27 @@ int getPlayerCount(){
 int getMobCount(){
     return getMC()->getLevel()->getTickedMobCountPrevious();
 }
+
+NetworkIdentifier* getPlayerIden(ServerPlayer& sp){
+    return access(&sp,NetworkIdentifier*,2952);
+}
+ServerPlayer* getuser_byname(const string& a){
+    auto& vc=getMC()->getLevel()->getUsers();
+    for(auto& i:vc){
+        if(i->getName()==a) return i.get();
+    }
+    return nullptr;
+}
+void forceKickPlayer(ServerPlayer& sp){
+    //auto iden=getPlayerIden(sp);
+    //auto sub=sp.getClientSubId();
+    //getMC()->getNetworkHandler()->onSubclientLogoff(*iden,sub);
+    sp.disconnect();
+}
+
 void base_init(list<string>& modlist)
 {
-    printf("[MOD/BASE] loaded! V2019-11-21\n");  
+    printf("[MOD/BASE] loaded! V2019-11-23\n");  
     srand(time(0));  	
     set_int_handler(fp(autostop));		
     load_helper(modlist);
