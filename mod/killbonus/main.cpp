@@ -12,11 +12,11 @@ extern "C" {
 extern void load_helper(std::list<string>& modlist);
 unordered_map<int,std::pair<int,int> > bonus_mp;
 void load(){
-    char buf[1024*1024*4];
+    char buf[256*1024];
     Document dc;
     std::ifstream ff;
     ff.open("config/killbonus.json",std::ios::in);
-    buf[ff.readsome(buf,1024*1024*4)]=0;
+    buf[ff.readsome(buf,256*1024)]=0;
     ff.close();
     if(dc.ParseInsitu(buf).HasParseError()){
         printf("[KillBonus] Config JSON ERROR!\n");

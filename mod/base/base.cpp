@@ -14,7 +14,7 @@ using std::vector;
 #include"cmdreg.hpp"
 #include"utils.hpp"
 #include<sstream>
-
+#include"base.h"
 extern "C" {
    BDL_EXPORT void base_init(list<string>& modlist);
 }
@@ -39,15 +39,13 @@ bool execute_cmd_random(const vector<string>& chain){
     return execute_cmdchain(chain[rd],"",false);
 }
 
-bool execute_cmdchain(const string& chain_,const string& sp_,bool chained){
-    string chain=chain_;   
-    if(sp_.size()){
-        string sp=sp_;
-        if(sp_[0]!='"') sp="\""+sp_+"\"";
+bool execute_cmdchain(string chain,string sp,bool chained){  
+    if(sp.size()){
+        if(sp[0]!='"') sp="\""+sp+"\"";
         char buf[8192];
-        const char* src=chain_.data();
+        const char* src=chain.data();
         int bufsz=0;
-        for(int i=0;i<chain_.size();++i){
+        for(int i=0;i<chain.size();++i){
             if(memcmp(src+i,"%name%",6)==0){
                 memcpy(buf+bufsz,sp.data(),sp.size());
 		        bufsz+=sp.size();
@@ -89,8 +87,12 @@ static TeleportCommand cmd_p;
 
 extern void load_helper(list<string>& modlist);
 void TeleportA(Actor& a,Vec3 b,AutomaticID<Dimension,int> c) {
-    a.setPos(b);
-    cmd_p.teleport(a,b,nullptr,c); 
+    if(a.getDimensionId()!=c){
+        cmd_p.teleport(a,b,nullptr,c);
+        cmd_p.teleport(a,b,nullptr,c);
+    }else{
+        cmd_p.teleport(a,b,nullptr,c);
+    } 
 }
 void KillActor(Actor* a) {
     //!!! dirty workaround
@@ -189,15 +191,12 @@ ServerPlayer* getuser_byname(const string& a){
     return nullptr;
 }
 void forceKickPlayer(ServerPlayer& sp){
-    //auto iden=getPlayerIden(sp);
-    //auto sub=sp.getClientSubId();
-    //getMC()->getNetworkHandler()->onSubclientLogoff(*iden,sub);
     sp.disconnect();
 }
 
 void base_init(list<string>& modlist)
 {
-    printf("[MOD/BASE] loaded! V2019-11-23\n");  
+    printf("[MOD/BASE] loaded! V2019-11-24\n");  
     srand(time(0));  	
     set_int_handler(fp(autostop));		
     load_helper(modlist);

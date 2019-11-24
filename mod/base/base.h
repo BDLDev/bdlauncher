@@ -38,7 +38,7 @@ BDL_EXPORT MCRESULT runcmdAs(const string& a,Player* sp);
 BDL_EXPORT Minecraft* getMC();
 
 BDL_EXPORT void split_string(const std::string& s, std::vector<std::string>& v, const std::string& c);
-BDL_EXPORT bool execute_cmdchain(const string& chain_,const string& sp="",bool chained=true);
+BDL_EXPORT bool execute_cmdchain(string chain_,string sp="",bool chained=true);
 BDL_EXPORT void register_cmd(const std::string& name,void* fn,const std::string& desc="mod command",int permlevel=0);
 
 BDL_EXPORT void reg_useitemon(std::function<bool(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPos const* dstPos,Block const* a5)>);
@@ -51,6 +51,8 @@ BDL_EXPORT void reg_pickup(std::function<bool(Actor* a0,ItemActor * a1)>);
 BDL_EXPORT void reg_popItem(std::function<bool(ServerPlayer&,BlockPos&)>);
 BDL_EXPORT void reg_mobhurt(function<bool(Mob&,ActorDamageSource const&,int&)> x);
 BDL_EXPORT void reg_mobdie(function<void(Mob&,ActorDamageSource const&)> x);
+BDL_EXPORT void reg_actorhurt(function<bool(Actor&,ActorDamageSource const&,int&)> x);
+BDL_EXPORT void reg_interact(function<bool(GameMode*,Actor&)> x);
 
 BDL_EXPORT int getPlayerCount();
 BDL_EXPORT int getMobCount();

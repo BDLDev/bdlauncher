@@ -368,14 +368,39 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
         }
     }
 }
-
+bool CanBack=true;
+static unordered_map<string,pair<Vec3,int> > deathpoint;
+static void oncmd_back(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
+    if(!CanBack) {outp.error("not enabled on this server"); return;}
+    auto it=deathpoint.find(b.getName());
+    if(it==deathpoint.end()){
+        outp.error("cant find deathpoint");
+        return;
+    }
+    ServerPlayer* sp=(ServerPlayer*)b.getEntity();
+    TeleportA(*sp,it->second.first,{it->second.second});
+    deathpoint.erase(it);
+    outp.success("okay!back to deathpoint");
+}
+static void handle_mobdie(Mob& mb,const ActorDamageSource&){
+    if(!CanBack) return;
+    if(mb.getEntityTypeId()==1){
+        ServerPlayer* sp=(ServerPlayer*)&mb;
+        sendText(sp,"use /back to return last deathpoint");
+        deathpoint[sp->getName()]={sp->getPos(),sp->getDimensionId()};
+    }
+}
 void tp_init(std::list<string>& modlist) {
-    printf("[TPs] loaded! V2019-11-23\n");
+    char* disableBack=getenv("NO_BACK");
+    if(disableBack) CanBack=atoi(disableBack);
+    printf("[TPs] loaded! V2019-11-24\n");
     load();
     register_cmd("suicide",(void*)oncmd_suic,"自杀");
     register_cmd("tpa",(void*)oncmd,"传送系统");
     register_cmd("home",(void*)oncmd_home,"家");
     register_cmd("warp",(void*)oncmd_warp,"地标");
+    register_cmd("back",(void*)oncmd_back,"back to deathpoint");
+    reg_mobdie(handle_mobdie);
     srand(time(0));
     load_helper(modlist);
 }

@@ -390,4 +390,25 @@ THook(void*,_ZN3Mob5_hurtERK17ActorDamageSourceibb,Mob& th,ActorDamageSource con
     }
     return nprevent?original(th,src,val,unk,unk2):nullptr;
 }
-
+list<function<bool(Actor&,ActorDamageSource const&,int&)> > actorhurt_hook;
+void reg_actorhurt(function<bool(Actor&,ActorDamageSource const&,int&)> x){
+    actorhurt_hook.push_back(x);
+}
+THook(void*,_ZN5Actor4hurtERK17ActorDamageSourceibb,Actor& th,ActorDamageSource const& src,int val,bool unk,bool unk2){
+    int nprevent=1;
+    for(auto& i:actorhurt_hook){
+        nprevent&=i(th,src,val);
+    }
+    return nprevent?original(th,src,val,unk,unk2):nullptr;
+}
+list<function<bool(GameMode*,Actor&)> > interact_hook;
+void reg_interact(function<bool(GameMode*,Actor&)> x){
+    interact_hook.push_back(x);
+}
+THook(void*,_ZN8GameMode8interactER5ActorRK4Vec3,GameMode* gm,Actor& ac, Vec3 const& vc){
+    int nprevent=1;
+    for(auto& i:interact_hook){
+        nprevent&=i(gm,ac);
+    }
+    return nprevent?original(gm,ac,vc):nullptr;
+}

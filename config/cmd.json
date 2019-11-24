@@ -3,8 +3,7 @@
 "time":5000,"shift":10,
 "cmd":"say timer!"},
 {"type":"join",
-"cmd":"say %name% hellp"},
-
+"cmd":"sched 10 %name% \"say $name$ 114514\""},
 {"type":"form",
 "text":"this is main menu",
 "title":"Main menu",

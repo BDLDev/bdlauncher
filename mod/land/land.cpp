@@ -412,7 +412,7 @@ static int handle_dest(GameMode* a0,BlockPos const* a1) {
     }
     return 1;
 }
-static bool handle_attack(Mob& vi,ActorDamageSource const& src,int& val){
+static bool handle_attack(Actor& vi,ActorDamageSource const& src,int& val){
     int x,y;
     if(src.isChildEntitySource() || src.isEntitySource()){
         auto id=src.getEntityUniqueID();
@@ -421,7 +421,7 @@ static bool handle_attack(Mob& vi,ActorDamageSource const& src,int& val){
             printf("[Land] wtf!!! broken euid %ld\n",id.id);
             return 1;
         }
-        if(ent->getEntityTypeId()!=1) return 1; //not a player
+        if(ent->getEntityTypeId()!=1) return 1; //not a player      
         auto& pos=vi.getPos();
         x=pos.x,y=pos.z;
         land* i=getLand(x,y,vi.getDimensionId());
@@ -439,6 +439,21 @@ static bool handle_attack(Mob& vi,ActorDamageSource const& src,int& val){
             }
         }
     } return 1;
+}
+static bool handle_inter(GameMode* a0,Actor& a1){
+    if(a0->getPlayer()->getPlayerPermissionLevel()>1) return 1;
+    auto pos=a1.getPos();
+    int x(pos.x),y(pos.z);
+    land* i=getLand(x,y,a1.getDimensionId());
+    ServerPlayer* sp=a0->getPlayer();
+    string nm=sp->getName();
+    if(i&&!i->checkown(nm)&&!i->canuse(nm)){
+        char buf[1000];
+        sprintf(buf,"§c你不能在 %s 的领地与方块交互",i->owner.c_str());
+        sendText2(sp,string(buf));
+        return 0;
+    }
+    return 1;
 }
 static bool handle_useion(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPos const* dstPos,Block const* a5) {
     if(choose_state[a0->getPlayer()->getName()]!=0){
@@ -498,15 +513,15 @@ static bool handle_popitem(ServerPlayer& sp,BlockPos& bpos){
     return 1;
 }
 void land_init(std::list<string>& modlist) {
-    printf("[LAND] loaded! V2019-11-21\n");
+    printf("[LAND] loaded! V2019-11-24\n");
     load();
     loadcfg();
-    MyHook(fp(dlsym(NULL,"_ZNK9FarmBlock15transformOnFallER11BlockSourceRK8BlockPosP5Actorf")),fp(dummy));
     register_cmd("land",(void*)oncmd,"领地系统");
     register_cmd("reload_land",fp(loadcfg),"reload land cfg",1);
     reg_destroy(handle_dest);
     reg_useitemon(handle_useion);
-    reg_mobhurt(handle_attack);
+    reg_actorhurt(handle_attack);
     reg_popItem(handle_popitem);
+    reg_interact(handle_inter);
     load_helper(modlist);
 }

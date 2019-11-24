@@ -10,3 +10,4 @@ cd cdk;sh cmp.sh;cd ..;
 cd transfer;sh cmp.sh;cd ..;
 cd cmdhelp;sh cmp.sh;cd ..;
 cd killbonus;sh cmp.sh;cd ..;
+cd protect;sh cmp.sh;cd ..;
