@@ -346,7 +346,7 @@ struct VirtInv{
         bad=false;
     }
 };
-unordered_map<string,IHash> lastitem;
+//unordered_map<string,IHash> lastitem;
 THook(unsigned long,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi,Player &player, bool b){
     if(player.getPlayerPermissionLevel()>1) return original(_thi,player,b);
     const string& name=player.getName();
@@ -365,6 +365,7 @@ THook(unsigned long,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi
             sendText2(&player,"§c无法使用违禁物品");
             return 6;
         }
+        /*
         if(j.getSlot()==50 && i.first.getContainerId()==124){
             //track this
             auto hashf=MAKE_IHASH(j.getFromItem()),hasht=MAKE_IHASH(j.getToItem());
@@ -380,7 +381,7 @@ THook(unsigned long,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi
                 }
                 it->second=hasht;
             }
-        }
+        }*/
         //printf("slot %u get %d %s %s hash %ld %ld\n",j.getSlot(),i.first.getContainerId(),j.getFromItem()->toString().c_str(),j.getToItem()->toString().c_str(),MAKE_IHASH(j.getFromItem()),MAKE_IHASH(j.getToItem()));
     }
     }
@@ -494,7 +495,7 @@ void bear_init(std::list<string>& modlist) {
     reg_chat(hkc);
     load_config();
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
-    printf("[ANTI-BEAR] Loaded V2019-11-23\n");
+    printf("[ANTI-BEAR] Loaded V2019-11-24\n");
     load_helper(modlist);
 }
 
