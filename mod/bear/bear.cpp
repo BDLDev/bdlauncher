@@ -168,9 +168,13 @@ using std::unordered_set;
 unordered_set<short> banitems,warnitems;
 
 bool dbg_player;
+int LOG_CHEST;
 static bool handle_u(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPos const* dstPos,Block const* a5) {
     if(dbg_player){
         sendText(a0->getPlayer(),"you use id "+std::to_string(a1->getId()));
+    }
+    if(LOG_CHEST && a5->getLegacyBlock()->getBlockItemId()==54){
+        async_log("[CHEST] %s open chest pos: %d %d %d\n",a0->getPlayer()->getName().c_str(),a2->x,a2->y,a2->z);
     }
     //printf("dbg use %s\n",a0->getPlayer()->getCarriedItem().toString().c_str());
     if(a0->getPlayer()->getPlayerPermissionLevel()>1) return 1;
@@ -481,6 +485,7 @@ static void bangui_cmd(std::vector<string>& a,CommandOrigin const & b,CommandOut
     });
 }
 void bear_init(std::list<string>& modlist) {
+    if(getenv("LOGCHEST")) LOG_CHEST=1;
     load();
     load2();
     initlog();
@@ -495,7 +500,7 @@ void bear_init(std::list<string>& modlist) {
     reg_chat(hkc);
     load_config();
     rori=(typeof(rori))(MyHook(fp(recvfrom),fp(recvfrom_hook)));
-    printf("[ANTI-BEAR] Loaded V2019-11-24\n");
+    printf("[ANTI-BEAR] Loaded V2019-11-25\n");
     load_helper(modlist);
 }
 

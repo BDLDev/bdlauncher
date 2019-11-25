@@ -52,7 +52,7 @@ struct land {
         return owner.find("|"+name+"|")!=std::string::npos;
     }
     bool canpop(const string& name) const {
-        return checkown(name) || ((dim_perm&PERMP)!=0);
+        return 1;//checkown(name) || ((dim_perm&PERMP)!=0);
     }
     bool canuse(const string& name) const {
         return checkown(name) || ((dim_perm&PERMU)!=0);
@@ -421,7 +421,7 @@ static bool handle_attack(Actor& vi,ActorDamageSource const& src,int& val){
             printf("[Land] wtf!!! broken euid %ld\n",id.id);
             return 1;
         }
-        if(ent->getEntityTypeId()!=1) return 1; //not a player      
+        if(!ent->isPlayer()) return 1; //not a player      
         auto& pos=vi.getPos();
         x=pos.x,y=pos.z;
         land* i=getLand(x,y,vi.getDimensionId());
@@ -513,7 +513,7 @@ static bool handle_popitem(ServerPlayer& sp,BlockPos& bpos){
     return 1;
 }
 void land_init(std::list<string>& modlist) {
-    printf("[LAND] loaded! V2019-11-24\n");
+    printf("[LAND] loaded! V2019-11-25\n");
     load();
     loadcfg();
     register_cmd("land",(void*)oncmd,"领地系统");

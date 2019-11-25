@@ -36,7 +36,7 @@ static void toggle_dbg(){
 void handle_die(Mob& a,ActorDamageSource const& b){
     if(b.isChildEntitySource() || b.isEntitySource()){
         auto ent=getMC()->getLevel()->fetchEntity(b.getEntityUniqueID(),false);
-        if(ent && ent->getEntityTypeId()==1){
+        if(ent && ent->isPlayer()){
             auto vid=a.getEntityTypeId();
             ServerPlayer* sp=(ServerPlayer*)ent;
             if(dbg_die){
@@ -57,6 +57,6 @@ void killbonus_init(std::list<string>& modlist) {
     register_cmd("reload_kbonus",fp(load),"reload kill bonus",1);
     register_cmd("dbg_kbonus",fp(toggle_dbg),"debug kill bonus",1);
     reg_mobdie(handle_die);
-    printf("[KillBonus] Loaded V2019-11-23\n");
+    printf("[KillBonus] Loaded V2019-11-25\n");
     load_helper(modlist);
 }
