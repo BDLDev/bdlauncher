@@ -330,11 +330,18 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     }
     if(a[0]=="trustgui"){
         string name=b.getName();
-        gui_ChoosePlayer((ServerPlayer*)b.getEntity(),"§e选择要信任的玩家","Land Req",[name](const string& dest){
+        auto sp=getSP(b.getEntity());
+        if(sp)
+        gui_ChoosePlayer(sp,"§e选择要信任的玩家","Land Req",[name](const string& dest){
             auto xx=getMC()->getLevel()->getPlayer(name);
                 if(xx)
                 runcmdAs("land trust "+SafeStr(dest),xx);
         });
+        else
+        {
+            outp.error("fucku");
+        }
+        
     }
     if(a[0]=="untrust") {
         ARGSZ(2)
@@ -417,15 +424,11 @@ static bool handle_attack(Actor& vi,ActorDamageSource const& src,int& val){
     if(src.isChildEntitySource() || src.isEntitySource()){
         auto id=src.getEntityUniqueID();
         auto ent=getMC()->getLevel()->fetchEntity(id,false);
-        if(!ent){
-            printf("[Land] wtf!!! broken euid %ld\n",id.id);
-            return 1;
-        }
-        if(!ent->isPlayer()) return 1; //not a player      
+        ServerPlayer* sp=getSP(ent);
+        if(!sp) return 1;     
         auto& pos=vi.getPos();
         x=pos.x,y=pos.z;
         land* i=getLand(x,y,vi.getDimensionId());
-        ServerPlayer* sp=(ServerPlayer*)ent;
         if(sp->getPlayerPermissionLevel()>1) return 1;
         string name=sp->getName();
         if(i && !i->checkown(name)) {

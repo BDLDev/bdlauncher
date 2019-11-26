@@ -36,9 +36,9 @@ static void toggle_dbg(){
 void handle_die(Mob& a,ActorDamageSource const& b){
     if(b.isChildEntitySource() || b.isEntitySource()){
         auto ent=getMC()->getLevel()->fetchEntity(b.getEntityUniqueID(),false);
-        if(ent && ent->isPlayer()){
+        ServerPlayer* sp=getSP(ent);
+        if(sp){
             auto vid=a.getEntityTypeId();
-            ServerPlayer* sp=(ServerPlayer*)ent;
             if(dbg_die){
                 sendText(sp,"you killed"+std::to_string(vid));
             }

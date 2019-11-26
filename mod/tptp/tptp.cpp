@@ -384,16 +384,16 @@ static void oncmd_back(std::vector<string>& a,CommandOrigin const & b,CommandOut
 }
 static void handle_mobdie(Mob& mb,const ActorDamageSource&){
     if(!CanBack) return;
-    if(mb.getEntityTypeId()==1){
+    auto sp=getSP(mb);
+    if(sp){
         ServerPlayer* sp=(ServerPlayer*)&mb;
         sendText(sp,"use /back to return last deathpoint");
         deathpoint[sp->getName()]={sp->getPos(),sp->getDimensionId()};
     }
 }
 void tp_init(std::list<string>& modlist) {
-    char* disableBack=getenv("NO_BACK");
-    if(disableBack) CanBack=atoi(disableBack);
-    printf("[TPs] loaded! V2019-11-24\n");
+    if(getenv("NO_BACK")) CanBack=0;
+    printf("[TPs] loaded! V2019-11-26\n");
     load();
     register_cmd("suicide",(void*)oncmd_suic,"自杀");
     register_cmd("tpa",(void*)oncmd,"传送系统");

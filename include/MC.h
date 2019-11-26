@@ -342,9 +342,7 @@ public:
   BlockSource *getBlockSource();
 };
 class Mob;
-extern "C"{
-    void** _ZTV12ServerPlayer;
-}
+extern void** _ZTV12ServerPlayer;
 class Actor:public TickingArea {
     public:
         const std::string &getNameTag() const;
@@ -367,10 +365,22 @@ class Actor:public TickingArea {
     int getOwnerEntityType();
     ActorUniqueID getOwnerId() const;
     bool isPlayer() const{
-        //printf("%p %p\n",access(this,void*,0),dlsym(NULL,"_ZTV12ServerPlayer"));
         return access(this,void*,0)==((void**)dlsym(NULL,"_ZTV12ServerPlayer")+2);
     }
 };
+//util for runtime type detecting
+static auto vtSP=((void**)dlsym(NULL,"_ZTV12ServerPlayer")+2);
+template<class T>
+inline ServerPlayer* getSP(T& a){
+    return access(&a,void*,0)==vtSP?(ServerPlayer*)&a:nullptr;
+}
+template<class T>
+inline ServerPlayer* getSP(T* a){
+    if(!a) return nullptr;
+    return access(a,void*,0)==vtSP?(ServerPlayer*)a:nullptr;
+}
+
+
 class Mob : public Actor {
     public:
         float getYHeadRot() const;

@@ -14,8 +14,13 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         x.write(a[0].data(),a[0].size());
         x.writeUnsignedShort(atoi(a[1].c_str()));
     });
+    auto sp=getSP(b.getEntity());
+    if(sp){
     ((ServerPlayer*)b.getEntity())->sendNetworkPacket(trpk);
-    outp.success();
+        outp.success();
+    }else{
+        outp.error("fucku");
+    }
 }
 void transfer_init(std::list<string>& modlist){
     register_cmd("transfer",fp(oncmd),"transfer to server");

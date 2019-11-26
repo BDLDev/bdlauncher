@@ -63,8 +63,13 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     if(a.size()==0) a.push_back("root");
     if(forms.count(a[0])){
         auto& fm=forms[a[0]];
-        fm.sendTo(*(ServerPlayer*)b.getEntity());
-        outp.success();
+        ServerPlayer* sp=getSP(b.getEntity());
+        if(sp){
+            fm.sendTo(*sp);
+            outp.success();
+        }else{
+            outp.error("fucku");
+        }
         //outp.success("gui showed");
     }else{
         outp.error("cant find");
@@ -166,6 +171,6 @@ void cmdhelp_init(std::list<string>& modlist){
     register_cmd("sched",fp(oncmd_sch),"schedule a delayed cmd",1);
     reg_player_join(join);
     reg_useitemon(handle_u);
-    printf("[CMDHelp] loaded! V2019-11-21\n");
+    printf("[CMDHelp] loaded! V2019-11-24\n");
     load_helper(modlist);
 }
