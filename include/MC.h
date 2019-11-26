@@ -109,7 +109,7 @@ struct Level{
     MapItemSavedData& getMapSavedData(std::unique_ptr<CompoundTag, std::default_delete<CompoundTag> > const&);
     int getUserCount() const;
     int getTickedMobCountPrevious() const;
-    std::vector<std::unique_ptr<ServerPlayer> >& getUsers();
+    std::vector<std::unique_ptr<ServerPlayer> >* getUsers();
     Actor* fetchEntity(ActorUniqueID, bool) const;
 };
 struct ChunkBlockPos{
@@ -222,7 +222,6 @@ struct Minecraft{
     Level* getLevel() const;
     UNK_64 disconnectClient(NetworkIdentifier const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&);
 };
-Minecraft* getMC();
 struct ClientBlobCache{
     struct Server{
         struct TransferBuilder;
@@ -239,9 +238,9 @@ struct NetworkChunkPublisher{
         *((unsigned char *)this + 184));
     }
     std::unique_ptr<ChunkViewSource>& getSource(){return *(unique_ptr<ChunkViewSource>*)((char*)this+216);}
-    ServerPlayer* getPlayer(){
+    /*ServerPlayer* getPlayer(){
 	    return getMC()->getNetworkHandler()->_getServerPlayer(*(NetworkIdentifier*)((char *)this + 24),*((unsigned char *)this + 184));
-	}
+	}*/
     //void _serializeAndCache(LevelChunkPacket&, ClientBlobCache::Server::TransferBuilder&, std::function<void (BinaryDataOutput&)>&&);
 };
 class IDataOutput{
@@ -368,19 +367,6 @@ class Actor:public TickingArea {
         return access(this,void*,0)==((void**)dlsym(NULL,"_ZTV12ServerPlayer")+2);
     }
 };
-//util for runtime type detecting
-static auto vtSP=((void**)dlsym(NULL,"_ZTV12ServerPlayer")+2);
-template<class T>
-inline ServerPlayer* getSP(T& a){
-    return access(&a,void*,0)==vtSP?(ServerPlayer*)&a:nullptr;
-}
-template<class T>
-inline ServerPlayer* getSP(T* a){
-    if(!a) return nullptr;
-    return access(a,void*,0)==vtSP?(ServerPlayer*)a:nullptr;
-}
-
-
 class Mob : public Actor {
     public:
         float getYHeadRot() const;
@@ -463,7 +449,7 @@ struct InventorySource {
 
 struct MyPkt:Packet{
     void** vtbl;
-    char filler[256];
+    char filler[312];
     int id;
     std::function<void (void*,BinaryStream&)> realexe;
     static int dummy(){return 0;}
@@ -484,7 +470,8 @@ struct MyPkt:Packet{
     MyPkt(int idx,std::function<void (void*,BinaryStream&)> callb){
         ParentInit();
         id=idx;
-        vtbl=(void**)vtbls;realexe=callb;
+        vtbl=(void**)vtbls;
+        realexe=callb;
     }
 };
 struct TextPacket:Packet{
@@ -512,3 +499,15 @@ class ActorDamageSource{
      virtual int getEntityType()const=0 ;
      virtual int getEntityCategories()const=0 ;
 };
+
+//util for runtime type detecting
+static auto vtSP=((void**)dlsym(NULL,"_ZTV12ServerPlayer")+2);
+template<class T>
+inline ServerPlayer* getSP(T& a){
+    return access(&a,void*,0)==vtSP?(ServerPlayer*)&a:nullptr;
+}
+template<class T>
+inline ServerPlayer* getSP(T* a){
+    if(!a) return nullptr;
+    return access(a,void*,0)==vtSP?(ServerPlayer*)a:nullptr;
+}

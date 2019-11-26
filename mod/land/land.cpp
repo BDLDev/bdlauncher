@@ -333,7 +333,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         auto sp=getSP(b.getEntity());
         if(sp)
         gui_ChoosePlayer(sp,"§e选择要信任的玩家","Land Req",[name](const string& dest){
-            auto xx=getMC()->getLevel()->getPlayer(name);
+            auto xx=getSrvLevel()->getPlayer(name);
                 if(xx)
                 runcmdAs("land trust "+SafeStr(dest),xx);
         });
@@ -423,7 +423,7 @@ static bool handle_attack(Actor& vi,ActorDamageSource const& src,int& val){
     int x,y;
     if(src.isChildEntitySource() || src.isEntitySource()){
         auto id=src.getEntityUniqueID();
-        auto ent=getMC()->getLevel()->fetchEntity(id,false);
+        auto ent=getSrvLevel()->fetchEntity(id,false);
         ServerPlayer* sp=getSP(ent);
         if(!sp) return 1;     
         auto& pos=vi.getPos();

@@ -35,7 +35,7 @@ static void toggle_dbg(){
 }
 void handle_die(Mob& a,ActorDamageSource const& b){
     if(b.isChildEntitySource() || b.isEntitySource()){
-        auto ent=getMC()->getLevel()->fetchEntity(b.getEntityUniqueID(),false);
+        auto ent=getSrvLevel()->fetchEntity(b.getEntityUniqueID(),false);
         ServerPlayer* sp=getSP(ent);
         if(sp){
             auto vid=a.getEntityTypeId();

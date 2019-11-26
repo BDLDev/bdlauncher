@@ -121,14 +121,14 @@ void sendTPForm(const string& from,int type,ServerPlayer* sp){
     auto lis=new list<pair<string,std::function<void()> > >();
     lis->push_back({
         "同意",[name]{
-            auto x=getMC()->getLevel()->getPlayer(name);
+            auto x=getSrvLevel()->getPlayer(name);
             if(x)
                 runcmdAs("tpa ac",x);
         }
     });
     lis->push_back({
         "拒绝",[name]{
-            auto x=getMC()->getLevel()->getPlayer(name);
+            auto x=getSrvLevel()->getPlayer(name);
             if(x)
                 runcmdAs("tpa de",x);
         }
@@ -138,7 +138,7 @@ void sendTPForm(const string& from,int type,ServerPlayer* sp){
 void sendTPChoose(ServerPlayer* sp,const string& type){
     string name=sp->getName();
     gui_ChoosePlayer(sp,"§e选择目标玩家","TP Req",[name,type](const string& dest){
-        auto xx=getMC()->getLevel()->getPlayer(name);
+        auto xx=getSrvLevel()->getPlayer(name);
             if(xx)
             runcmdAs("tpa "+type+" "+SafeStr(dest),xx);
     });
@@ -186,7 +186,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         auto lis=new list<pair<string,std::function<void()> > >();
         lis->push_back({
             "传送到玩家",[name]{
-                auto x=getMC()->getLevel()->getPlayer(name);
+                auto x=getSrvLevel()->getPlayer(name);
                 if(x)
                 {
                     sendTPChoose((ServerPlayer*)x,"t");
@@ -195,7 +195,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         });
         lis->push_back({
             "传送玩家到你",[name]{
-                auto x=getMC()->getLevel()->getPlayer(name);
+                auto x=getSrvLevel()->getPlayer(name);
                 if(x)
                 {
                     sendTPChoose((ServerPlayer*)x,"f");
@@ -298,7 +298,7 @@ static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOut
             lis->push_back({
                 "到 "+warpname,
                 [warpname,name]()->void{
-                    auto x=getMC()->getLevel()->getPlayer(name);
+                    auto x=getSrvLevel()->getPlayer(name);
                     if(x)
                         runcmdAs("home go "+SafeStr(warpname),x);
                 }
@@ -351,7 +351,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
             lis->push_back({
                 "前往 "+warpname,
                 [warpname,nam]()->void{
-                    auto x=getMC()->getLevel()->getPlayer(nam);
+                    auto x=getSrvLevel()->getPlayer(nam);
                     if(x)
                         runcmdAs("warp "+SafeStr(warpname),x);
                 }

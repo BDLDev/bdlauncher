@@ -74,14 +74,60 @@ struct TeleportCommand {
     TeleportCommand();
     void teleport(Actor &,Vec3,Vec3*,AutomaticID<Dimension,int>) const;
 };
-void sendText(Player* a,string ct) {
-    TextPacket pk=TextPacket::createRaw(ct);
-    ((ServerPlayer*)a)->sendNetworkPacket(pk);
+//https://github.com/PetteriM1/NukkitPetteriM1Edition/blob/master/src/main/java/cn/nukkit/network/protocol/TextPacket.java
+/* this.putByte(this.type);
+        this.putBoolean(this.isLocalized || type == TYPE_TRANSLATION);
+        switch (this.type) {
+            case TYPE_RAW:
+            case TYPE_TIP:
+            case TYPE_SYSTEM:
+            case TYPE_JSON:
+                this.putString(this.message);
+                break;
+            case TYPE_TRANSLATION:
+            case TYPE_POPUP:
+            case TYPE_JUKEBOX_POPUP:
+                this.putString(this.message);
+                this.putUnsignedVarInt(this.parameters.length);
+                for (String parameter : this.parameters) {
+                    this.putString(parameter);
+                }
+        }
+                this.putString(this.xboxUserId);
+            this.putString(this.platformChatId);
+    }*/
+struct MyTxtPk{
+    const string* str;
+    TextType type;
+    void setText(const string& ct,TextType typ){
+        str=&ct;
+        type=typ;
+    }
+    void send(Player* p){
+        auto pk=MyPkt(0x9,[this](void*,BinaryStream& bs){
+            bs.writeByte(this->type);
+            bs.writeBool(false);
+            bs.writeUnsignedVarInt(this->str->size());
+            bs.write(this->str->data(),this->str->size());
+            bs.writeUnsignedVarInt(0);
+            bs.writeUnsignedVarInt(0);//padding
+            bs.writeUnsignedVarInt(0);
+        });
+        ((ServerPlayer*)p)->sendNetworkPacket(pk);
+    }
+};
+MyTxtPk gTextPkt;
+void sendText(Player* a,const string& ct,TextType type) {
+    /*TextPacket pk=TextPacket::createRaw(ct);
+    ((ServerPlayer*)a)->sendNetworkPacket(pk);*/
+    gTextPkt.setText(ct,type);
+    gTextPkt.send(a);
 }
+/*
 void sendText2(Player* a,string ct) {
     TextPacket pk=TextPacket::createJukeboxPopup(ct);
     ((ServerPlayer*)a)->sendNetworkPacket(pk);
-}
+}*/
 
 static TeleportCommand cmd_p;
 
@@ -98,9 +144,9 @@ void KillActor(Actor* a) {
     //!!! dirty workaround
     ((Mob*)a)->kill();
 }
+/*
 Player* getplayer_byname(const string& name) {
-    Minecraft* mc=getMC();
-    Level* lv=mc->getLevel();
+    Level* lv=getSrvLevel();
     Player* rt=NULL;
     lv->forEachPlayer([&](Player& tg)->bool{
         if(tg.getRealNameTag()==name) {
@@ -110,11 +156,11 @@ Player* getplayer_byname(const string& name) {
         return true;
     });
     return rt;
-}
+}*/
+
 #define fcast(a,b) (*((a*)(&b)))
 Player* getplayer_byname2(const string& name) {
-    Minecraft* mc=getMC();
-    Level* lv=mc->getLevel();
+    Level* lv=getSrvLevel();
     Player* rt=NULL;
     lv->forEachPlayer([&](Player& tg)->bool{
         string bf=tg.getRealNameTag();
@@ -137,13 +183,13 @@ Player* getplayer_byname2(const string& name) {
 }
 
 void get_player_names(vector<string>& a){
-    getMC()->getLevel()->forEachPlayer([&](Player& tg)->bool{
+    getSrvLevel()->forEachPlayer([&](Player& tg)->bool{
         a.push_back(tg.getName());
         return true;
     });
 }
 static Minecraft* MC;
-BDL_EXPORT Minecraft* getMC() {
+BDL_EXPORT Minecraft* _getMC() {
     return MC;
 }
 THook(void*,_ZN14ServerCommands19setupStandardServerER9MinecraftRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_P15PermissionsFile,Minecraft& a, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const& d, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const& b, PermissionsFile* c){
@@ -174,18 +220,18 @@ static void autostop(){
         }
 }
 int getPlayerCount(){
-    return getMC()->getLevel()->getUserCount();
+    return getSrvLevel()->getUserCount();
 }
 int getMobCount(){
-    return getMC()->getLevel()->getTickedMobCountPrevious();
+    return getSrvLevel()->getTickedMobCountPrevious();
 }
 
 NetworkIdentifier* getPlayerIden(ServerPlayer& sp){
     return access(&sp,NetworkIdentifier*,2952);
 }
 ServerPlayer* getuser_byname(const string& a){
-    auto& vc=getMC()->getLevel()->getUsers();
-    for(auto& i:vc){
+    auto vc=getSrvLevel()->getUsers();
+    for(auto& i:*vc){
         if(i->getName()==a) return i.get();
     }
     return nullptr;

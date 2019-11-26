@@ -11,5 +11,4 @@
 #include "minecraft/commands/CommandOrigin.h"
 
 //void cmdhelper_init();
-Minecraft* getMC();
 void register_shutdown(void*);

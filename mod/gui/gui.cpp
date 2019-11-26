@@ -74,7 +74,7 @@ BDL_EXPORT void sendForm(ServerPlayer& sp,BaseForm* fm){
     sendStr(sp,x,fm->getid());
 }
 BDL_EXPORT void sendForm(const string& sp,BaseForm* fm){
-    auto x=getMC()->getLevel()->getPlayer(sp);
+    auto x=getSrvLevel()->getPlayer(sp);
     if(x)
     sendForm(*x,fm);
 }

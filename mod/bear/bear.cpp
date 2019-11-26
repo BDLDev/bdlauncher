@@ -147,7 +147,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         banlist[a[0]]=a.size()==1?0:(time(0)+atoi(a[1].c_str()));
         runcmd(string("skick \"")+a[0]+"\" §c你号没了");
         save();
-        auto x=getplayer_byname(a[0]);
+        auto x=getuser_byname(a[0]);
         if(x){
             xuid_name[x->getXUID()]=x->getName();
             save2();
@@ -181,7 +181,7 @@ static bool handle_u(GameMode* a0,ItemStack * a1,BlockPos const* a2,BlockPos con
     string sn=a0->getPlayer()->getName();
     if(banitems.count(a1->getId())){
         async_log("[ITEM] %s 使用高危物品(banned) %s pos: %d %d %d\n",sn.c_str(),a1->toString().c_str(),a2->x,a2->y,a2->z);
-        sendText2(a0->getPlayer(),"§c无法使用违禁物品");
+        sendText(a0->getPlayer(),"§c无法使用违禁物品",JUKEBOX_POPUP);
         return 0;
     }
     if(warnitems.count(a1->getId())){
@@ -366,7 +366,7 @@ THook(unsigned long,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi
         }
         if(banitems.count(j.getFromItem()->getId()) || banitems.count(j.getToItem()->getId())){
             async_log("[ITEM] %s 使用高危物品(banned) %s %s\n",name.c_str(),j.getFromItem()->toString().c_str(),j.getToItem()->toString().c_str());
-            sendText2(&player,"§c无法使用违禁物品");
+            sendText(&player,"§c无法使用违禁物品",JUKEBOX_POPUP);
             return 6;
         }
         /*
@@ -466,6 +466,7 @@ static void toggle_dbg(){
 static void kick_cmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     ARGSZ(1)
     if((int)b.getPermissionsLevel()>0) {
+        if(a.size()==1) a.push_back("Kicked");
         runcmd("kick \""+a[0]+"\" "+a[1]);
         auto x=getuser_byname(a[0]);
         if(x){

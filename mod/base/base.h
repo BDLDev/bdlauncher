@@ -26,16 +26,23 @@ BDL_EXPORT void reg_player_join(void* a);
 BDL_EXPORT void reg_player_left(void* a);
 */
 
-BDL_EXPORT void sendText(Player* a,string ct);
+enum TextType:char{
+    RAW=0,
+    POPUP=3,
+    JUKEBOX_POPUP=4,
+    TIP=5
+};
+BDL_EXPORT void sendText(Player* a,const string& ct,TextType type=RAW);
+#define sendText2(a,b) sendText(a,b,JUKEBOX_POPUP)
 BDL_EXPORT void TeleportA(Actor& a,Vec3 b,AutomaticID<Dimension,int> c);
-BDL_EXPORT Player* getplayer_byname(const string& name);
+//BDL_EXPORT Player* getplayer_byname(const string& name);
+#define getplayer_byname(x) (getSrvLevel()->getPlayer(x))
 BDL_EXPORT Player* getplayer_byname2(const string& name);
 BDL_EXPORT void get_player_names(vector<string>& a);
 BDL_EXPORT void KillActor(Actor* a);
-BDL_EXPORT void sendText2(Player* a,string ct);
 BDL_EXPORT MCRESULT runcmd(const string& a);
 BDL_EXPORT MCRESULT runcmdAs(const string& a,Player* sp);
-BDL_EXPORT Minecraft* getMC();
+BDL_EXPORT Minecraft* _getMC();
 
 BDL_EXPORT void split_string(const std::string& s, std::vector<std::string>& v, const std::string& c);
 BDL_EXPORT bool execute_cmdchain(string chain_,string sp="",bool chained=true);
@@ -63,4 +70,12 @@ BDL_EXPORT void forceKickPlayer(ServerPlayer& sp);
 
 #define ARGSZ(b) if(a.size()<b){outp.error("check your arg");return;}
 #define SafeStr(a) ("\""+(a)+"\"")
+static Minecraft* McCache;
+static Level* LvCache;
+static inline Minecraft* getMC(){
+    return McCache?McCache:(McCache=_getMC());
+}
+static inline Level* getSrvLevel(){
+    return LvCache?LvCache:(LvCache=_getMC()->getLevel());
+}
 
