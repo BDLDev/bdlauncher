@@ -82,7 +82,7 @@ struct home {
     }
 };
 static unordered_map<string,home> homes;
-static forward_list<Vpos> wps;
+static list<Vpos> wps;
 static void save() {
     char* bf;
     int sz=maptomem(homes,&bf,h_str2str,home::tostr);
@@ -110,7 +110,6 @@ struct tpreq {
     string name;
 };
 static unordered_map<string,tpreq> tpmap;
-static unordered_map<string,int> wild_limit;
 static void oncmd_suic(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     KillActor(b.getEntity());
     outp.success("§e你死了");
@@ -119,20 +118,20 @@ void sendTPForm(const string& from,int type,ServerPlayer* sp){
     string cont="§e"+from+(type?"想传送你到对方":"想传送到你")+"\n";
     string name=sp->getName();
     auto lis=new list<pair<string,std::function<void()> > >();
-    lis->push_back({
+    lis->emplace_back(
         "同意",[name]{
             auto x=getSrvLevel()->getPlayer(name);
             if(x)
                 runcmdAs("tpa ac",x);
         }
-    });
-    lis->push_back({
+    );
+    lis->emplace_back(
         "拒绝",[name]{
             auto x=getSrvLevel()->getPlayer(name);
             if(x)
                 runcmdAs("tpa de",x);
         }
-    });
+    );
     gui_Buttons(sp,cont,"TP 请求",lis);
 }
 void sendTPChoose(ServerPlayer* sp,const string& type){
@@ -184,7 +183,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     }
     if(a[0]=="gui"){
         auto lis=new list<pair<string,std::function<void()> > >();
-        lis->push_back({
+        lis->emplace_back(
             "传送到玩家",[name]{
                 auto x=getSrvLevel()->getPlayer(name);
                 if(x)
@@ -192,8 +191,8 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
                     sendTPChoose((ServerPlayer*)x,"t");
                 }
             }
-        });
-        lis->push_back({
+        );
+        lis->emplace_back(
             "传送玩家到你",[name]{
                 auto x=getSrvLevel()->getPlayer(name);
                 if(x)
@@ -201,7 +200,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
                     sendTPChoose((ServerPlayer*)x,"f");
                 }
             }
-        });
+        );
         gui_Buttons((ServerPlayer*)b.getEntity(),"发送传送请求","发送传送请求",lis);
     }
     if(a[0]=="ac") {
@@ -295,14 +294,14 @@ static void oncmd_home(std::vector<string>& a,CommandOrigin const & b,CommandOut
         auto lis=new list<pair<string,std::function<void()> > >();
         for(int i=0; i<myh.cnt; ++i) {
             string warpname=myh.vals[i].name;
-            lis->push_back({
+            lis->emplace_back(
                 "到 "+warpname,
                 [warpname,name]()->void{
                     auto x=getSrvLevel()->getPlayer(name);
                     if(x)
                         runcmdAs("home go "+SafeStr(warpname),x);
                 }
-            });
+            );
         }
         gui_Buttons((ServerPlayer*)b.getEntity(),"回家\n","家",lis);
     }
@@ -319,7 +318,7 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
     if(a[0]=="add") {
         if(pl<1) return;
         ARGSZ(2)
-        wps.push_front(Vpos(pos.x,pos.y,pos.z,b.getEntity()->getDimensionId(),a[1]));
+        wps.emplace_back(pos.x,pos.y,pos.z,b.getEntity()->getDimensionId(),a[1]);
         save();
         outp.success("§e§e[Teleport] 已添加Warp");
         return;
@@ -348,14 +347,14 @@ static void oncmd_warp(std::vector<string>& a,CommandOrigin const & b,CommandOut
         string nam=b.getName();
         for(auto const& i:wps) {
             string warpname=i.name;
-            lis->push_back({
+            lis->emplace_back(
                 "前往 "+warpname,
                 [warpname,nam]()->void{
                     auto x=getSrvLevel()->getPlayer(nam);
                     if(x)
                         runcmdAs("warp "+SafeStr(warpname),x);
                 }
-            });
+            );
         }
         gui_Buttons((ServerPlayer*)b.getEntity(),"前往地标\n","warp",lis);
     }

@@ -49,7 +49,7 @@ std::list<std::string> mod_loadall() {
     while(fgets(str+7,100,fp)!=nullptr) {
         cook(str);
         printf("[MOD] loading %s\n",str);
-        modlist.push_back(std::string(str));
+        modlist.emplace_back(std::string(str));
     }
     ret_list=modlist;
     printf("[MOD] start loading\n");

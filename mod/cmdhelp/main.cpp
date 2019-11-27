@@ -20,6 +20,10 @@ struct CMD{
         if(execute_cmdchain(cond,name,chained)) {execute_cmdchain(run,name,false);return true;}
         return false;
     }
+    CMD(const string& a,const string& b){
+        cond=a,run=b;
+    }
+    CMD(){}
 };
 struct Timer{
     int tim,sft;
@@ -27,6 +31,10 @@ struct Timer{
     bool chk(int tk){
         return tk%tim==sft;
     }
+    Timer(int a,int b,const CMD& c){
+        tim=a,sft=b,run=c;
+    }
+    Timer(){}
 };
 struct CMDForm{
     unordered_map<string,CMD> cmds;
@@ -55,12 +63,15 @@ struct Oneshot{
     bool operator <(Oneshot const& a) const{
         return time<a.time;
     }
+    Oneshot(int a,const string& b,const string& c){
+        time=a,name=b;cmd=c;
+    }
 };
 priority_queue<Oneshot> oneshot_timers;
 CMD joinHook;
 static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &outp) {
     auto nm=b.getName();
-    if(a.size()==0) a.push_back("root");
+    if(a.size()==0) a.emplace_back("root");
     if(forms.count(a[0])){
         auto& fm=forms[a[0]];
         ServerPlayer* sp=getSP(b.getEntity());
@@ -137,13 +148,13 @@ static void load(){
             for(auto& i:buttons.GetArray()){
                 assert(i.IsArray());
                 auto&& but=i.GetArray();
-                cf.cmds.insert({but[0].GetString(),{but[1].GetString(),but[2].GetString()}});
-                cf.ordered_cmds.push_back(but[0].GetString());
+                cf.cmds.emplace(string(but[0].GetString()),CMD(but[1].GetString(),but[2].GetString()));
+                cf.ordered_cmds.emplace_back(but[0].GetString());
             }
-	forms.insert({name.GetString(),cf});
+	forms.emplace(name.GetString(),cf);
         }
         if(typ=="timer"){
-            timers.push_back({x["time"].GetInt(),x["shift"].GetInt(),{"",x["cmd"].GetString()}});
+            timers.emplace_back(x["time"].GetInt(),x["shift"].GetInt(),CMD("",x["cmd"].GetString()));
         }
     }
 }
@@ -161,7 +172,7 @@ static void oncmd_sch(std::vector<string>& a,CommandOrigin const & b,CommandOutp
     int dtime=atoi(a[0].c_str());
     string name=a[1];
     string chain=a[2];
-    oneshot_timers.push({tkl/20+dtime,name,chain});
+    oneshot_timers.emplace(tkl/20+dtime,name,chain);
     outp.success();
 }
 void cmdhelp_init(std::list<string>& modlist){

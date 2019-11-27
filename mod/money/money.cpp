@@ -24,8 +24,11 @@ extern "C" {
     BDL_EXPORT void money_init(std::list<string>& modlist);
 }
 extern void load_helper(std::list<string>& modlist);
+int DIRTY=1;
 static std::unordered_map<string,int> moneys;
 static void save() {
+    if(!DIRTY) return;
+    DIRTY=0;
     char* bf;
     int sz=maptomem(moneys,&bf,h_str2str,h_int2str);
     mem2file("data/money/money.db",bf,sz);
@@ -60,10 +63,13 @@ void loadcfg(){
 }
 int get_money(const string& pn) {
     //lazy init
-    return moneys.count(pn)==0?INIT_MONEY:moneys[pn];
+    auto it=moneys.find(pn);
+    if(it==moneys.end()) return INIT_MONEY;
+    return it->second;
 }
 void set_money(const string& pn,int am) {
     moneys[pn]=am;
+    DIRTY=1;
     //save();
 }
 bool red_money(const string& pn,int am) {

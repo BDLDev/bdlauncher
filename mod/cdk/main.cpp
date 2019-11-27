@@ -45,20 +45,20 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
     outp.success("success");
 }
 using namespace rapidjson;
-char buf[1024*1024*4];
+char buf[1024*1024*2];
 static void load(){
     cdks.clear();
     Document dc;
     ifstream ff;
     ff.open("config/cdk.json",ios::in);
-    buf[ff.readsome(buf,1024*1024*4)]=0;
+    buf[ff.readsome(buf,1024*1024*2)]=0;
     ff.close();
     if(dc.ParseInsitu(buf).HasParseError()){
         printf("[CDK] Config JSON ERROR!\n");
         exit(1);
     }
     for(auto& i:dc.GetObject()){
-        cdks.insert({i.name.GetString(),i.value.GetString()});
+        cdks.emplace(i.name.GetString(),i.value.GetString());
     }
 }
 static void save(){

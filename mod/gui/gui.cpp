@@ -43,7 +43,6 @@ extern void load_helper(std::list<string>& modlist);
 using namespace rapidjson;
 using std::vector;
 using std::unordered_map;
-unordered_map<string,BaseForm*> player_forms;
 unordered_map<int,BaseForm*> id_forms;
 
 BDL_EXPORT void sendStr(ServerPlayer& sp,string& fm,int id){
@@ -65,11 +64,6 @@ BDL_EXPORT void sendForm(ServerPlayer& sp,BaseForm* fm){
     }
     auto x=fm->getstr();
     fm->setID(++autoid);
-    /*if(player_forms.count(sp.getName())){
-        delete player_forms[sp.getName()];
-        player_forms.erase(sp.getName());
-    }
-    player_forms[sp.getName()]=fm;*/
     id_forms[autoid]=fm;
     sendStr(sp,x,fm->getid());
 }
@@ -82,11 +76,6 @@ THook(void*,_ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK23ModalFormR
      ServerPlayer* p=sh->_getServerPlayer(iden,pk->getClientSubId());
     if(p){
        // printf("handle %d [%s]\n",access(pk,int,36),access(pk,string,40).c_str());
-        /*if(player_forms.count(p->getName())){
-            player_forms[p->getName()]->process(access(pk,string,40));
-            delete player_forms[p->getName()];
-            player_forms.erase(p->getName());
-        }*/
         int id=access(pk,int,36);
         if(id_forms.count(id)){
             id_forms[id]->process(access(pk,string,40));

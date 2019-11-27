@@ -386,21 +386,21 @@ THook(unsigned long,_ZNK20InventoryTransaction11executeFullER6Playerb,void* _thi
                 it->second=hasht;
             }
         }*/
-        //printf("slot %u get %d %s %s hash %ld %ld\n",j.getSlot(),i.first.getContainerId(),j.getFromItem()->toString().c_str(),j.getToItem()->toString().c_str(),MAKE_IHASH(j.getFromItem()),MAKE_IHASH(j.getToItem()));
+        //printf("cid %d flg %d src %d slot %u get %d %s %s hash %ld %ld\n",j.getSource().getContainerId(),j.getSource().getFlags(),j.getSource().getType(),j.getSlot(),i.first.getContainerId(),j.getFromItem()->toString().c_str(),j.getToItem()->toString().c_str(),MAKE_IHASH(j.getFromItem()),MAKE_IHASH(j.getToItem()));
     }
     }
     return original(_thi,player,b);
 }
-char buf[1024*1024];
 using namespace rapidjson;
 static void load_config(){
+    char buf[96*1024];
     banitems.clear();warnitems.clear();
     int fd=open("config/bear.json",O_RDONLY);
     if(fd==-1){
         printf("[BEAR] Cannot load config file!check your configs folder\n");
         exit(0);
     }
-    buf[read(fd,buf,1024*1024-1)]=0;
+    buf[read(fd,buf,96*1024-1)]=0;
     close(fd);
     Document d;
     if(d.ParseInsitu(buf).HasParseError()){
@@ -411,6 +411,7 @@ static void load_config(){
     FExpOrb=d["FSpwanExp"].GetBool();
     FDest=d["FDestroyCheck"].GetBool();
     FChatLimit=d["FChatLimit"].GetBool();
+    LOG_CHEST=d.HasMember("LogChest")?d["LogChest"].GetBool():false;
     auto&& x=d["banitems"].GetArray();
     for(auto& i:x){
         banitems.insert((short)i.GetInt());
@@ -435,20 +436,21 @@ static int handle_dest(GameMode* a0,BlockPos const& a1,unsigned char a2) {
     Block& bk=*a0->getPlayer()->getBlockSource()->getBlock(a1);
     int id=bk.getLegacyBlock()->getBlockItemId();
     if(id==7 || id==416){
+        notifyCheat(name,CheatType::INV);
         return 0;
     }
     if(name==lastn && clock()-lastcl<CLOCKS_PER_SEC*(10.0/1000)/*10ms*/) {
         lastcl=clock();
         fd_count++; 
-        if(fd_count>=4){
-            fd_count=2;
+        if(fd_count>=5){
+            fd_count=3;
             return 0;
         }
-        return 1;
+    }else{
+        lastn=name;
+        lastcl=clock();
+        fd_count=0;
     }
-    lastn=name;
-    lastcl=clock();
-    fd_count=0;
     const Vec3& fk=a0->getPlayer()->getPos();
 #define abs(x) ((x)<0?-(x):(x))
     int dx=fk.x-x;

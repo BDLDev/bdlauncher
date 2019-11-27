@@ -239,7 +239,6 @@ THook(void*,_ZN20ServerNetworkHandler19_displayGameMessageERK6PlayerRKNSt7__cxx1
     for(auto& hk:chat_hook){
         if(hk(sp,x)==false){
             fg=0;
-            break;
         }
     }
     if(fg) return original(a,sp,x);
@@ -281,7 +280,6 @@ THook(void*,_ZN6Player6attackER5Actor,ServerPlayer* sp,Actor* x){
     for(auto& hk:attack_hook){
         if(hk(sp,x)==false){
             fg=0;
-            break;
         }
     }
     if(fg)
@@ -298,7 +296,6 @@ THook(void*,_ZN5Actor10pickUpItemER9ItemActor,Actor* sp,ItemActor* x){
     for(auto& hk:pickup_hook){
         if(hk(sp,x)==false){
             fg=0;
-            break;
         }
     }
     if(fg)
@@ -315,7 +312,6 @@ THook(void*,_ZN8GameMode12destroyBlockERK8BlockPosh,GameMode* sp,BlockPos const&
     for(auto& hk:dest_hook){
         if(hk(sp,&x)==false){
             fg=0;
-            break;
         }
     }
     if(fg)
@@ -340,7 +336,6 @@ THook(void*,_ZN8GameMode9useItemOnER9ItemStackRK8BlockPoshRK4Vec3PK5Block,GameMo
     for(auto& hk:useion_hook){
         if(hk(sp,&ite,&bpos,&calced,bl)==false){
             fg=0;
-            break;
         }
     }
     if(fg)

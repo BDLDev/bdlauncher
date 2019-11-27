@@ -127,7 +127,7 @@ struct TMCache{
     std::unordered_map<K,land*,key_hash> pools[2];
     int nowptr=0;
     void push(const K& k,land* v){
-        pools[nowptr].insert({k,v});
+        pools[nowptr].emplace(k,v);
         if(pools[nowptr].size()==cap){
             nowptr=!nowptr;
             pools[nowptr].clear();
@@ -145,7 +145,7 @@ struct TMCache{
         pools[1].clear();
     }
 };
-static TMCache<std::tuple<int,int,int>,160 > tcache;
+static TMCache<std::tuple<int,int,int>,256 > tcache;
 static void ccache() {
     tcache.clear();
 }
@@ -263,7 +263,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
             return;
         }
         if(pl>0 || red_money(name,price)) {
-            lands.push_front(tmp);
+            lands.emplace_front(tmp);
             ccache();
             save();
             outp.success("§e[Land system] 购买成功");

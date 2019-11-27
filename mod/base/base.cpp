@@ -27,12 +27,12 @@ void split_string(const std::string& s, std::vector<std::string>& v, const std::
   pos1 = 0;
   while(std::string::npos != pos2)
   {
-    v.push_back(s.substr(pos1, pos2-pos1));
+    v.emplace_back(s.substr(pos1, pos2-pos1));
     pos1 = pos2 + c.size();
     pos2 = s.find(c, pos1);
   }
   if(pos1 != s.length())
-    v.push_back(s.substr(pos1));
+    v.emplace_back(s.substr(pos1));
 }
 bool execute_cmd_random(const vector<string>& chain){
     int rd=rand()%chain.size();
@@ -99,12 +99,13 @@ struct TeleportCommand {
 struct MyTxtPk{
     const string* str;
     TextType type;
+    MyPkt* pk;
     void setText(const string& ct,TextType typ){
         str=&ct;
         type=typ;
     }
-    void send(Player* p){
-        auto pk=MyPkt(0x9,[this](void*,BinaryStream& bs){
+    MyTxtPk(){
+        pk=new MyPkt(0x9,[this](void*,BinaryStream& bs){
             bs.writeByte(this->type);
             bs.writeBool(false);
             bs.writeUnsignedVarInt(this->str->size());
@@ -113,7 +114,9 @@ struct MyTxtPk{
             bs.writeUnsignedVarInt(0);//padding
             bs.writeUnsignedVarInt(0);
         });
-        ((ServerPlayer*)p)->sendNetworkPacket(pk);
+    }
+    void send(Player* p){
+        ((ServerPlayer*)p)->sendNetworkPacket(*pk);
     }
 };
 MyTxtPk gTextPkt;
@@ -184,7 +187,7 @@ Player* getplayer_byname2(const string& name) {
 
 void get_player_names(vector<string>& a){
     getSrvLevel()->forEachPlayer([&](Player& tg)->bool{
-        a.push_back(tg.getName());
+        a.emplace_back(tg.getName());
         return true;
     });
 }

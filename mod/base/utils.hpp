@@ -7,7 +7,7 @@ void call_sht(int d);
 int tkl;
 THook(void*,_ZN5Level4tickEv,Level& a){
     tkl++;
-    if(tkl%(15*60*20)==0) //15min
+    if(tkl%(5*60*20)==0) //5min
         call_sht(SIGABRT); //send sigabrt for auto save data
     return original(a);
 }
