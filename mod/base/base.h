@@ -15,16 +15,6 @@ class Vec3;
 //class AutomaticID<Dimension,int>;
 class Dimension;
 struct MCRESULT;
-/*
-BDL_EXPORT void reg_attack(void* a);
-BDL_EXPORT void reg_pickup(void* a);
-BDL_EXPORT void reg_useitem(void* a);
-BDL_EXPORT void reg_useitemon(void* a);
-BDL_EXPORT void reg_build(void* a);
-BDL_EXPORT void reg_destroy(void* a);
-BDL_EXPORT void reg_player_join(void* a);
-BDL_EXPORT void reg_player_left(void* a);
-*/
 
 enum TextType:char{
     RAW=0,

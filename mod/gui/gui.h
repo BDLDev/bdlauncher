@@ -52,7 +52,7 @@ struct Form:BaseForm{
         ss.SetString(text.data(),text.size(),dc.GetAllocator());
         bt.AddMember("text",ss,dc.GetAllocator());
         dc["buttons"].PushBack(bt,dc.GetAllocator());
-        labels.push_back(label);
+        labels.emplace_back(label);
         return this;
     }
     Form* setContent(const string& text){
@@ -109,7 +109,6 @@ struct SimpleInput:BaseForm{
         return this;
     }
 };
-BDL_EXPORT void sendStr(ServerPlayer& sp,string& fm,int id);
 BDL_EXPORT void sendForm(ServerPlayer& sp,BaseForm* fm);
 BDL_EXPORT void sendForm(const string& sp,BaseForm* fm);
 

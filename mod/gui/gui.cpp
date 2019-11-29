@@ -44,14 +44,24 @@ using namespace rapidjson;
 using std::vector;
 using std::unordered_map;
 unordered_map<int,BaseForm*> id_forms;
-
-BDL_EXPORT void sendStr(ServerPlayer& sp,string& fm,int id){
-    MyPkt xd(100,[&](void* x,BinaryStream& b)->void{
-        b.writeUnsignedVarInt(id);
-        b.writeUnsignedVarInt(fm.size());
-        b.write(fm.data(),fm.size());
-    });
-    sp.sendNetworkPacket(*(Packet*)&xd);
+struct GUIPK{
+    MyPkt* pk;
+    const string* fm;
+    int id;
+    GUIPK(){
+        pk=new MyPkt(100,[this](void* x,BinaryStream& b)->void{
+            b.writeUnsignedVarInt(id);
+            b.writeUnsignedVarInt(fm->size());
+            b.write(fm->data(),fm->size());
+        });
+    }
+    void send(ServerPlayer& sp,const string& st,int i){
+        fm=&st,id=i;
+        sp.sendNetworkPacket(*pk);
+    }
+} gGUIPK;
+static void sendStr(ServerPlayer& sp,string& fm,int id){
+    gGUIPK.send(sp,fm,id);
 }
 int autoid;
 BDL_EXPORT void sendForm(ServerPlayer& sp,BaseForm* fm){
@@ -120,7 +130,6 @@ void gui_Buttons(ServerPlayer* sp,const string& text,const string& title,const l
     sendForm(*sp,fm);
 }
 void gui_init(std::list<string>& modlist) {
-    //register_cmd("gui",fp(oncmd),"gui handler");
     printf("[GUI] Loaded V2019-11-23\n");
     load_helper(modlist);
 }

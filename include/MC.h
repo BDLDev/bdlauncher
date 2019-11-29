@@ -120,7 +120,10 @@ struct ChunkBlockPos{
         y=b;
     };
 };
-struct BlockActor;
+struct BlockPos;
+struct BlockActor{
+    BlockPos& getPosition() const;
+};
 struct BlockProperty{
         unsigned long x;
 };
@@ -449,7 +452,7 @@ struct InventorySource {
 
 struct MyPkt:Packet{
     void** vtbl;
-    char filler[312];
+    char filler[256];
     int id;
     std::function<void (void*,BinaryStream&)> realexe;
     static int dummy(){return 0;}
@@ -472,6 +475,11 @@ struct MyPkt:Packet{
         id=idx;
         vtbl=(void**)vtbls;
         realexe=callb;
+    }
+    MyPkt(int idx){
+        ParentInit();
+        vtbl=(void**)vtbls;
+        id=idx;
     }
 };
 struct TextPacket:Packet{
