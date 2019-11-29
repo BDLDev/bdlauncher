@@ -51,6 +51,9 @@ struct land {
     bool checkown(const string& name) const {
         return owner.find("|"+name+"|")!=std::string::npos;
     }
+    bool checkown_orig(const string& name) const {
+        return owner.find("|"+name+"|")==0;
+    }
     bool canpop(const string& name) const {
         return 1;//checkown(name) || ((dim_perm&PERMP)!=0);
     }
@@ -296,7 +299,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         int x=round(b.getWorldPosition().x);
         int y=round(b.getWorldPosition().z); //fix
         land* i=getLand(x,y,dim);
-        if(i&&(i->checkown(name)||pl>0)) {
+        if(i&&(i->checkown_orig(name)||pl>0)) {
             char buf[1000];
             int price=LAND_PRICE2*i->size();
             add_money(name,price);
@@ -319,7 +322,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         int x=round(b.getWorldPosition().x);
         int y=round(b.getWorldPosition().z); //fix
         land* i=getLand(x,y,dim);
-        if(i&&(i->checkown(name)||pl>0)) {
+        if(i&&(i->checkown_orig(name)||pl>0)) {
             i->addown(a[1]);
             save();
             outp.success("§e[Land system] 已信任玩家 "+a[1]);
@@ -349,7 +352,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         int x=round(b.getWorldPosition().x);
         int y=round(b.getWorldPosition().z); //fix
         land* i=getLand(x,y,dim);
-        if(i&&(i->checkown(name)||pl>0)&&i->checkown(a[1])) {
+        if(i&&(i->checkown_orig(name)||pl>0)&&i->checkown(a[1])) {
             i->rmown(a[1]);
             save();
             outp.success("§e[Land system] 已取消对玩家 "+a[1]+" 的信任");
@@ -364,7 +367,7 @@ static void oncmd(std::vector<string>& a,CommandOrigin const & b,CommandOutput &
         int x=round(b.getWorldPosition().x);
         int y=round(b.getWorldPosition().z); //fix
         land* i=getLand(x,y,dim);
-        if(i&&(i->checkown(name)||pl>0)) {
+        if(i&&(i->checkown_orig(name)||pl>0)) {
             i->dim_perm-=(i->dim_perm&15);
             i->dim_perm|=atoi(a[1].c_str());
             save();

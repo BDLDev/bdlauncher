@@ -216,7 +216,13 @@ THook(void*,_ZN15DedicatedServer5startERKNSt7__cxx1112basic_stringIcSt11char_tra
     return original(t,b);
 }
 void set_int_handler(void* fn);
+static int ctrlc;
 static void autostop(){
+        ctrlc++;
+        if(ctrlc==3){
+            printf("killing server\n");
+            exit(0);
+        }
         if(dserver){
             printf("stoping server\n");
             dserver->stop();

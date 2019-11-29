@@ -148,6 +148,14 @@ static void load(){
             for(auto& i:buttons.GetArray()){
                 assert(i.IsArray());
                 auto&& but=i.GetArray();
+                if(but.Size()!=3){
+                    printf("[CMD] wtf!cmdchain size mismatch.3 required,%d found\n",but.Size());
+                    printf("[CMD] Hint:\n");
+                    for(auto& j:but){
+                        printf("[CMD] %s\n",j.GetString());
+                    }
+                    exit(0);
+                }
                 cf.cmds.emplace(string(but[0].GetString()),CMD(but[1].GetString(),but[2].GetString()));
                 cf.ordered_cmds.emplace_back(but[0].GetString());
             }
