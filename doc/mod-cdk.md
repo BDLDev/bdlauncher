@@ -1,3 +1,4 @@
+# cdk.so
 /reload_cdk 重载cdk  
 /cdk [cdk] 玩家兑换cdk  
 配置文件 cdk.json  

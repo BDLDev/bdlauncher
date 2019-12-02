@@ -1,28 +1,27 @@
 mods/mod.list是插件列表，条目顺序是插件加载顺序，不建议修改
 如果要禁用插件，或者增加插件，直接删除对应行或给最后一行添加即可
 
-opti.so
-服务器优化
- server optimizer
-base.so
-基础插件（required）
-bear.so
-防熊，黑名单
- blacklist support and simple anticheat
-money.so
- 经济
-land.so
- 领地
-tp.so
- tpa home支持
+- opti.so  
+服务器优化  
+server optimizer  
+- base.so  
+基础插件（required）  
+- bear.so  
+防熊，黑名单  
+blacklist support and simple anticheat  
+- money.so  
+经济  
+- land.so  
+领地  
+- tp.so  
+tpa home支持
 
-More plugins:
-https://github.com/thirteenc13/bdlauncher-mods
+Third-party plugin developers: [thirteenc](https://github.com/thirteenc13), [no more]()
 
 </pre>
 <pre>
 所有玩家名带空格的，可以写成"bla bla"
-例如
+例如:
 /money query "114514 1919810"
 
 !!!anticheat.so会禁止推动容器方块，新版本容器推不动（旧版推了会消失）

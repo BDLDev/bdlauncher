@@ -1,5 +1,4 @@
 # tp.so  
-
 /home add 名字  
 /home ls 查看  
 /home go 名字 回家  

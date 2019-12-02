@@ -1,4 +1,4 @@
-<h1>bdlauncher</h1>
+# bdlauncher
 Third-party BedrockServer launcher with mods support (1.13.x only)
 # Install it to BDS
 <pre>
