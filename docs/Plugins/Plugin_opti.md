@@ -1,4 +1,4 @@
-# opti.so  
+# opti.mod  
 ## English
 Prohibit connection encryption, modify creature spawning distance, modify redstone trigger frequency  
 

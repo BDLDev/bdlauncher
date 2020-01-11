@@ -1,6 +1,6 @@
 #include<Loader.h>
 #include<MC.h>
-#include"../base/base.h"
+#include"base.h"
 #include"rapidjson/document.h"
 #include"rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"

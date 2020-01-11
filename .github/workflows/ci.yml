@@ -1,0 +1,21 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    container: gcc:9
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: make
+      run: make RELEASE=1
+    - name: make install
+      run: make install DESTDIR=dist
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: dist
+        path: dist

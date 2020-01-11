@@ -1,4 +1,4 @@
-# transfer.so
+# transfer.mod
 ## English
 /transfer [IP] [Port]  
 Transfer you to another server  

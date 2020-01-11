@@ -3,7 +3,7 @@
 #include <forward_list>
 #include <string>
 #include <unordered_map>
-#include "../cmdhelper.h"
+#include "cmdhelper.h"
 #include <vector>
 #include <Loader.h>
 #include <MC.h>
@@ -11,7 +11,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include "../base/base.h"
+#include "base.h"
 #include <cmath>
 #include <cstdlib>
 #include <ctime>

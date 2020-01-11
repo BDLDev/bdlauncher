@@ -1,14 +1,14 @@
 #include <cstdio>
 #include <string>
 #include <unordered_map>
-#include "../cmdhelper.h"
+#include "cmdhelper.h"
 #include <vector>
 #include <Loader.h>
 #include <MC.h>
 #include <unistd.h>
 #include <cstdarg>
 
-#include "../base/base.h"
+#include "base.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

@@ -2,7 +2,7 @@
 #include<list>
 #include<string>
 #include<unordered_map>
-#include"../cmdhelper.h"
+#include"cmdhelper.h"
 #include"base.h"
 #include<vector>
 #include<Loader.h>

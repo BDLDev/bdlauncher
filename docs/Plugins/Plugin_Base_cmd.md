@@ -1,4 +1,4 @@
-# cmd.so
+# cmd.mod
 [简体中文](#%e7%ae%80%e4%bd%93%e4%b8%ad%e6%96%87)
 ## English
 ### Command sequence
