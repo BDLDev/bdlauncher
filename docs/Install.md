@@ -16,7 +16,7 @@ make install DESTDIR=..
 popd
 ```
 # Launch server
-`./run.sh`
+`./bdlauncher`
 # Note
 BDL replaced SIGINT handler so that server will handle ctrl-c safely(use /stop command).  
 If server hangs,you can use pkill -9 `pgrep bedrock_server` to kill your server.
