@@ -5,7 +5,7 @@
 #include "CommandLexer.h"
 #include "CommandVersion.h"
 
-#include<climits>
+#include <climits>
 #include <memory>
 #include <vector>
 
@@ -51,8 +51,9 @@ public:
     unsigned value() const;
   };
   struct Enum {
-    using ParseFn = bool (CommandRegistry::*)(void *, CommandRegistry::ParseToken const &, CommandOrigin const &, int, std::string &,
-                                              std::vector<std::string> &);
+    using ParseFn = bool (CommandRegistry::*)(
+        void *, CommandRegistry::ParseToken const &, CommandOrigin const &, int, std::string &,
+        std::vector<std::string> &);
     std::string name;
     typeid_t<CommandRegistry> tid;
     ParseFn parseFn;
@@ -95,17 +96,20 @@ public:
     ~SoftEnum();
   };
   template <typename Type, typename TConverter>
-  bool parseEnum(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const {
+  bool
+  parseEnum(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const {
     return true;
   }
-  template <typename Type> bool parse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const;
+  template <typename Type>
+  bool parse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const;
 
   void registerCommand(std::string const &, char const *, CommandPermissionLevel, CommandFlag, CommandFlag);
   void buildOverload(CommandRegistry::Overload &);
   void registerOverloadInternal(Signature &, Overload &);
   Signature *findCommand(std::string const &);
 
-  template <typename F> void registerCustomOverload(std::string name, CommandVersion version, std::unique_ptr<Command> (*allocator)(), F f) {
+  template <typename F>
+  void registerCustomOverload(std::string name, CommandVersion version, std::unique_ptr<Command> (*allocator)(), F f) {
     Signature *signature = findCommand(name);
     signature->overloads.emplace_back(version, allocator);
     Overload &overload = *signature->overloads.rbegin();
@@ -114,12 +118,12 @@ public:
     registerOverloadInternal(*signature, overload);
   }
   template <typename T> static std::unique_ptr<Command> allocateCommand() { return std::unique_ptr<Command>(new T()); }
-  template <typename... Args> void registerOverload2(const char *name,void* allo, Args &&... args) {
+  template <typename... Args> void registerOverload2(const char *name, void *allo, Args &&... args) {
     Signature *signature = findCommand(name);
-    signature->overloads.emplace_back((CommandVersion){0,INT_MAX}, (Overload::FactoryFn)allo);
+    signature->overloads.emplace_back((CommandVersion){0, INT_MAX}, (Overload::FactoryFn) allo);
     Overload &overload = *signature->overloads.rbegin();
     buildOverload(overload);
-    overload.params = { args... };
+    overload.params = {args...};
     registerOverloadInternal(*signature, overload);
   }
 };

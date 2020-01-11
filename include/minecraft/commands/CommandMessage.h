@@ -9,7 +9,7 @@ template <typename> class CommandSelector;
 class Actor;
 
 class CommandMessage {
- char filler[24];
+  char filler[24];
 
 public:
   std::string getMessage(CommandOrigin const &) const;

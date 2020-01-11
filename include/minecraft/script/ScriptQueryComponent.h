@@ -12,9 +12,8 @@ struct ScriptQueryComponent {
   std::string y;
   std::string z;
 
-  // ScriptQueryComponent(ViewType, std::string const &, std::string const &, std::string const &, std::string const &);
-  // ScriptQueryComponent(ViewType);
-  // ScriptQueryComponent(ScriptQueryComponent &&);
+  // ScriptQueryComponent(ViewType, std::string const &, std::string const &, std::string const &, std::string const
+  // &); ScriptQueryComponent(ViewType); ScriptQueryComponent(ScriptQueryComponent &&);
 
   // ScriptQueryComponent &operator=(ScriptQueryComponent &&);
   // ~ScriptQueryComponent();

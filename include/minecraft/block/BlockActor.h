@@ -9,8 +9,8 @@ class CompoundTag;
 class DataLoadHelper;
 class BlockSource;
 class Packet;
-struct BlockPos{
-	int x,int y,int z;
+struct BlockPos {
+  int x, int y, int z;
 };
 class Actor;
 class UIProfanityContext;

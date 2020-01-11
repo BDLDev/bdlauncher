@@ -10,5 +10,5 @@ class Player;
 class Dimension {
 public:
   std::unordered_map<ActorUniqueID, Actor *> &getEntityIdMap() const;
-  void forEachPlayer(std::function<bool (Player &)>);
+  void forEachPlayer(std::function<bool(Player &)>);
 };

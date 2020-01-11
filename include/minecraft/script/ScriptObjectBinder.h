@@ -7,7 +7,7 @@
 #include <vector>
 
 #ifndef PATCHABLE
-#define PATCHABLE
+#  define PATCHABLE
 #endif
 
 class ScriptBinderComponent;

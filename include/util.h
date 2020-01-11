@@ -10,6 +10,8 @@
 #define INLINE __attribute__((always_inline)) inline
 #define USED __attribute__((used))
 
-#define MakeAccessor(name, R, offset)                                                                                                                                                                  \
-  INLINE R &name() ABITAG(custom) { return *reinterpret_cast<R *>(reinterpret_cast<char *>(this) + offset); }                                                                                          \
-  INLINE R const &name() const ABITAG(custom) { return *reinterpret_cast<R const *>(reinterpret_cast<char const *>(this) + offset); }
+#define MakeAccessor(name, R, offset)                                                                                  \
+  INLINE R &name() ABITAG(custom) { return *reinterpret_cast<R *>(reinterpret_cast<char *>(this) + offset); }          \
+  INLINE R const &name() const ABITAG(custom) {                                                                        \
+    return *reinterpret_cast<R const *>(reinterpret_cast<char const *>(this) + offset);                                \
+  }

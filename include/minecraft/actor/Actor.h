@@ -34,14 +34,14 @@ public:
   TickingArea *getTickingArea();
   bool save(CompoundTag &);
   int getEntityTypeId() const;
-  u64 pickUpItem(ItemActor &);	
+  u64 pickUpItem(ItemActor &);
   void kill();
   void changeDimension(AutomaticID<Dimension, int>, bool);
   int getDimensionId() const;
-  Vec3& getPos() const;	
+  Vec3 &getPos() const;
   bool isRiding() const;
-  ItemStack& getOffhandSlot() const;
+  ItemStack &getOffhandSlot() const;
   template <typename T> T *tryGetComponent();
-  void setPos(Vec3 const&);
+  void setPos(Vec3 const &);
   virtual ~Actor();
 };

@@ -10,8 +10,9 @@
 class CommandOrigin;
 enum class CommandParameterDataType { NORMAL, ENUM, SOFT_ENUM };
 struct CommandParameterData {
-  using ParseFn = bool (CommandRegistry::*)(void *, CommandRegistry::ParseToken const &, CommandOrigin const &, int, std::string &,
-                                            std::vector<std::string> &) const;
+  using ParseFn = bool (CommandRegistry::*)(
+      void *, CommandRegistry::ParseToken const &, CommandOrigin const &, int, std::string &,
+      std::vector<std::string> &) const;
   typeid_t<CommandRegistry> tid;
   ParseFn parser;
   std::string name;
@@ -21,6 +22,7 @@ struct CommandParameterData {
   int unk72;
   int offset;
   bool optional;
-  CommandParameterData(typeid_t<CommandRegistry> tid, ParseFn parser, char const *name, CommandParameterDataType type, char const *desc, int offset,
-                       bool mand, int flag_offset);
+  CommandParameterData(
+      typeid_t<CommandRegistry> tid, ParseFn parser, char const *name, CommandParameterDataType type, char const *desc,
+      int offset, bool mand, int flag_offset);
 };

@@ -10,8 +10,7 @@ namespace Json {
 
 class StaticString {
 public:
-  explicit StaticString(const char *czstring)
-      : c_str_(czstring) {}
+  explicit StaticString(const char *czstring) : c_str_(czstring) {}
   operator const char *() const { return c_str_; }
   const char *c_str() const { return c_str_; }
 

@@ -96,9 +96,9 @@ public:
   template <typename Func> void each(Func func) const {
     if (unk96) {
       for (std::size_t i = entityIds.size(); i != 0; --i) {
-        TEntity temp{ i - 1 };
+        TEntity temp{i - 1};
         auto id = entityIds[temp];
-        TEntity target{ ((std::size_t)id) & 0xFFFFF };
+        TEntity target{((std::size_t) id) & 0xFFFFF};
         if (temp == target) func(id);
       }
     } else {

@@ -106,7 +106,6 @@ public:
   unsigned getIdentifier() const;
 };
 
-
 class ScriptItemStackBinderComponent : public ScriptBinderComponent {
   unsigned count, stacksize;
   std::string name;
