@@ -1,5 +1,5 @@
 # 1.config from an empty server
-Now we can launch our server by `sh run.sh`,which outputs like this
+Now we can launch our server by `./bdlauncher`,which outputs like this
 ```
 [MOD] inject to 0x55555b2abd30 pid 82119
 [MOD] main,start loading mods

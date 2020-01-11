@@ -1,13 +1,16 @@
 # Compile it by yourself
-Requirements:   
+Requirements:
 <pre>
 g++ 9 or later
-Configure your compiler in cmp.sh and all.sh
+GNU make
+Configure your compiler in environment (CC/CXX)
 </pre>
-`sh cmp.sh` Compile the loader(a.so)   
-`cd mods;sh all.sh` Compile mods   
-`cd mods/xxx;sh cmp.sh` Compile a mod,YOU MUST CONFIGURE CFLAGS AND CXX FIRST.See all.sh for details.   
-需要g++9或以上  
-`sh cmp.sh` 编译loader(a.so)   
-`cd mods;sh all.sh` 编译 mods   
-`cd mods/xxx;sh cmp.sh` 编译 一个 mod，必须先配置好环境变量，参见all.sh内的export   
+`make preload` Compile the prelad(preload.so)
+`make mods LANG=EN` Compile mods
+`make list-mod` List mods
+`make mod-XXX LANG=EN` Compile a mod
+需要 g++9 或以上
+`make preload` 编译 preload
+`make mods` 编译 mods
+`make list-mod` 显示模组列表
+`make mod-XXX` 编译 一个 mod
