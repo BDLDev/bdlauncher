@@ -68,7 +68,7 @@ clean:
 	@rm -rf $(BIN_LAUNCHER) $(DLL_PRELOAD) $(MOD_OUTS) build/mods/mod.list
 
 .PHONY: install
-install:
+install: all
 	@cp -a build $(DESTDIR)
 	@cp -a config $(DESTDIR)
 
