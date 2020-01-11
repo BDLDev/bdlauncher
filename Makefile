@@ -1,6 +1,6 @@
 BIN_LAUNCHER=build/bdlauncher
 DLL_PRELOAD=build/preload.so
-MOD_LIST=$(filter-out DEPRECATED,$(patsubst mod/%,%,$(shell find mod -maxdepth 1 -type d -print)))
+MOD_LIST=$(filter-out DEPRECATED mod,$(patsubst mod/%,%,$(shell find mod -maxdepth 1 -type d -print)))
 MOD_OUTS=$(patsubst %,build/mods/%.mod,$(MOD_LIST))
 DESTDIR=/opt/bdlauncher
 
@@ -71,6 +71,13 @@ clean:
 install: all
 	@cp -a build $(DESTDIR)
 	@cp -a config $(DESTDIR)
+
+.PHONY: help
+help:
+	@echo available target:
+	@echo common target: all clean install help
+	@echo group target: bdlauncher preload mods
+	@echo mods target: $(addprefix mod-,$(MOD_LIST))
 
 # Direct Target
 
