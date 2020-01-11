@@ -13,7 +13,7 @@ jobs:
     - name: make
       run: make RELEASE=1
     - name: make install
-      run: make install DESTDIR=dist
+      run: make install RELEASE=1 DESTDIR=dist
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
