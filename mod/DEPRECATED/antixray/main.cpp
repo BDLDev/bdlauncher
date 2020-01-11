@@ -1,7 +1,7 @@
 #include<MC.h>
 #include<Loader.h>
 #include"minecraft/core/types.h"
-#include"../base/base.h"
+#include"base.h"
 
 extern "C" {
   __attribute__((visibility("default"))) void antixray_init(std::list<std::string>& modlist);

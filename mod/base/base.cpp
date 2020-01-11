@@ -1,6 +1,6 @@
 #define BASE
-#include"../cmdhelper.h"
-#include"../myhook.h"
+#include"cmdhelper.h"
+#include"myhook.h"
 #include<Loader.h>
 #include<MC.h>
 #include<vector>

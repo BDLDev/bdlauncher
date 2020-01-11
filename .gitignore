@@ -1,0 +1,8 @@
+.gdb_history
+build/*
+obj/*
+build/mods/*
+!build/.keep
+!build/mods
+!build/mods/.keep
+!obj/.keep

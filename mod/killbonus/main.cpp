@@ -1,8 +1,8 @@
 #include<Loader.h>
 #include<MC.h>
-#include"../cmdhelper.h"
+#include"cmdhelper.h"
 #include "rapidjson/document.h"
-#include "../base/base.h"
+#include "base.h"
 #include "../money/money.h"
 #include<fstream>
 using namespace rapidjson;
