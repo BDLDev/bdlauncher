@@ -1,3 +1,4 @@
+.vscode
 .gdb_history
 build/*
 obj/*
