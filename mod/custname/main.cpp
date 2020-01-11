@@ -1,6 +1,6 @@
 #include<Loader.h>
 #include<MC.h>
-#include"../base/base.h"
+#include"base.h"
 extern "C" {
    BDL_EXPORT void mod_init(std::list<string>& modlist);
 }

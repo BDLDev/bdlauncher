@@ -1,7 +1,7 @@
 #include<Loader.h>
 #include<MC.h>
-#include"../base/base.h"
-#include"../cmdhelper.h"
+#include"base.h"
+#include"cmdhelper.h"
 extern "C" {
    BDL_EXPORT void mod_init(std::list<string>& modlist);
 }

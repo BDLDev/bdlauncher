@@ -1,4 +1,4 @@
-#include"../myhook.h"
+#include"myhook.h"
 #include<Loader.h>
 #include<MC.h>
 #include"rapidjson/document.h"

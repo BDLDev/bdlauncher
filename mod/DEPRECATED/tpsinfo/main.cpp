@@ -1,8 +1,8 @@
 #include<Loader.h>
 #include<MC.h>
-#include"../cmdhelper.h"
+#include"cmdhelper.h"
 #include "rapidjson/document.h"
-#include "../base/base.h"
+#include "base.h"
 #include<fstream>
 #include"seral.hpp"
 #include"../serial/seral.hpp"
