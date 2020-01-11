@@ -1,0 +1,7 @@
+{
+    "can_back":true,
+    "can_tp":true,
+    "can_home":true,
+    "max_homes":10,
+    "TP_TIMEOUT":30
+}
