@@ -10,6 +10,7 @@ class CommandOrigin;
 
 class CommandSelectorBase {
   char filler[168];
+
 public:
   CommandSelectorBase(bool);
   ~CommandSelectorBase();

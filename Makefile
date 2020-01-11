@@ -72,10 +72,16 @@ install: all
 	@cp -a build $(DESTDIR)
 	@cp -a config $(DESTDIR)
 
+.PHONY: format
+format:
+	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|c\|h\)' -and -not -path "./include/*" -exec clang-format -i {} \;
+	find include/minecraft -regex '.*\.\(cpp\|hpp\|cc\|cxx\|c\|h\)' -exec clang-format -i {} \;
+	clang-format -i include/*.h include/*.hpp
+
 .PHONY: help
 help:
 	@echo available target:
-	@echo common target: all clean install help
+	@echo common target: all clean install help format
 	@echo group target: bdlauncher preload mods
 	@echo mods target: $(addprefix mod-,$(MOD_LIST))
 

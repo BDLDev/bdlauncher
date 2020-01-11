@@ -7,7 +7,7 @@
 #include <unordered_map>
 
 #ifndef PATCHABLE
-#define PATCHABLE
+#  define PATCHABLE
 #endif
 
 namespace Json {

@@ -40,7 +40,7 @@ struct NetworkIdentifier {
 };
 
 static_assert(offsetof(NetworkIdentifier, type) == 144);
-static_assert(sizeof(NetworkIdentifier)==0x98);
+static_assert(sizeof(NetworkIdentifier) == 0x98);
 
 namespace std {
 template <> struct hash<NetworkIdentifier> {

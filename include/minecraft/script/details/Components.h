@@ -5,21 +5,24 @@
 #include <string>
 
 #ifndef PATCHABLE
-#define PATCHABLE
+#  define PATCHABLE
 #endif
 
-#define COMMON_COMMONENT(name)                                                                                                                       \
-  class name : public ScriptTemplateFactory<ScriptServerContext>::Component {                                                                        \
-  public:                                                                                                                                            \
-    static std::string getName();                                                                                                                    \
-                                                                                                                                                     \
-    name();                                                                                                                                          \
-    virtual ~name();                                                                                                                                 \
-    virtual bool applyComponentTo(ScriptApi::ScriptVersionInfo const &, ScriptEngine &, ScriptServerContext &, Actor &,                              \
-                                  ScriptApi::ScriptObjectHandle const &) const override PATCHABLE;                                                   \
-    virtual bool retrieveComponentFrom(ScriptApi::ScriptVersionInfo const &, ScriptEngine &, ScriptServerContext &, Actor &,                         \
-                                       ScriptApi::ScriptObjectHandle &) const override PATCHABLE;                                                    \
-    virtual bool hasComponent(ScriptApi::ScriptVersionInfo const &, ScriptEngine &, ScriptServerContext &, Actor &, bool &) const override;          \
+#define COMMON_COMMONENT(name)                                                                                         \
+  class name : public ScriptTemplateFactory<ScriptServerContext>::Component {                                          \
+  public:                                                                                                              \
+    static std::string getName();                                                                                      \
+                                                                                                                       \
+    name();                                                                                                            \
+    virtual ~name();                                                                                                   \
+    virtual bool applyComponentTo(                                                                                     \
+        ScriptApi::ScriptVersionInfo const &, ScriptEngine &, ScriptServerContext &, Actor &,                          \
+        ScriptApi::ScriptObjectHandle const &) const override PATCHABLE;                                               \
+    virtual bool retrieveComponentFrom(                                                                                \
+        ScriptApi::ScriptVersionInfo const &, ScriptEngine &, ScriptServerContext &, Actor &,                          \
+        ScriptApi::ScriptObjectHandle &) const override PATCHABLE;                                                     \
+    virtual bool hasComponent(                                                                                         \
+        ScriptApi::ScriptVersionInfo const &, ScriptEngine &, ScriptServerContext &, Actor &, bool &) const override;  \
   }
 
 COMMON_COMMONENT(ScriptArmorContainerComponent);

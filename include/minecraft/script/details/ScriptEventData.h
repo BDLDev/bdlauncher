@@ -6,7 +6,7 @@
 #include "../ScriptEventData.h"
 
 #ifndef PATCHABLE
-#define PATCHABLE
+#  define PATCHABLE
 #endif
 
 class CustomScriptEventData : public ScriptEventData {
@@ -248,6 +248,6 @@ public:
   virtual ~ScriptPlayerAttackedActorEvent();
   virtual bool _serialize(ScriptEngine &, ScriptApi::ScriptObjectHandle &) const PATCHABLE;
 
-  void setPlayerId(ActorUniqueID const&);
-  void setAttackedActorId(ActorUniqueID const&);
+  void setPlayerId(ActorUniqueID const &);
+  void setAttackedActorId(ActorUniqueID const &);
 };

@@ -14,5 +14,5 @@ public:
   int getHotbarSize();
   std::vector<ItemStack const *> getSlots() const;
   void setItem(int, ItemStack const &, ContainerID);
-  bool removeResource(ItemStack const&);
+  bool removeResource(ItemStack const &);
 };

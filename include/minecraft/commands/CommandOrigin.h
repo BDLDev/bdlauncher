@@ -62,10 +62,13 @@ public:
 class ServerLevel;
 class ScriptEngine;
 class ServerCommandOrigin : public CommandOrigin {
-	char filler[72];
-	public:
-	ServerCommandOrigin(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ServerLevel&, CommandPermissionLevel);
-	virtual ~ServerCommandOrigin();
+  char filler[72];
+
+public:
+  ServerCommandOrigin(
+      std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &, ServerLevel &,
+      CommandPermissionLevel);
+  virtual ~ServerCommandOrigin();
   virtual std::string getRequestId() const;
   virtual std::string getName() const;
   virtual BlockPos getBlockPosition() const;
@@ -79,7 +82,6 @@ class ServerCommandOrigin : public CommandOrigin {
   virtual bool isSelectorExpansionAllowed() const;
   virtual OriginType getOriginType() const;
   virtual void handleCommandOutputCallback(Json::Value &&);
-
 };
 
 class ScriptCommandOrigin : public CommandOrigin {

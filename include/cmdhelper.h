@@ -7,5 +7,5 @@
 #include "minecraft/commands/MinecraftCommands.h"
 #include "minecraft/commands/CommandOutput.h"
 #include "minecraft/commands/CommandOrigin.h"
-//void cmdhelper_init();
-void register_shutdown(void*);
+// void cmdhelper_init();
+void register_shutdown(void *);

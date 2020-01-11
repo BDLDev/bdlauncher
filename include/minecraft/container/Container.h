@@ -35,7 +35,7 @@ public:
   virtual std::vector<ItemStack const *> getSlots() const;
   virtual int getItemCount();
   virtual int getItemCount(ItemStack const &);
-  virtual int findFirstSlotForItem(ItemStack const&);
+  virtual int findFirstSlotForItem(ItemStack const &);
   virtual bool canPushInItem(BlockSource &, int, int, ItemStack const &) const;
   virtual bool canPullOutItem(BlockSource &, int, int, ItemStack const &) const;
   virtual void setContainerChanged(int);
@@ -44,6 +44,7 @@ public:
   virtual bool hasCustomName() const;
   virtual void readAdditionalSaveData(CompoundTag const &);
   virtual void addAdditionalSaveData(CompoundTag &);
-  virtual void createTransactionContext(std::function<void(Container &, int, ItemStack const &, ItemStack const &)>, std::function<void()>);
+  virtual void createTransactionContext(
+      std::function<void(Container &, int, ItemStack const &, ItemStack const &)>, std::function<void()>);
   virtual void triggerTransactionChange(int, ItemStack const &, ItemStack const &);
 };

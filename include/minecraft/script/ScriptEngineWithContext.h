@@ -13,7 +13,7 @@
 #include <string>
 
 #ifndef PATCHABLE
-#define PATCHABLE
+#  define PATCHABLE
 #endif
 
 namespace ScriptApi {
@@ -42,41 +42,64 @@ public:
   bool helpDefineActor(Actor const &, ScriptApi::ScriptObjectHandle &);
   bool helpDefineActor(ActorUniqueID const &, ScriptApi::ScriptObjectHandle &);
   bool helpDefineItemStack(ItemInstance const &, ScriptApi::ScriptObjectHandle &);
-  bool helpDefineTickingArea(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &, ITickingArea const &);
-  bool helpDefineTickingArea(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &, ActorUniqueID const &);
+  bool
+  helpDefineTickingArea(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &, ITickingArea const &);
+  bool
+  helpDefineTickingArea(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &, ActorUniqueID const &);
   bool helpGetActor(ScriptApi::ScriptObjectHandle const &, Actor **);
   bool helpGetBlockSource(ScriptApi::ScriptObjectHandle const &, BlockSource **);
   bool helpGetBlock(ScriptApi::ScriptObjectHandle const &, Block const **, BlockSource const &);
   bool helpGetLevel(ScriptApi::ScriptObjectHandle const &, Level **);
 
-  bool helpDefineItemStackWithPath(ItemInstance const &, Actor const &, std::string const &, int idx, ScriptApi::ScriptObjectHandle &) ABITAG(quickjs);
+  bool helpDefineItemStackWithPath(
+      ItemInstance const &, Actor const &, std::string const &, int idx, ScriptApi::ScriptObjectHandle &)
+      ABITAG(quickjs);
   bool helpGetItemStackFromPath(ItemInstance &, ScriptApi::ScriptObjectHandle const &) ABITAG(quickjs);
   bool helpApplyItemStackWithPath(ItemInstance const &, ScriptApi::ScriptObjectHandle const &) ABITAG(quickjs);
 
   bool createEntity(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &) PATCHABLE;
-  bool createEntity(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &, std::string const &type, std::string const &identifier);
+  bool createEntity(
+      ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &, std::string const &type,
+      std::string const &identifier);
   bool destroyEntity(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &);
   bool isValidEntity(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, bool &);
 
-  bool registerEventData(ScriptApi::ScriptVersionInfo const &, std::string const &, ScriptApi::ScriptObjectHandle const &);
-  bool createEventData(ScriptApi::ScriptVersionInfo const &, std::string const &, ScriptApi::ScriptObjectHandle &) PATCHABLE;
+  bool
+  registerEventData(ScriptApi::ScriptVersionInfo const &, std::string const &, ScriptApi::ScriptObjectHandle const &);
+  bool
+  createEventData(ScriptApi::ScriptVersionInfo const &, std::string const &, ScriptApi::ScriptObjectHandle &) PATCHABLE;
 
-  bool registerComponent(ScriptApi::ScriptVersionInfo const &, std::string const &, ScriptApi::ScriptObjectHandle const &);
-  bool createComponent(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, std::string const &, ScriptApi::ScriptObjectHandle &) PATCHABLE;
-  bool hasComponent(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, std::string const &, bool &);
-  bool getComponent(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, std::string const &, ScriptApi::ScriptObjectHandle &) PATCHABLE;
-  bool applyComponentChanges(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, ScriptApi::ScriptObjectHandle const &) PATCHABLE;
-  bool destroyComponent(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, std::string const &);
+  bool
+  registerComponent(ScriptApi::ScriptVersionInfo const &, std::string const &, ScriptApi::ScriptObjectHandle const &);
+  bool createComponent(
+      ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, std::string const &,
+      ScriptApi::ScriptObjectHandle &) PATCHABLE;
+  bool hasComponent(
+      ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, std::string const &, bool &);
+  bool getComponent(
+      ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, std::string const &,
+      ScriptApi::ScriptObjectHandle &) PATCHABLE;
+  bool applyComponentChanges(
+      ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &,
+      ScriptApi::ScriptObjectHandle const &) PATCHABLE;
+  bool
+  destroyComponent(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, std::string const &);
 
   bool registerQuery(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &);
-  bool registerQuery(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &, std::string const &, std::string const &, std::string const &, std::string const &);
+  bool registerQuery(
+      ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &, std::string const &, std::string const &,
+      std::string const &, std::string const &);
   bool addFilter(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle const &, std::string const &);
 
-  bool getBlock(ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &, BlockPos const &, ScriptApi::ScriptObjectHandle const &) PATCHABLE;
+  bool getBlock(
+      ScriptApi::ScriptVersionInfo const &, ScriptApi::ScriptObjectHandle &, BlockPos const &,
+      ScriptApi::ScriptObjectHandle const &) PATCHABLE;
 
   bool fireEvent(ScriptEventData const &) PATCHABLE;
-  bool onEventReceivedFromScriptEngine(ScriptApi::ScriptVersionInfo const &, std::string const &, ScriptApi::ScriptObjectHandle const &) PATCHABLE;
+  bool onEventReceivedFromScriptEngine(
+      ScriptApi::ScriptVersionInfo const &, std::string const &, ScriptApi::ScriptObjectHandle const &) PATCHABLE;
 
   bool __hack__viewTouch();
-  static BlockSource *_helpGetBlockSourceFromBinder(Level &, ScriptLevelAreaBinderComponent const *, ScriptActorAreaBinderComponent const *);
+  static BlockSource *_helpGetBlockSourceFromBinder(
+      Level &, ScriptLevelAreaBinderComponent const *, ScriptActorAreaBinderComponent const *);
 };

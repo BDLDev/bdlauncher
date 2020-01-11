@@ -26,7 +26,8 @@ public:
   virtual void onSourceCreated(BlockSource &);
   virtual void onSourceDestroyed(BlockSource &);
   virtual void onAreaChanged(BlockSource &, BlockPos const &, BlockPos const &);
-  virtual void onBlockChanged(BlockSource &, BlockPos const &, unsigned int, Block const &, Block const &, int, ActorBlockSyncMessage const *);
+  virtual void onBlockChanged(
+      BlockSource &, BlockPos const &, unsigned int, Block const &, Block const &, int, ActorBlockSyncMessage const *);
   virtual void onBrightnessChanged(BlockSource &, BlockPos const &);
   virtual void onBlockEntityChanged(BlockSource &, BlockActor &);
   virtual void onBlockEntityAboutToBeRemoved(BlockSource &, std::shared_ptr<BlockActor>);
@@ -44,8 +45,8 @@ public:
   static bool isUsableLevel(Level *);
   void forEachPlayer(std::function<bool(Player &)>);
   BlockPalette *getGlobalBlockPalette() const;
-  LevelStorage* getLevelStorage();
-  MapItemSavedData& getMapSavedData(ItemStack const&);
+  LevelStorage *getLevelStorage();
+  MapItemSavedData &getMapSavedData(ItemStack const &);
   // ~ level-helper ~ //
   std::vector<std::unique_ptr<Actor>> &getActorVector() const ABITAG(level_helper);
   void forEachActor(std::function<bool(Dimension &, ActorUniqueID, Actor *)>) ABITAG(level_helper);

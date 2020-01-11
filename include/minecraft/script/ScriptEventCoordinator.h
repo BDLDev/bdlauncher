@@ -16,6 +16,6 @@ public:
   void sendScriptListenForEvent(std::string const &);
   void sendScriptLoaded(std::string const &, unsigned long);
   void sendScriptRan(std::string const &, std::string const &, bool);
-  void sendScriptRegisterSpatialView(std::string const&);
+  void sendScriptRegisterSpatialView(std::string const &);
   void sendScriptRegisterView();
 };

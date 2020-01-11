@@ -4,7 +4,7 @@
 #include <vector>
 
 #ifndef PATCHABLE
-#define PATCHABLE
+#  define PATCHABLE
 #endif
 
 namespace ScriptApi {
@@ -52,7 +52,8 @@ public:
   bool getValue(ScriptObjectHandle const &, long &);
   bool getValue(ScriptObjectHandle const &, std::string &);
   bool getValue(ScriptObjectHandle const &, bool &);
-  bool callObjectFunction(ScriptObjectHandle const &, std::string const &, std::vector<ScriptObjectHandle> const &, ScriptObjectHandle &);
+  bool callObjectFunction(
+      ScriptObjectHandle const &, std::string const &, std::vector<ScriptObjectHandle> const &, ScriptObjectHandle &);
   bool callGlobalFunction(ScriptObjectHandle const &, std::vector<ScriptObjectHandle> const &, ScriptObjectHandle &);
   bool getHandleType(ScriptObjectHandle const &, ScriptObjectType &);
   bool getMemberNames(ScriptObjectHandle const &, std::vector<std::string> &);

@@ -1,7 +1,7 @@
 #pragma once
-#include<string>
+#include <string>
 class Item {
-    public:
-    char filler[336];
-    Item(std::string const&,short spec);
+public:
+  char filler[336];
+  Item(std::string const &, short spec);
 };

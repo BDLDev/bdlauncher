@@ -1,9 +1,9 @@
 #pragma once
-#include<string>
-#include"../../RakNet/PluginInterface2.h"
-#include"../../RakNet/peerinterface.h"
-#include"../../RakNet/types.h"
-#include"../../RakNet/peer.h"
+#include <string>
+#include "../../RakNet/PluginInterface2.h"
+#include "../../RakNet/peerinterface.h"
+#include "../../RakNet/types.h"
+#include "../../RakNet/peer.h"
 ;
 class EntityRegistry;
 
@@ -17,9 +17,9 @@ class MinecraftCommands;
 class IMinecraftEventing;
 using RakNet::RakPeer;
 class NetworkIdentifier;
-class NetworkHandler{
-	public:
-	RakPeer& getPeerForUser(NetworkIdentifier const&);
+class NetworkHandler {
+public:
+  RakPeer &getPeerForUser(NetworkIdentifier const &);
 };
 class NetworkStatistics;
 class RakNetServerLocator;
@@ -28,14 +28,14 @@ class Timer;
 class Level;
 class NetworkIdentifier;
 class ServerPlayer;
-class ServerNetworkHandler{
+class ServerNetworkHandler {
 public:
-void disconnectClient(NetworkIdentifier const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool); //def false?
-NetworkHandler* getNH() const{
-	return *((NetworkHandler **)this+8);
-}
-void _onPlayerLeft(ServerPlayer*, bool);
-void _sendAdditionalLevelData(ServerPlayer&, NetworkIdentifier const&);
+  void disconnectClient(
+      NetworkIdentifier const &, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &,
+      bool); // def false?
+  NetworkHandler *getNH() const { return *((NetworkHandler **) this + 8); }
+  void _onPlayerLeft(ServerPlayer *, bool);
+  void _sendAdditionalLevelData(ServerPlayer &, NetworkIdentifier const &);
 };
 class Minecraft : public IEntityRegistryOwner {
 public:

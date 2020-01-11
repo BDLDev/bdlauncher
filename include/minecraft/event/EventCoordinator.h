@@ -16,6 +16,6 @@ public:
   ~EventCoordinator();
   void _checkThreadId();
   void processEvent(std::function<EventResult(L *)>);
-  void registerListener(L&);
-  void unregisterListener(L&);
+  void registerListener(L &);
+  void unregisterListener(L &);
 };

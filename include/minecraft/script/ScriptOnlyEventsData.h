@@ -18,7 +18,8 @@ template <> class ScriptOnlyEventsData<ScriptServerContext> {
   std::map<std::string, Json::Value> data;
 
 public:
-  bool createEventData(ScriptApi::ScriptVersionInfo const &, ScriptEngine &, ScriptServerContext &, std::string const &,
-                       ScriptApi::ScriptObjectHandle &);
+  bool createEventData(
+      ScriptApi::ScriptVersionInfo const &, ScriptEngine &, ScriptServerContext &, std::string const &,
+      ScriptApi::ScriptObjectHandle &);
   bool isDefined(std::string const &) const;
 };
