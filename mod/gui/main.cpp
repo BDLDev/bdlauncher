@@ -3,14 +3,14 @@
 #include<forward_list>
 #include<string>
 #include<unordered_map>
-#include"../cmdhelper.h"
+#include"cmdhelper.h"
 #include<vector>
 #include<Loader.h>
 #include<MC.h>
 #include<unistd.h>
 #include<cstdarg>
 
-#include"../base/base.h"
+#include"base.h"
 #include<cmath>
 #include<deque>
 #include<dlfcn.h>

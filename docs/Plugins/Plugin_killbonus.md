@@ -1,4 +1,4 @@
-# killbonus.so
+# killbonus.mod
 ## English
 `/reload_kbonus` reload config  
 `/dbg_kbonus` turn on debug,kill mobs to get eid  

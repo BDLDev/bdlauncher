@@ -1,4 +1,4 @@
-# map.so
+# map.mod
 ## 简体中文
 ```
 /map filename

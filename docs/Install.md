@@ -3,22 +3,17 @@
 If you do not have a bedrock server, please download it from the [official website](https://www.minecraft.net/download/server/bedrock/) first
 ```
 (In your bedrock server folder)
-git clone https://github.com/sysca11/bdlauncher -b master --depth=1  
-mkdir mods  
-cp -a bdlauncher/out/* ./mods
-cp -a bdlauncher/mod.list ./mods
-cp -a bdlauncher/config .
-cp -a bdlauncher/run.sh .
+git clone https://github.com/sysca11/bdlauncher -b master --depth=1
+pushd bdlauncher
+make install DESTDIR=..
+popd
 ```
 # Upgrade from an old version
 ```
-cd bdlauncher
+pushd bdlauncher
 git pull
-cd ..
-cp -a bdlauncher/out/* ./mods  
-cp -a bdlauncher/mod.list ./mods
-cp -a bdlauncher/config .  
-(in general, you might need to overwrite your configs, because new version uses a new format of config.)
+make install DESTDIR=..
+popd
 ```
 # Launch server
 `./run.sh`

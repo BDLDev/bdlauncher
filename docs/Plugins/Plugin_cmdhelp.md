@@ -1,4 +1,4 @@
-# cmdhelp.so
+# cmdhelp.mod
 Translate this document into English later :D
 ## 简体中文
 `/c` 打开预设命令列表  
