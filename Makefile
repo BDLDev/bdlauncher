@@ -67,6 +67,11 @@ clean:
 	@rm -rf obj/*.o obj/*.d
 	@rm -rf $(BIN_LAUNCHER) $(DLL_PRELOAD) $(MOD_OUTS) build/mods/mod.list
 
+.PHONY: install
+install:
+	@cp -a build $(DESTDIR)
+	@cp -a config $(DESTDIR)
+
 # Direct Target
 
 _BIN_LAUNCHER_SRC=$(wildcard launcher/*.c)
