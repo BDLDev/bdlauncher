@@ -1,14 +1,20 @@
 # bdlauncher
-A flexible , simple and easy-to-install third-party BedrockServer launcher with mods support (1.14)  
-Only for BDS Linux  
-telegram group https://t.me/bdlauncher  
-# License: 
-MIT with additional conditions   
-If you want to redistribute software in a commercial manner,please read LICENSE carefully   
-商用用途请仔细阅读LICENSE   
+A flexible , simple and easy-to-install third-party BedrockServer launcher with mods support (1.14)<br>
+Only for BDS Linux<br>
+telegram group https://t.me/bdlauncher
+
+# License:
+MIT with additional conditions<br>
+If you want to redistribute software in a commercial manner,please read LICENSE carefully<br>
+商用用途请仔细阅读LICENSE
+
+# Prebuilt binary
+Checkout the GitHub Actions Artifact: https://github.com/Sysca11/bdlauncher/actions
+
 # Docs:
-- [Install](docs/Install.md)  
+- [Install](docs/Install.md)
 - [docs folder](docs/Home.md)
+
 # Credits:
 | name | link |
 |  ----|----  |
