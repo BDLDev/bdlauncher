@@ -8,17 +8,15 @@ HEADERS=$(shell find include -type f -print)
 
 LANG=CN
 BDLTAG=$(shell cat version)
-CFLAGS+= -fPIC -std=gnu11 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
+CFLAGS= -Os
 CXXFLAGS+= -fPIC -std=gnu++17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
 
 ifeq (1,$(RELEASE))
 	OBJ_SUFFIX=release
-	CFLAGS+= -s -O3
 	CXXFLAGS+= -s -O3
 	LDFLAGS+= -Wl,-z,relro,-z,now
 else
 	OBJ_SUFFIX=debug
-	CFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined -Wall -Werror -Wno-unknown-warning-option
 	CXXFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined -Wall -Werror -Wno-invalid-offsetof -Wno-unknown-warning-option
 	LDFLAGS+= -fsanitize=undefined
 endif
@@ -26,6 +24,10 @@ endif
 .SECONDARY: obj/%.d
 
 # Macros
+define makearchive
+	@echo " AR  $(1)"
+	@$(AR) $(ARFLAGS) $(1) $(2)
+endef
 define compile
 	@echo " CXX $(1)"
 	@$(CXX) $(CXXFLAGS) -c -o $(1) $(2)
@@ -93,8 +95,9 @@ help:
 
 _BIN_LAUNCHER_SRC=$(wildcard launcher/*.c)
 _BIN_LAUNCHER_OBJ=$(patsubst launcher/%.c,obj/launcher_%_$(OBJ_SUFFIX).o,$(_BIN_LAUNCHER_SRC))
+_BIN_LAUNCHER_LIB=obj/copoll.a -lreadline -lutil
 
-$(BIN_LAUNCHER): $(_BIN_LAUNCHER_OBJ)
+$(BIN_LAUNCHER): $(_BIN_LAUNCHER_OBJ) $(_BIN_LAUNCHER_LIB)
 	$(call link,$@,,$^)
 
 _DLL_PRELOAD_SRC=$(wildcard preload/*.cpp)
@@ -106,8 +109,16 @@ $(DLL_PRELOAD): $(_DLL_PRELOAD_OBJ) $(_DLL_PRELOAD_LIB)
 
 # Object Target
 
+obj/copoll.a: obj/copoll_copoll.o obj/copoll_ctx.o
+	$(call makearchive,$@,$^)
+
+obj/copoll_%.o: copoll/%.c
+	$(call compilec,$@,$< -Wall -Werror)
+obj/copoll_%.o: copoll/%.S
+	$(call compilec,$@,$< -Wall -Werror)
+
 obj/launcher_%_$(OBJ_SUFFIX).o: launcher/%.c obj/launcher_%_$(OBJ_SUFFIX).d
-	$(call compilec,$@,$<)
+	$(call compilec,$@,$< -Wall -Werror -I copoll)
 .PRECIOUS: obj/launcher_%_$(OBJ_SUFFIX).d
 obj/launcher_%_$(OBJ_SUFFIX).d: launcher/%.c
 	$(call makedep,$@,$<)
