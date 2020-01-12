@@ -51,7 +51,9 @@ Config: `config/tp.json`
 | `/tpa ac` | 同意 |
 | `/tpa de` | 拒绝 |
 | `/suicide` | 自杀 |
+
 新版本GUI指令:
+
 | 指令 | 功能 |
 | - | - |
 | `/home gui` | GUI回家 |

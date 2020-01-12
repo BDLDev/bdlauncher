@@ -28,7 +28,7 @@
 > such as: 2=sleep<br>
 > 6=sleep and attack
 
-config: `land.json`
+config: `land.json`<br>
 buy_price: Price per square
 
 ## 简体中文
@@ -58,5 +58,5 @@ buy_price: Price per square
 6=可以睡觉，开箱子，攻击生物
 ```
 
-配置文件: `land.json`
+配置文件: `land.json`<br>
 buy_price: 制定了领地每一块的价格

@@ -17,7 +17,7 @@
 | `/money paygui` | Open the transfer interface |
 | `/reload_money` | reload config |
 
-config: `config/money.json`
+config: `config/money.json`<br>
 init_money: `Player initial money`
 
 ## 简体中文
@@ -36,5 +36,5 @@ init_money: `Player initial money`
 | `/money paygui` | 使用GUI来转账 |
 | `/reload_money` | 重载配置 |
 
-配置文件: `money.json`
+配置文件: `money.json`<br>
 init_money: 玩家初始金钱

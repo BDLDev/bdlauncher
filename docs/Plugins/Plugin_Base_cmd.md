@@ -12,7 +12,7 @@ chain type:
 
    for example: `"give %name% diamond 1,tell %name% success"`
 
-1. random chain: 
+1. random chain:
 
    Begins with "!" And consists of multiple ordinary chains, each chain is separated by ";" each chain is executed with equal probability, and only one chain
 

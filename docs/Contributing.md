@@ -34,7 +34,7 @@ Use clang-format
      	echo "Commit did not match clang-format"
      	exit 1;
      fi
-     
+
      # If there are whitespace errors, print the offending file names and fail.
      exec git diff-index --check --cached $against --
      ```
@@ -45,4 +45,6 @@ The BDLauncher project use [Github Flavored Markdown](https://github.github.com/
 
 #### Link
 
-Prefer to use relative link insteads of absolute link
+* Prefer to use relative link insteads of absolute link
+* Use explicit &lt;br/&gt; insteads of invisible character
+* Prefer to use table for commands description
