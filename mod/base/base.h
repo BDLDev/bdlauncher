@@ -85,4 +85,7 @@ static inline bool isOp(ServerPlayer const *sp) { return (int) sp->getPlayerPerm
 static inline bool isOp(CommandOrigin const &sp) { return (int) sp.getPermissionsLevel() > 0; }
 
 using std::pair;
-#define BDL_TAG "V2020-1-11"
+#ifndef BDL_TAG
+#  define BDL_TAG "(unknown)"
+#  warning No bdl tag
+#endif

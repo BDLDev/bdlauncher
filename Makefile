@@ -7,8 +7,9 @@ DESTDIR=/opt/bdlauncher
 HEADERS=$(shell find include -type f -print)
 
 LANG=CN
-CFLAGS+= -fPIC -std=gnu11 -DLANG=$(LANG)
-CXXFLAGS+= -fPIC -std=gnu++17 -DLANG=$(LANG)
+BDLTAG=$(file < version)
+CFLAGS+= -fPIC -std=gnu11 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
+CXXFLAGS+= -fPIC -std=gnu++17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
 
 ifeq (1,$(RELEASE))
 	OBJ_SUFFIX=release

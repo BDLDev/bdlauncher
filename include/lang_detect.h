@@ -1,5 +1,5 @@
 #pragma once
 
 #ifndef LANG
-#define LANG CN
+#  define LANG CN
 #endif
