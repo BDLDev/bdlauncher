@@ -1,5 +1,6 @@
 #pragma once
-#ifndef LANG_EN
+#include <lang_detect.h>
+#if LANG == CN
 #  define YOU_R_BANNED "§c你在当前服务器的黑名单内!"
 #  define BANNED_ITEM "§c无法使用违禁物品"
 #else
