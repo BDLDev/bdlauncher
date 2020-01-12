@@ -6,9 +6,13 @@
 #include <functional>
 #include <vector>
 //#include "db.hpp"
-#include "stl.hpp"
 #include "stkbuf.hpp"
+#include "stl.hpp"
 #include <string_view>
+#include "cmdreg.h"
+#include "dbimpl.h"
+#include "utils.h"
+
 using namespace std::literals;
 using std::function;
 using std::string;
@@ -23,7 +27,6 @@ class Dimension;
 struct MCRESULT;
 
 enum TextType : char { RAW = 0, POPUP = 3, JUKEBOX_POPUP = 4, TIP = 5 };
-typedef static_deque<string_view, 64> argVec;
 
 BDL_EXPORT void sendText(Player *a, string_view ct, TextType type = RAW);
 BDL_EXPORT void broadcastText(string_view ct, TextType type = RAW);
@@ -37,14 +40,6 @@ BDL_EXPORT MCRESULT runcmdAs(string_view a, Player *sp);
 BDL_EXPORT void split_string(string_view s, std::vector<std::string_view> &v, string_view c);
 BDL_EXPORT void split_string(string_view s, static_deque<std::string_view> &v, string_view c);
 BDL_EXPORT bool execute_cmdchain(string_view chain_, string_view sp, bool chained = true);
-BDL_EXPORT void register_cmd(
-    const std::string &name, void (*fn)(argVec &, CommandOrigin const &, CommandOutput &outp, string_view args),
-    const std::string &desc = "mod command", int permlevel = 0);
-BDL_EXPORT void register_cmd(
-    const std::string &name, void (*fn)(argVec &, CommandOrigin const &, CommandOutput &outp),
-    const std::string &desc = "mod command", int permlevel = 0);
-BDL_EXPORT void
-register_cmd(const std::string &name, void (*fn)(void), const std::string &desc = "mod command", int permlevel = 0);
 BDL_EXPORT void
 reg_useitemon(bool (*)(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos const *dstPos, Block const *a5));
 BDL_EXPORT void reg_destroy(bool (*)(GameMode *a0, BlockPos const *));
@@ -66,16 +61,6 @@ BDL_EXPORT NetworkIdentifier *getPlayerNeti(ServerPlayer &sp);
 BDL_EXPORT ServerPlayer *getuser_byname(string_view a);
 BDL_EXPORT void base_sendPkt(ServerPlayer *sp, Packet &pk);
 
-BDL_EXPORT ItemStack *createItemStack_static(short id, short aux, unsigned char amo, ItemStack *stk);
-BDL_EXPORT ItemStack *createItemStack(short id, short aux, unsigned char amo);
-BDL_EXPORT ItemStack *createItemStack_static(string const &name, unsigned char amo, ItemStack *stk);
-BDL_EXPORT ItemStack *createItemStack(string const &name, unsigned char amo);
-
-BDL_EXPORT void giveItem(ServerPlayer &sp, ItemStack *is);
-BDL_EXPORT ActorUniqueID summon(BlockSource &bs, Vec3 const &vc, string const &name);
-BDL_EXPORT bool takeItem_unsafe(ServerPlayer &sp, ItemStack *is);
-BDL_EXPORT bool takeItem(ServerPlayer &sp, ItemStack *is);
-
 #define getplayer_byname(x) (getuser_byname(x))
 
 BDL_EXPORT void forceKickPlayer(ServerPlayer &sp);
@@ -94,27 +79,10 @@ void MC(); // dummy
 void ServLevel();
 }
 #endif
-#define getMC() (*(Minecraft **) MC)
-#define getSrvLevel() (*(Level **) ServLevel)
+#define getMC() (*reinterpret_cast<Minecraft **>(MC))
+#define getSrvLevel() (*reinterpret_cast<Level **>(ServLevel))
 static inline bool isOp(ServerPlayer const *sp) { return (int) sp->getPlayerPermissionLevel() > 1; }
 static inline bool isOp(CommandOrigin const &sp) { return (int) sp.getPermissionsLevel() > 0; }
-
-#include <leveldb/db.h>
-struct LDBImpl {
-  leveldb::DB *db;
-  leveldb::ReadOptions rdopt;
-  leveldb::WriteOptions wropt;
-  leveldb::Options options;
-  void load(const char *name, bool read_cache = true, int lru_cache_sz = 0);
-  LDBImpl(const char *name, bool read_cache = true, int lru_cache_sz = 0);
-  void close();
-  ~LDBImpl();
-  bool Get(string_view key, string &val) const;
-  void Put(string_view key, string_view val);
-  bool Del(string_view key);
-  void Iter(function<void(string_view, string_view)> fn) const;
-  void CompactAll();
-};
 
 using std::pair;
 #define BDL_TAG "V2020-1-11"

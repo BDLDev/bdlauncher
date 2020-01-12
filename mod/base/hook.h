@@ -1,3 +1,4 @@
+
 static_deque<bool (*)(ServerPlayer *a0, string &payload)> chat_hook;
 THook(
     void *,
@@ -11,11 +12,13 @@ THook(
   if (fg) return original(a, sp, x);
   return nullptr;
 }
+
 static_deque<void (*)(ServerPlayer *)> join_hook;
 THook(void *, _ZN12ServerPlayer27setLocalPlayerAsInitializedEv, ServerPlayer *sp) {
   for (auto &hk : join_hook) { hk(sp); }
   return original(sp);
 }
+
 static_deque<void (*)(ServerPlayer *)> left_hook;
 THook(void *, _ZN20ServerNetworkHandler13_onPlayerLeftEP12ServerPlayerb, void *a, ServerPlayer *sp, bool x) {
   for (auto &hk : left_hook) { hk(sp); }
@@ -131,8 +134,23 @@ THook(void *, _ZN8GameMode8interactER5ActorRK4Vec3, GameMode *gm, Actor &ac, Vec
   for (auto &i : interact_hook) { nprevent &= i(gm, ac); }
   return nprevent ? original(gm, ac, vc) : nullptr;
 }
+
 #define regAPI(name, hk)                                                                                               \
-  BDL_EXPORT void reg_##name(decltype(&(***hk##_hook.begin())) x) { hk##_hook.push_back(x); }
-regAPI(chat, chat) regAPI(player_join, join) regAPI(player_left, left) regAPI(attack, attack) regAPI(pickup, pickup)
-    regAPI(destroy, dest) regAPI(useitemon, useion) regAPI(popItem, popItem) regAPI(mobdie, mobdie)
-        regAPI(mobhurt, mobhurt) regAPI(actorhurt, actorhurt) regAPI(interact, interact)
+  void reg_##name(decltype(&(***hk##_hook.begin())) x) { hk##_hook.push_back(x); }
+
+// clang-format off
+
+regAPI(chat, chat)
+regAPI(player_join, join)
+regAPI(player_left, left)
+regAPI(attack, attack)
+regAPI(pickup, pickup)
+regAPI(destroy, dest)
+regAPI(useitemon, useion)
+regAPI(popItem, popItem)
+regAPI(mobdie, mobdie)
+regAPI(mobhurt, mobhurt)
+regAPI(actorhurt, actorhurt)
+regAPI(interact, interact)
+
+    // clang-format on

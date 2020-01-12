@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "util.h"
+#include "global.h"
 
 using std::string;
 template <typename T> USED static auto autosize(const T &a) { return std::distance(a.begin(), a.end()); }

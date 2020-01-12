@@ -1,3 +1,9 @@
+#include <Loader.h>
+#include <global.h>
+#include <MC.h>
+#include <string>
+
+using std::string;
 
 THook(
     void *,
@@ -14,15 +20,6 @@ void _ZN9ItemStack10EMPTY_ITEME();
 void _ZN7WeakPtrI4ItemE5resetEv(char *);
 void _ZN12ItemRegistry7getItemEs(char *, short);
 }
-ItemStack *createItemStack(string const &name, unsigned char amo) {
-  ItemStack *ik = new ItemStack();
-  auto res      = createItemStack_static(name, amo, ik);
-  if (res == nullptr) {
-    free(ik);
-    return nullptr;
-  }
-  return ik;
-}
 ItemStack *createItemStack_static(string const &name, unsigned char amo, ItemStack *stk) {
   char filler[16];
   memset(filler, 0, sizeof(filler));
@@ -35,15 +32,6 @@ ItemStack *createItemStack_static(string const &name, unsigned char amo, ItemSta
   ItemStack *ik = new (stk) ItemStack(*ite);
   ik->setStackSize(amo);
   return stk;
-}
-ItemStack *createItemStack(short id, short aux, unsigned char amo) {
-  ItemStack *ik = new ItemStack();
-  auto res      = createItemStack_static(id, aux, amo, ik);
-  if (res == nullptr) {
-    free(ik);
-    return nullptr;
-  }
-  return ik;
 }
 ItemStack *createItemStack_static(short id, short aux, unsigned char amo, ItemStack *stk) {
   char filler[16];
@@ -59,6 +47,24 @@ ItemStack *createItemStack_static(short id, short aux, unsigned char amo, ItemSt
   ik->setAuxValue(aux);
   printf(ik->toString().c_str());
   return stk;
+}
+ItemStack *createItemStack(string const &name, unsigned char amo) {
+  ItemStack *ik = new ItemStack();
+  auto res      = createItemStack_static(name, amo, ik);
+  if (res == nullptr) {
+    free(ik);
+    return nullptr;
+  }
+  return ik;
+}
+ItemStack *createItemStack(short id, short aux, unsigned char amo) {
+  ItemStack *ik = new ItemStack();
+  auto res      = createItemStack_static(id, aux, amo, ik);
+  if (res == nullptr) {
+    free(ik);
+    return nullptr;
+  }
+  return ik;
 }
 void giveItem(ServerPlayer &sp, ItemStack *is) {
   auto trm = sp.getTransactionManager();

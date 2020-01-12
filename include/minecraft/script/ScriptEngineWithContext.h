@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../util.h"
+#include <global.h>
 #include "../core/types.h"
 #include "../level/ITickingArea.h"
 #include "ScriptBinderTemplateController.h"

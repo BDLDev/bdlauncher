@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../util.h"
+#include <global.h>
 #include "../core/NBT.h"
 #include <memory>
 #include <string>

@@ -3,7 +3,7 @@
 #include <MC.h>
 #include "rapidjson/document.h"
 #include <fstream>
-#include "util.h"
+#include <global.h>
 
 typedef uint64_t u64;
 typedef uint32_t u32;

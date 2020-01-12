@@ -1,5 +1,5 @@
 #pragma once
-#include "../../util.h"
+#include <global.h>
 class Actor;
 class ItemStack;
 class BlockPos;

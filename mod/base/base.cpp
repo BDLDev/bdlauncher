@@ -13,18 +13,18 @@ using std::list;
 using std::tuple;
 using std::vector;
 #include "base.h"
-#include "hook.hpp"
-#include "cmdreg.hpp"
-#include "utils.hpp"
+#include "hook.h"
 #include <sstream>
 #include "base.h"
-#include "dbimpl.hpp"
+
 extern void load_helper(list<string> &modlist);
+
 extern "C" {
 BDL_EXPORT void mod_init(list<string> &modlist);
 BDL_EXPORT Minecraft *MC;
 BDL_EXPORT Level *ServLevel;
 }
+
 static ServerNetworkHandler *MCSNH;
 static LoopbackPacketSender *MCPKTSEND;
 static MinecraftCommands *MCCMD;
@@ -224,13 +224,11 @@ THook(
   printf("pkt send %p snh %p\n", MCPKTSEND, MCSNH);
   return ret;
 }
-THook(void *, _ZN10SayCommand5setupER15CommandRegistry, CommandRegistry &thi, CommandRegistry &a) {
-  handle_regcmd(thi);
-  return original(thi, a);
-}
+
 struct DedicatedServer {
   void stop();
 };
+
 DedicatedServer *dserver;
 THook(
     void *, _ZN15DedicatedServer5startERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE, DedicatedServer *t,

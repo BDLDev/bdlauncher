@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../util.h"
+#include <global.h>
 #include "Packet.h"
 
 class TextPacket : public Packet {
