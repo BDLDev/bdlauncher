@@ -4,18 +4,21 @@ on: [push]
 
 jobs:
   build:
+    strategy:
+      matrix:
+        mode: [DEBUG, RELEASE]
 
     runs-on: ubuntu-latest
     container: gcc:9
 
     steps:
     - uses: actions/checkout@v1
-    - name: make
-      run: make RELEASE=1
+    - name: make ${{ matrix.mode }}
+      run: make ${{ matrix.mode }}=1
     - name: make install
-      run: make install RELEASE=1 DESTDIR=dist
+      run: make install ${{ matrix.mode }}=1 DESTDIR=dist-${{ matrix.mode }}
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: dist
-        path: dist
+        name: dist-${{ matrix.mode }}
+        path: dist-${{ matrix.mode }}
