@@ -3,6 +3,7 @@
 #define likely(cond) __glibc_likely(!!(cond))
 #include <string_view>
 #include <string>
+#include <logger.h>
 using std::string;
 using std::string_view;
 template <typename T, const int S = 96, const int SZ_MAX = sizeof(T) * S> struct static_deque {
@@ -206,7 +207,7 @@ struct FileBuffer {
   FileBuffer(const char *fn) {
     int fd = open(fn, O_RDONLY);
     if (fd == -1) {
-      printf("[ERROR] cannot open %s\n", fn);
+      do_log("cannot open %s\n", fn);
       perror("open");
       size = 0;
       data = nullptr;

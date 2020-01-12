@@ -7,3 +7,4 @@ build/mods/*
 !build/mods
 !build/mods/.keep
 !obj/.keep
+dist

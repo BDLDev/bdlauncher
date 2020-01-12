@@ -24,6 +24,6 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
 }
 void mod_init(std::list<string> &modlist) {
   register_cmd("transfer", oncmd, "transfer to server");
-  printf("[Trans] loaded! V2019-12-14\n");
+  do_log("loaded! V2019-12-14");
   load_helper(modlist);
 }

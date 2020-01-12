@@ -72,7 +72,7 @@ void CONVERT_WARP() {
     DataStream tmpds;
     tmpds << pos;
     tp_db.Put("warp_" + pos.name, tmpds.dat);
-    printf("warp %s found\n", pos.name.c_str());
+    do_log("warp %s found", pos.name.c_str());
     warps.emplace_back(pos.name);
   }
   DataStream tmpds;
@@ -89,14 +89,14 @@ void CONVERT_HOME() {
   DataStream ds;
   ds.dat = string(buf, siz);
   ds >> cnt;
-  printf("sz %d\n", cnt);
+  do_log("sz %d", cnt);
   for (int i = 0; i < cnt; ++i) {
     string key;
     home hom;
     int homelen;
     ds >> key;
     ds >> homelen;
-    printf("key %s len %d\n", key.c_str(), homelen);
+    do_log("key %s len %d", key.c_str(), homelen);
     int homecnt;
     ds >> homecnt;
     hom.cnt = homecnt;
@@ -132,7 +132,7 @@ void load_warps_new() {
   DataStream ds;
   if (!tp_db.Get("warps", ds.dat)) return; // fix crash
   ds >> warp_list;
-  printf("%ld warps found\n", warp_list.size());
+  do_log("%ld warps found", warp_list.size());
   for (auto &i : warp_list) {
     DataStream tmpds;
     tp_db.Get("warp_" + i, tmpds.dat);
@@ -158,7 +158,7 @@ static void putHome(const string &key, home &hm) {
 static void load() {
   struct stat tmp;
   if (stat("data/tp/tp.db", &tmp) != -1) {
-    printf("[TP] CONVERTING DATA.\n");
+    do_log("CONVERTING DATA.");
     CONVERT_HOME();
     CONVERT_WARP();
     link("data/tp/tp.db", "data/tp/tp.db_old");
@@ -405,7 +405,7 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
 }
 static void oncmd_warp(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   int pl = (int) b.getPermissionsLevel();
-  // printf("pl %d\n",pl);
+  // do_log("pl %d",pl);
   string name = b.getName();
   Vec3 pos    = b.getWorldPosition();
   ARGSZ(1)
@@ -505,7 +505,7 @@ static void load_cfg() {
   Document d;
   FileBuffer fb("config/tp.json");
   if (d.ParseInsitu(fb.data).HasParseError()) {
-    printf("[TP] JSON ERROR!\n");
+    do_log("JSON ERROR!");
     exit(1);
   }
   CanBack  = d["can_back"].GetBool();
@@ -515,12 +515,12 @@ static void load_cfg() {
   if (d.HasMember("TP_TIMEOUT"))
     TP_TIMEOUT = d["TP_TIMEOUT"].GetInt();
   else {
-    printf("[TP/Warn] NO TP_TIMEOUT FOUND!USE 30s AS DEFAULT!!!\n");
+    do_log("NO TP_TIMEOUT FOUND!USE 30s AS DEFAULT!!!");
   }
 }
 
 void mod_init(std::list<string> &modlist) {
-  printf("[TPs] loaded! " BDL_TAG "\n");
+  do_log("loaded! " BDL_TAG "");
   load();
   load_warps_new();
   load_cfg();

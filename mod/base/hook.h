@@ -75,7 +75,7 @@ THook(
   calced.x += X[side];
   calced.y += Y[side];
   calced.z += Z[side];
-  // printf("side %d\n,%d %d %d\n",side,calced.x,calced.y,calced.z);
+  // do_log("side %d\n,%d %d %d",side,calced.x,calced.y,calced.z);
   for (auto &hk : useion_hook) {
     if (hk(sp, &ite, &bpos, &calced, bl) == false) { fg = 0; }
   }
@@ -114,7 +114,7 @@ THook(
     void *, _ZN3Mob5_hurtERK17ActorDamageSourceibb, Mob &th, ActorDamageSource const &src, int val, bool unk,
     bool unk2) {
   int nprevent = 1;
-  // printf("call %ld %ld %d\n",th.getUniqueID().id,src.getEntityUniqueID().id,val);
+  // do_log("call %ld %ld %d",th.getUniqueID().id,src.getEntityUniqueID().id,val);
   for (auto &i : mobhurt_hook) { nprevent &= i(th, src, val); }
   return nprevent ? original(th, src, val, unk, unk2) : nullptr;
 }

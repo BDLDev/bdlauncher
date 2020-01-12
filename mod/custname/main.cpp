@@ -36,7 +36,7 @@ static void oncmd(argVec &av, CommandOrigin const &co, CommandOutput &outp) {
   outp.success("okay");
 }
 void mod_init(std::list<string> &modlist) {
-  printf("[CUSTNAME] Loaded " BDL_TAG "!\n");
+  do_log("Loaded " BDL_TAG "!");
   load();
   register_cmd("cname", oncmd, "custom name", 1);
   load_helper(modlist);

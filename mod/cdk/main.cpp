@@ -53,7 +53,7 @@ static void load() {
   Document dc;
   FileBuffer fb("config/cdk.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf("[CDK] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   for (auto &i : dc.GetObject()) { cdks.emplace(i.name.GetString(), i.value.GetString()); }
@@ -80,6 +80,6 @@ void mod_init(std::list<string> &modlist) {
   load();
   register_cmd("cdk", oncmd, "use a cdk");
   register_cmd("reload_cdk", load, "reload cdks", 1);
-  printf("[CDK] loaded! V2019-12-11\n");
+  do_log("loaded! V2019-12-11");
   load_helper(modlist);
 }

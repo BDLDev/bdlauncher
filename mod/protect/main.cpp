@@ -41,6 +41,6 @@ void mod_init(std::list<string> &modlist) {
 #define getfn(x) fp(dlsym(NULL, x))
   if (NoEnderPick) { MyHook(getfn("_ZN21EndermanTakeBlockGoal6canUseEv"), fp(dummy)); }
   if (NoFarm) { MyHook(getfn("_ZNK9FarmBlock15transformOnFallER11BlockSourceRK8BlockPosP5Actorf"), fp(dummy)); }
-  printf("[WorldProtect] Loaded " BDL_TAG "\n");
+  do_log("Loaded " BDL_TAG "");
   load_helper(modlist);
 }

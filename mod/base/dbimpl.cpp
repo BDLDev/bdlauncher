@@ -6,6 +6,7 @@
 #include <functional>
 #include <cstdlib>
 #include <cstring>
+#include <logger.h>
 
 using leveldb::Slice;
 using std::function;
@@ -21,7 +22,7 @@ void LDBImpl::load(const char *name, bool read_cache, int lru_cache_sz) {
   if (lru_cache_sz) { options.block_cache = leveldb::NewLRUCache(lru_cache_sz); }
   options.create_if_missing = true;
   leveldb::Status status    = leveldb::DB::Open(options, name, &db);
-  if (!status.ok()) { printf("[DB ERROR] cannot load %s reason: %s\n", name, status.ToString().c_str()); }
+  if (!status.ok()) { do_log("cannot load %s reason: %s", name, status.ToString().c_str()); }
   assert(status.ok());
 }
 
@@ -38,7 +39,7 @@ bool LDBImpl::Get(string_view key, string &val) const {
 
 void LDBImpl::Put(string_view key, string_view val) {
   auto s = db->Put(wropt, Slice(key.data(), key.size()), Slice(val.data(), val.size()));
-  if (!s.ok()) { printf("[DBError] %s\n", s.ToString().c_str()); }
+  if (!s.ok()) { do_log("%s", s.ToString().c_str()); }
 }
 
 bool LDBImpl::Del(string_view key) {

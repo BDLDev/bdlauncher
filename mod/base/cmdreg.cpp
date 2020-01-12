@@ -59,7 +59,7 @@ static ACmd *chelper(void *fn) {
 
 static void handle_regcmd(CommandRegistry &t) {
   for (auto const &i : reqs) {
-    // printf("reg %s %p\n",i.name.c_str(),i.fn);
+    // do_log("reg %s %p",i.name.c_str(),i.fn);
     t.registerCommand(
         i.name, i.desc.c_str(), (CommandPermissionLevel) i.permlevel, (CommandFlag) 0, (CommandFlag) 0x40);
     t.registerOverload2(

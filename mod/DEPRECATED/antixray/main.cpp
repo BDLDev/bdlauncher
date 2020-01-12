@@ -102,7 +102,7 @@ THook(
     int, _ZN21NetworkChunkPublisher16_sendQueuedChunkERK8ChunkPosPN15ClientBlobCache6Server15TransferBuilderE,
     NetworkChunkPublisher *thi, ChunkPos *pos, ClientBlobCache::Server::TransferBuilder *unk) {
   if (!unk) {
-    printf("wtf refused it\n");
+    do_log("wtf refused it");
     return 0;
   } // refuse no cache client
   auto &x = thi->getSource();
@@ -172,6 +172,6 @@ int onDestBlock(GameMode *a0, BlockPos const &pos, unsigned char a2) {
 }
 void antixray_init(std::list<std::string> &modlist) {
   reg_destroy((void *) (onDestBlock));
-  printf("[AntiXray] Loaded!\n");
+  do_log("Loaded!");
   load_helper(modlist);
 }

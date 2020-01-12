@@ -45,7 +45,7 @@ static void loadcfg() {
   Document dc;
   FileBuffer fb("config/land.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf("[Land] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   LAND_PRICE  = dc["buy_price"].GetInt();
@@ -308,7 +308,7 @@ static void CONVERT(char *b, int s) {
   ds.dat = string(b, s);
   int cnt;
   ds >> cnt;
-  printf("%d lands found\n", cnt);
+  do_log("%d lands found", cnt);
   for (int i = 0; i < cnt; ++i) {
     DataStream ds2;
     ds >> ds2.dat;
@@ -318,9 +318,9 @@ static void CONVERT(char *b, int s) {
     dx = x + dx - 1;
     dy = y + dy - 1;
     dim >>= 4;
-    printf("land %d %d %d %d %d %s\n", x, y, dx, dy, dim, owner.c_str());
+    do_log("land %d %d %d %d %d %s", x, y, dx, dy, dim, owner.c_str());
     if (x < -200000 || y < -200000 || dx < -200000 || dy < -200000) {
-      printf("refuse to add land %s\n", owner.c_str());
+      do_log("refuse to add land %s", owner.c_str());
       continue;
     }
     addLand((x) ^ 0x80000000, (dx) ^ 0x80000000, (y) ^ 0x80000000, (dy) ^ 0x80000000, dim, owner);
@@ -333,7 +333,7 @@ static void load() {
   struct stat tmp;
   if (stat("data/land/land.db", &tmp) != -1) {
     FileBuffer fb("data/land/land.db");
-    printf("CONVERTING LANDS\n");
+    do_log("CONVERTING LANDS");
     CONVERT(fb.data, fb.size);
     link("data/land/land.db", "data/land/land.db.old");
     unlink("data/land/land.db");
@@ -477,7 +477,7 @@ THook(void *, _ZN12ServerPlayer9tickWorldERK4Tick, ServerPlayer *sp, unsigned lo
 }
 
 void mod_init(std::list<string> &modlist) {
-  printf("[LAND] loaded! " BDL_TAG "\n");
+  do_log("loaded! " BDL_TAG "");
   load();
   loadcfg();
   string dummy;

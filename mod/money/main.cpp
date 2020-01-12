@@ -26,7 +26,7 @@ BDL_EXPORT void mod_init(std::list<string> &modlist);
 extern void load_helper(std::list<string> &modlist);
 static LDBImpl db("data_v2/money", true, 1048576 * 2); // 2MB Cache
 static void DO_DATA_CONVERT(const char *buf, int sz) {
-  printf("size %d\n", sz);
+  do_log("size %d", sz);
   DataStream ds;
   ds.dat = string(buf, sz);
   int length;
@@ -34,7 +34,7 @@ static void DO_DATA_CONVERT(const char *buf, int sz) {
   for (int i = 0; i < length; ++i) {
     string key, val;
     ds >> key >> val;
-    printf("key %s val %d\n", key.c_str(), access(val.data(), int, 0));
+    do_log("key %s val %d", key.c_str(), access(val.data(), int, 0));
     db.Put(key, val);
   }
 }
@@ -45,7 +45,7 @@ static void load() {
   if (stat("data/money/money.db", &tmp) != -1) {
     FileBuffer fb("data/money/money.db");
     DO_DATA_CONVERT(fb.data, fb.size);
-    printf("[MONEY] DATA CONVERT DONE;old:data/money/money.db.old\n");
+    do_log("DATA CONVERT DONE;old:data/money/money.db.old");
     link("data/money/money.db", "data/money/money.db.old");
     unlink("data/money/money.db");
   }
@@ -56,7 +56,7 @@ void loadcfg() {
   Document dc;
   FileBuffer fb("config/money.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf("[Money] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   INIT_MONEY = dc["init_money"].GetInt();
@@ -202,7 +202,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
 }
 #include <iostream>
 void mod_init(std::list<string> &modlist) {
-  printf("[MONEY] loaded! " BDL_TAG "\n");
+  do_log("loaded! " BDL_TAG "");
   load();
   loadcfg();
   register_cmd("money", oncmd, "money command");

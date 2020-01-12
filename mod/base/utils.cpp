@@ -1,7 +1,9 @@
 #include <Loader.h>
 #include <global.h>
+#include <logger.h>
 #include <MC.h>
 #include <string>
+#include "utils.h"
 
 using std::string;
 
@@ -45,7 +47,7 @@ ItemStack *createItemStack_static(short id, short aux, unsigned char amo, ItemSt
   ItemStack *ik = new (stk) ItemStack(*ite);
   ik->setStackSize(amo);
   ik->setAuxValue(aux);
-  printf(ik->toString().c_str());
+  do_log("%s", ik->toString().c_str());
   return stk;
 }
 ItemStack *createItemStack(string const &name, unsigned char amo) {

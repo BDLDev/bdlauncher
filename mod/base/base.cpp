@@ -15,7 +15,7 @@ using std::vector;
 #include "base.h"
 #include "hook.h"
 #include <sstream>
-#include "base.h"
+#include <logger.h>
 
 extern void load_helper(list<string> &modlist);
 
@@ -41,11 +41,11 @@ THook(
     // seek for neti offset
     for (int i = 2000; i < 4000; ++i) {
       if (memcmp(((char *) a1) + i, a7, 0x98) == 0) {
-        if (SPEC_NETI_OFFSET) { printf("wtf!duplicate network iden??? first:%ld next %d\n", SPEC_NETI_OFFSET, i); }
+        if (SPEC_NETI_OFFSET) { do_log("wtf!duplicate network iden??? first:%ld next %d", SPEC_NETI_OFFSET, i); }
         SPEC_NETI_OFFSET = i;
       }
     }
-    printf("get offset %ld\n", SPEC_NETI_OFFSET);
+    do_log("get offset %ld", SPEC_NETI_OFFSET);
   }
   sp_net[a1] = a8;
   return ret;
@@ -215,13 +215,13 @@ THook(
     Minecraft &a, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &d,
     std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &b, PermissionsFile *c) {
   auto ret = original(a, d, b, c);
-  printf("MC %p\n", &a);
+  do_log("MC %p", &a);
   MC        = &a;
   ServLevel = MC->getLevel();
   MCCMD     = MC->getCommands();
   MCSNH     = MC->getNetEventCallback();
   MCPKTSEND = access(MCSNH, LoopbackPacketSender *, 88);
-  printf("pkt send %p snh %p\n", MCPKTSEND, MCSNH);
+  do_log("pkt send %p snh %p", MCPKTSEND, MCSNH);
   return ret;
 }
 
@@ -233,7 +233,7 @@ DedicatedServer *dserver;
 THook(
     void *, _ZN15DedicatedServer5startERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE, DedicatedServer *t,
     string &b) {
-  printf("starting server %p\n", t);
+  do_log("starting server %p", t);
   dserver = t;
   return original(t, b);
 }
@@ -242,11 +242,11 @@ static int ctrlc;
 static void autostop() {
   ctrlc++;
   if (ctrlc >= 3) {
-    printf("killing server\n");
+    do_log("killing server");
     exit(0);
   }
   if (dserver) {
-    printf("stoping server\n");
+    do_log("stoping server");
     dserver->stop();
   }
 }
@@ -306,14 +306,14 @@ static void dummy__() {}
 void mod_init(list<string> &modlist) {
   uintptr_t *pt = (uintptr_t *) _ZTV19ServerCommandOrigin;
   memcpy(fake_vtbl, (void *) _ZTV19ServerCommandOrigin, sizeof(fake_vtbl));
-  printf(
-      "[BASE] fake vtable pt %p %p %p %p\n", (void *) pt[0], (void *) pt[1], (void *) pt[2],
+  do_log(
+      "fake vtable pt %p %p %p %p", (void *) pt[0], (void *) pt[1], (void *) pt[2],
       _ZN19ServerCommandOriginD2Ev);              // pt[3]=D0ev
   fake_vtbl[2] = fake_vtbl[3] = (void *) dummy__; // fix free(ServerCommandOrigin)
   memcpy(fake_vtbl_ply, (void *) (void *) _ZTV19PlayerCommandOrigin, sizeof(fake_vtbl_ply));
   fake_vtbl_ply[2] = fake_vtbl_ply[3] = (void *) dummy__;
   mkdir("data_v2", S_IRWXU);
-  printf("[MOD/BASE] loaded! " BDL_TAG "\n");
+  do_log("loaded! " BDL_TAG);
   set_int_handler(fp(autostop));
   load_helper(modlist);
 }

@@ -71,8 +71,10 @@ clean:
 
 .PHONY: install
 install: all
-	@cp -a build $(DESTDIR)
-	@cp -a config $(DESTDIR)
+	@echo installing to $(DESTDIR)
+	@mkdir -p $(DESTDIR)
+	@cp -r build/* $(DESTDIR)
+	@cp -r config $(DESTDIR)
 
 .PHONY: format
 format:
@@ -130,11 +132,11 @@ $$(MOD_$1): $$(_MOD_$1_OBJ)
 	$(call link,$$@,-shared -fPIC -ldl -fvisibility=hidden,$$^)
 
 obj/mod_$1_%_$$(OBJ_SUFFIX).o: mod/$1/%.cpp obj/mod_$1_%_$(OBJ_SUFFIX).d
-	$(call compile,$$@,$$< -I include -I mod/base -fvisibility=hidden)
+	$(call compile,$$@,$$< -I include -I mod/base -fvisibility=hidden -DMOD_NAME=\"$1\")
 
 .PRECIOUS: obj/mod_$1_%_$$(OBJ_SUFFIX).d
 obj/mod_$1_%_$$(OBJ_SUFFIX).d: mod/$1/%.cpp
-	$(call makedep,$$@,$$< -I include -I mod/base -fvisibility=hidden)
+	$(call makedep,$$@,$$< -I include -I mod/base -fvisibility=hidden -DMOD_NAME=\"$1\")
 endef
 
 $(foreach mod,$(MOD_LIST),$(eval $(call build-mods-rules,$(mod))))

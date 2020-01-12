@@ -52,7 +52,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   outp.success("okay!rejoin server to see new map");
 }
 void mod_init(std::list<string> &modlist) {
-  printf("[CustomMap] loaded! " BDL_TAG "\n");
+  do_log("loaded! " BDL_TAG "");
   register_cmd("map", oncmd, "CustomMap", 1);
   load_helper(modlist);
 }

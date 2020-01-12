@@ -19,7 +19,7 @@ void load() {
   int siz;
   file2mem("config/tps.json", &buf, siz);
   if (dc.ParseInsitu(buf).HasParseError()) {
-    printf("[TPSInfo] Config JSON ERROR!\n");
+    do_log("Config JSON ERROR!");
     exit(1);
   }
   WEATHER = {dc["WEATHER_START"].GetInt(), dc["WEATHER_STOP"].GetInt()};
@@ -39,6 +39,6 @@ THook(void *, _ZN5Level4tickEv, Level &a) {
 }
 void mod_init(std::list<string> &modlist) {
   load();
-  printf("[TPSInfo] Loaded " BDL_TAG "\n");
+  do_log("Loaded " BDL_TAG "");
   load_helper(modlist);
 }

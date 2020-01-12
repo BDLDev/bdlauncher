@@ -16,7 +16,7 @@ void load() {
   std::ifstream ff;
   FileBuffer fb("config/killbonus.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf("[KillBonus] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   for (auto &i : dc.GetArray()) {
@@ -50,6 +50,6 @@ void mod_init(std::list<string> &modlist) {
   register_cmd("reload_kbonus", load, "reload kill bonus", 1);
   register_cmd("dbg_kbonus", toggle_dbg, "debug kill bonus", 1);
   reg_mobdie(handle_die);
-  printf("[KillBonus] Loaded " BDL_TAG "\n");
+  do_log("Loaded " BDL_TAG "");
   load_helper(modlist);
 }

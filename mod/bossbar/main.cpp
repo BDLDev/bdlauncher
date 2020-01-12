@@ -174,7 +174,7 @@ static void onJoin(ServerPlayer *sp) {
 }
 void mod_init(std::list<string> &modlist) {
   db.Get("pinned", PinnedBBar);
-  printf("[BossBar] Loaded " BDL_TAG "\n");
+  do_log("Loaded " BDL_TAG "");
   register_cmd("sendbb", cm, "send bb", 1);
   register_cmd("hidebb", cm2, "hide bb", 1);
   register_cmd("pinbb", cm_pin, "pin bb", 1);

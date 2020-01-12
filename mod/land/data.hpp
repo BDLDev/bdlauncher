@@ -31,7 +31,7 @@ struct FastLand {
     // x="|"+x+"|";
     int sz   = x.size();
     auto dat = x.data();
-    // printf("owner sz %d\n",owner_sz);
+    // do_log("owner sz %d",owner_sz);
     for (int i = 1; i < owner_sz - sz; ++i) {
       if (memcmp(dat, owner + i, sz) == 0 && owner[i - 1] == '|' && owner[i + sz] == '|') { return i == 1 ? 2 : 1; }
     }
@@ -95,7 +95,7 @@ static struct LandCacheManager {
     }
   }
   FastLand *requestLand(int id) {
-    // printf("req %d\n",id);
+    // do_log("req %d",id);
     auto it = cache.find(id);
     FastLand *res;
     if (it == cache.end()) {
@@ -114,7 +114,7 @@ static struct LandCacheManager {
       res = it->second;
     }
     res->refcount++;
-    // printf("req %d rcnt %d lp %p\n",id,res->refcount,res);
+    // do_log("req %d rcnt %d lp %p",id,res->refcount,res);
     return res;
   }
 } LCMan;
@@ -290,12 +290,12 @@ static void proc_chunk_del(lpos_t x, lpos_t dx, lpos_t z, lpos_t dz, int dim, ui
     for (decltype(dz) j = z; j <= dz; ++j) {
       memcpy(buf, &i, 4);
       memcpy(buf + 4, &j, 4);
-      // printf("proc del %d %d %d\n",i,j,dim);
+      // do_log("proc del %d %d %d",i,j,dim);
       db.Get(key, val);
-      // printf("size %d access %u\n",val.size(),access(val.data(),uint,0));
+      // do_log("size %d access %u",val.size(),access(val.data(),uint,0));
       for (decltype(val.size()) i = 0; i < val.size(); i += 4) {
         if (access(val.data(), uint, i) == lid) {
-          // printf("erase %d\n",i);
+          // do_log("erase %d",i);
           val.erase(i, 4);
           break;
         }
@@ -319,7 +319,7 @@ static void addLand(lpos_t x, lpos_t dx, lpos_t z, lpos_t dz, int dim, const str
   string_view key(buf, 6);
   DataStream ds;
   ds << ld;
-  // printf("sss %d\n",ds.dat.size());
+  // do_log("sss %d",ds.dat.size());
   db.Put(key, ds.dat);
   proc_chunk_add(x, dx, z, dz, dim, lid);
   purge_cache();
@@ -384,7 +384,7 @@ void iterLands_const(function<void(const DataLand &)> cb) {
 }
 
 void CHECK_AND_FIX_ALL() {
-  printf("[LAND/LCK] start data fix&optimize\n");
+  do_log("start data fix&optimize");
   vector<pair<string, DataLand>> lands;
   string val;
   uint lids;
@@ -406,12 +406,12 @@ void CHECK_AND_FIX_ALL() {
   system("rm -r data_v2/land_old;mv data_v2/land data_v2/land_old");
   db.load("data_v2/land", true, 1048576 * 8); // 8MB Cache
   db.Put("land_id", string_view((char *) &lids, 4));
-  printf("[LAND/LCK] %ld lands found!\n", lands.size());
+  do_log("%ld lands found!", lands.size());
   for (auto &nowLand : lands) {
     DataStream ds;
     auto &Land = nowLand.second;
     if (Land.ver == 0) {
-      printf("upgrade land %d\n", Land.lid);
+      do_log("upgrade land %d", Land.lid);
       Land.ver = 1;
       int xx   = Land.x - 200000;
       int zz   = Land.z - 200000;
@@ -427,5 +427,5 @@ void CHECK_AND_FIX_ALL() {
     proc_chunk_add(Land.x, Land.dx, Land.z, Land.dz, Land.dim, Land.lid);
   }
   db.CompactAll();
-  printf("[LAND/LCK] Done land data fix: %ld!\n", lands.size());
+  do_log("Done land data fix: %ld!", lands.size());
 }

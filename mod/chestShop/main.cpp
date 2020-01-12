@@ -97,7 +97,7 @@ static void load() {
   ff.close();
   if (strlen(buf) == 0) { strcpy(buf, "[]"); }
   if (dc.ParseInsitu(buf).HasParseError()) {
-    printf("[ChestShop] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   if (dc.IsArray()) {
@@ -137,7 +137,7 @@ THook(void *, _ZN15ChestBlockActor8stopOpenER6Player, BlockActor &ac, Player &pl
 }
 THook(void *, _ZN15ChestBlockActor9startOpenER6Player, BlockActor &ac, Player &pl) {
   auto &pos = ac.getPosition();
-  // printf("start pos %d %d %d\n",pos.x,pos.y,pos.z);
+  // do_log("start pos %d %d %d",pos.x,pos.y,pos.z);
   Chest *gch = fetchChest(pos.x, pos.y, pos.z);
   if (gch) { sessions.emplace(pl.getName(), gch); }
   return original(ac, pl);
@@ -300,7 +300,7 @@ void mod_init(std::list<string> &modlist) {
   load();
   reg_useitemon(handle_u);
   register_shutdown(fp(r_save));
-  printf("[ChestShop] Loaded\n");
+  do_log("Loaded");
   register_cmd("cshop", oncmd);
   load_helper(modlist);
 }

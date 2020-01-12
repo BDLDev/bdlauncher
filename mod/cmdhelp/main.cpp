@@ -110,12 +110,12 @@ static void load() {
   Document dc;
   FileBuffer fb("config/cmd.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf("[CMDHelper] JSON ERROR pos: %ld type: %s !\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
-    printf("--Hint--\n");
+    do_log("JSON ERROR pos: %ld type: %s !", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    do_log("--Hint--");
     auto off = dc.GetErrorOffset();
     FileBuffer fb2("config/cmd.json");
     auto hint = fb2.getsv().substr(std::max(0ul, off - 12), 24);
-    printf("%s\n", string(hint).c_str());
+    do_log("%s", string(hint).c_str());
     exit(1);
   }
   for (auto &i : dc.GetArray()) {
@@ -134,9 +134,9 @@ static void load() {
         assert(i.IsArray());
         auto &&but = i.GetArray();
         if (but.Size() != 3) {
-          printf("[CMD] wtf!cmdchain size mismatch.3 required,%d found\n", but.Size());
-          printf("[CMD] Hint:\n");
-          for (auto &j : but) { printf("[CMD] %s\n", j.GetString()); }
+          do_log("wtf!cmdchain size mismatch.3 required,%d found", but.Size());
+          do_log("Hint:");
+          for (auto &j : but) { do_log("%s", j.GetString()); }
           exit(0);
         }
         cf.ordered_cmds.emplace_back(
@@ -226,6 +226,6 @@ void mod_init(std::list<string> &modlist) {
   register_cmd("runas", oncmd_runas, "run cmd as", 1);
   reg_player_join(join);
   reg_useitemon(handle_u);
-  printf("[CMDHelp] loaded! " BDL_TAG "\n");
+  do_log("loaded! " BDL_TAG "");
   load_helper(modlist);
 }

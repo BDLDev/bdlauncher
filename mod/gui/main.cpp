@@ -66,7 +66,7 @@ BDL_EXPORT void sendForm(ServerPlayer &sp, SharedForm *fm) {
   if (id_forms.size() > 128) {
     for (auto &i : id_forms) { delete i.second; }
     id_forms.clear();
-    printf("[GUI] Warning!Form Spam Detected!Clearing Form datas.Last Player %s\n", sp.getName().c_str());
+    do_log("Warning!Form Spam Detected!Clearing Form datas.Last Player %s", sp.getName().c_str());
   }
   auto x           = fm->serial();
   fm->fid          = ++autoid;
@@ -103,11 +103,11 @@ void cm(argVec &a, CommandOrigin const &b, CommandOutput &c) {
   auto pis = createItemStack_static(3, 0, 10, &is);
   pis->setCustomLore({"kksk"});
   giveItem(*sp, pis);
-  printf("res %d\n", takeItem(*sp, &sp->getCarriedItem()));
+  do_log("res %d", takeItem(*sp, &sp->getCarriedItem()));
   auto eid   = summon(sp->getRegion(), sp->getPos(), "zombie");
   Actor *act = getSrvLevel()->fetchEntity(eid, false);
   if (act) {
-    printf("get act\n");
+    do_log("get act");
     act->setNameTag("kksk");
     act->setScoreTag("kksk");
     act->setNameTagVisible(true);
@@ -156,7 +156,7 @@ bs.writeUnsignedVarInt(54);bs.writeUnsignedVarInt(3);bs.writeFloat(5);
   sp->sendNetworkPacket(pk);*/
 }
 void mod_init(std::list<string> &modlist) {
-  printf("[GUI] Loaded " BDL_TAG "\n");
+  do_log("Loaded " BDL_TAG "");
   load_helper(modlist);
   register_cmd("g", cm, "debug", 1);
 }

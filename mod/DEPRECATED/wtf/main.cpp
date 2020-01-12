@@ -109,6 +109,6 @@ THook(__int64, _ZN4Core6Random13_genRandInt32Ev, void *thi) {
   return (v4 << 15) & 0xEFC60000 ^ v4 ^ (((v4 << 15) & 0xEFC60000 ^ v4) >> 18);
 }
 void mod_init(std::list<string> &modlist) {
-  printf("[wtf] loaded! V2019-12-14\n");
+  do_log("loaded! V2019-12-14");
   load_helper(modlist);
 }

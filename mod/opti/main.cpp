@@ -4,6 +4,7 @@
 #include "rapidjson/document.h"
 #include <fstream>
 #include <global.h>
+#include <logger.h>
 
 typedef uint64_t u64;
 typedef uint32_t u32;
@@ -44,12 +45,12 @@ void load() {
   buf[ff.readsome(buf, 4096)] = 0;
   ff.close();
   if (dc.ParseInsitu(buf).HasParseError()) {
-    printf("[OPTI] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   if (dc["FastMath"].GetBool()) {
     fast_math();
-    printf("[OPTI] FastMath\n");
+    do_log("FastMath");
   }
   // 1.13.1 26581604 1.13.2 26587812 1.14 0x9287ed8 0x78d6840
   RedStoneMUL = dc["RedStoneMUL"].GetInt();
@@ -59,9 +60,9 @@ void load() {
   int hit          = -114514;
   for (int i = -5000; i < 10000; ++i) {
     if (pp[i] == 9216) {
-      printf("found %d\n", i);
+      do_log("found %d", i);
       if (hit != -114514) {
-        printf("[OPTI] Warning!!!Broken patch dected.Wont Patch it!\n");
+        do_log("Warning!!!Broken patch dected.Wont Patch it!");
         hit = -114514;
         break;
       }
@@ -69,7 +70,7 @@ void load() {
     }
   }
   if (hit == -114514) {
-    printf("[OPTI] Warning!!!Broken patch dected.Wont Patch it!\n");
+    do_log("Warning!!!Broken patch dected.Wont Patch it!");
     return;
   }
   float *patch = pp + hit;
@@ -191,6 +192,6 @@ THook(__int64,_ZN4Core6Random13_genRandInt32Ev,void *thi)
 
 void mod_init(std::list<string> &modlist) {
   load();
-  printf("[OPTI] loaded! V2019-12-19\n");
+  do_log("loaded! V2019-12-19");
   load_helper(modlist);
 }

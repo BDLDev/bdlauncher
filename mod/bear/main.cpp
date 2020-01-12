@@ -97,9 +97,9 @@ THook(
   string val;
   auto succ = ban_data.Get(xuid, val);
   if (!succ) { ban_data.Put(xuid, pn); }
-  // printf("%p\n",getMC());
-  // printf("%p\n",getMC()->getNetworkHandler());
-  // printf("%p %p\n",snh,getMC()->getNetEventCallback());
+  // do_log("%p",getMC());
+  // do_log("%p",getMC()->getNetworkHandler());
+  // do_log("%p %p",snh,getMC()->getNetEventCallback());
   if (isBanned(pn) || (succ && isBanned(val))) {
     snh->disconnectClient(a, YOU_R_BANNED, false);
     return nullptr;
@@ -177,7 +177,7 @@ static bool handle_u(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos c
   /*if(LOG_CHEST && a5->getLegacyBlock()->getBlockItemId()==54){
       async_log("[CHEST] %s open chest pos: %d %d %d\n",a0->getPlayer()->getName().c_str(),a2->x,a2->y,a2->z);
   }*/
-  // printf("dbg use %s\n",a0->getPlayer()->getCarriedItem().toString().c_str());
+  // do_log("dbg use %s",a0->getPlayer()->getCarriedItem().toString().c_str());
   if (a0->getPlayer()->getPlayerPermissionLevel() > 1) return 1;
   auto &sn = a0->getPlayer()->getName();
   if (banitems.has(a1->getId())) {
@@ -407,7 +407,7 @@ static void _load_config() {
   Document d;
   FileBuffer fb("config/bear.json");
   if (d.ParseInsitu(fb.data).HasParseError()) {
-    printf("[ANTIBEAR] JSON ERROR pos: %ld type: %s!\n", d.GetErrorOffset(), GetParseErrorFunc(d.GetParseError()));
+    do_log("JSON ERROR pos: %ld type: %s!", d.GetErrorOffset(), GetParseErrorFunc(d.GetParseError()));
     exit(1);
   }
   FPushBlock = d["FPushChest"].GetBool();
@@ -507,7 +507,7 @@ static string dumpSP(ServerPlayer &sp) {
   int sz  = x.getContainerSize((ContainerID) 0ul);
   for (int i = 0; i < sz; ++i) {
     auto &item = x.getItem(i, (ContainerID) 0ul);
-    // printf("%s\n",item.toString().c_str());
+    // do_log("%s",item.toString().c_str());
     ret += item.toString() + " | ";
   }
   return ret;
@@ -516,13 +516,13 @@ static string dumpSP_Ender(ServerPlayer &sp) {
   string ret;
   auto *x = sp.getEnderChestContainer();
   if (!x) {
-    printf("no ender found\n");
+    do_log("no ender found");
     return "";
   }
   int sz = x->getContainerSize();
   for (int i = 0; i < sz; ++i) {
     auto &item = x->getItem(i);
-    // printf("%s\n",item.toString().c_str());
+    // do_log("%s",item.toString().c_str());
     ret += item.toString() + " | ";
   }
   return ret;
@@ -566,6 +566,6 @@ void mod_init(std::list<string> &modlist) {
   reg_chat(hkc);
   _load_config();
   if (getenv("LOGNET")) rori = (typeof(rori))(MyHook(fp(recvfrom), fp(recvfrom_hook)));
-  printf("[ANTI-BEAR] Loaded " BDL_TAG "\n");
+  do_log("Loaded " BDL_TAG);
   load_helper(modlist);
 }
