@@ -24,7 +24,7 @@ void _ZN28ClientboundMapItemDataPacketC2ER16MapItemSavedDataR5Level(void *thi, M
 void _ZN28ClientboundMapItemDataPacketD2Ev(void *);
 }
 extern void load_helper(std::list<string> &modlist);
-static unsigned int getrgb(unsigned char r, unsigned char g, unsigned char b) {
+USED static unsigned int getrgb(unsigned char r, unsigned char g, unsigned char b) {
   return 0xff000000 | (r << 16) | (g << 8) | b;
 }
 static unsigned int datam[128 * 128];

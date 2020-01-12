@@ -87,7 +87,7 @@ static void tick(int tk) {
   while (!oneshot_timers.empty()) {
     auto a = oneshot_timers.top();
     if (a.time <= tk) {
-      for (int i = 0; i < a.cmd.size(); ++i)
+      for (decltype(a.cmd.size()) i = 0; i < a.cmd.size(); ++i)
         if (a.cmd[i] == '$') a.cmd[i] = '%';
       execute_cmdchain(a.cmd, a.name, false);
       oneshot_timers.pop();
@@ -110,7 +110,7 @@ static void load() {
   Document dc;
   FileBuffer fb("config/cmd.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf("[CMDHelper] JSON ERROR pos: %d type: %s !\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    printf("[CMDHelper] JSON ERROR pos: %ld type: %s !\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     printf("--Hint--\n");
     auto off = dc.GetErrorOffset();
     FileBuffer fb2("config/cmd.json");
@@ -198,7 +198,7 @@ static void oncmd_runas(argVec &a, CommandOrigin const &b, CommandOutput &outp) 
       ptr += a[i].size();
       buf[ptr++] = ' ';
     }
-    runcmdAs({buf, ptr}, sp).isSuccess() ? outp.success() : outp.error("error");
+    runcmdAs({buf, (size_t) ptr}, sp).isSuccess() ? outp.success() : outp.error("error");
   } else {
     outp.error("Can't find player");
   }

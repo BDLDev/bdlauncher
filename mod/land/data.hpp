@@ -127,7 +127,9 @@ struct ChunkLandManager {
   static_deque<FastLand *, 256> managed_lands;
   void reset() {
     if (managed_lands.size() != 0) memset(lands, 0, sizeof(lands));
-    for (int i = managed_lands.head; i != managed_lands.tail; ++i) { LCMan.noticeFree(managed_lands[i]); }
+    for (decltype(managed_lands.tail) i = managed_lands.head; i != managed_lands.tail; ++i) {
+      LCMan.noticeFree(managed_lands[i]);
+    }
     managed_lands.clear();
   }
   void init(int *landlist, int siz) {
@@ -286,14 +288,14 @@ static void proc_chunk_del(lpos_t x, lpos_t dx, lpos_t z, lpos_t dz, int dim, ui
   buf[8] = dim;
   string_view key(buf, 9);
   string val;
-  for (int i = x; i <= dx; ++i) {
-    for (int j = z; j <= dz; ++j) {
+  for (decltype(dx) i = x; i <= dx; ++i) {
+    for (decltype(dz) j = z; j <= dz; ++j) {
       memcpy(buf, &i, 4);
       memcpy(buf + 4, &j, 4);
       // printf("proc del %d %d %d\n",i,j,dim);
       db.Get(key, val);
       // printf("size %d access %u\n",val.size(),access(val.data(),uint,0));
-      for (int i = 0; i < val.size(); i += 4) {
+      for (decltype(val.size()) i = 0; i < val.size(); i += 4) {
         if (access(val.data(), uint, i) == lid) {
           // printf("erase %d\n",i);
           val.erase(i, 4);
@@ -348,7 +350,10 @@ static void removeLand(FastLand *land) {
   purge_cache();
 }
 static inline void Fland2Dland(FastLand *ld, DataLand &d) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
   memcpy(&d, ld, 24);
+#pragma GCC diagnostic pop
   d.owner = string(ld->owner, ld->owner_sz);
 }
 void iterLands(function<void(DataLand &)> cb) {
@@ -403,7 +408,7 @@ void CHECK_AND_FIX_ALL() {
   system("rm -r data_v2/land_old;mv data_v2/land data_v2/land_old");
   db.load("data_v2/land", true, 1048576 * 8); // 8MB Cache
   db.Put("land_id", string_view((char *) &lids, 4));
-  printf("[LAND/LCK] %d lands found!\n", lands.size());
+  printf("[LAND/LCK] %ld lands found!\n", lands.size());
   for (auto &nowLand : lands) {
     DataStream ds;
     auto &Land = nowLand.second;
@@ -424,5 +429,5 @@ void CHECK_AND_FIX_ALL() {
     proc_chunk_add(Land.x, Land.dx, Land.z, Land.dz, Land.dim, Land.lid);
   }
   db.CompactAll();
-  printf("[LAND/LCK] Done land data fix!\n", lands.size());
+  printf("[LAND/LCK] Done land data fix: %ld!\n", lands.size());
 }

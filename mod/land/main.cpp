@@ -45,7 +45,7 @@ static void loadcfg() {
   Document dc;
   FileBuffer fb("config/land.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf("[Land] JSON ERROR pos: %d type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    printf("[Land] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   LAND_PRICE  = dc["buy_price"].GetInt();
@@ -327,8 +327,8 @@ static void CONVERT(char *b, int s) {
   }
 }
 static void load() {
-  char *buf;
-  int sz;
+  //   char *buf;
+  //   int sz;
 
   struct stat tmp;
   if (stat("data/land/land.db", &tmp) != -1) {

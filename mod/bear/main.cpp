@@ -57,7 +57,7 @@ bool isBanned(const string &name) {
     return 0;
   }
 }
-int MAX_CHAT_SIZE;
+size_t MAX_CHAT_SIZE;
 static_deque<string, 128> banword;
 static int logfd;
 static int logsz;
@@ -409,7 +409,7 @@ static void _load_config() {
   Document d;
   FileBuffer fb("config/bear.json");
   if (d.ParseInsitu(fb.data).HasParseError()) {
-    printf("[ANTIBEAR] JSON ERROR pos: %d type: %s!\n", d.GetErrorOffset(), GetParseErrorFunc(d.GetParseError()));
+    printf("[ANTIBEAR] JSON ERROR pos: %ld type: %s!\n", d.GetErrorOffset(), GetParseErrorFunc(d.GetParseError()));
     exit(1);
   }
   FPushBlock = d["FPushChest"].GetBool();
@@ -436,7 +436,7 @@ static Shash_t lastn;
 static clock_t lastcl;
 static int fd_count;
 #include <ctime>
-static int handle_dest(GameMode *a0, BlockPos const &a1, unsigned char a2) {
+USED static int handle_dest(GameMode *a0, BlockPos const &a1, unsigned char a2) {
   if (!FDest) return 1;
   auto sp = a0->getPlayer();
   int pl  = sp->getPlayerPermissionLevel();

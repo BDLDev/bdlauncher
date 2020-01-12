@@ -39,8 +39,8 @@ static void DO_DATA_CONVERT(const char *buf, int sz) {
   }
 }
 static void load() {
-  char *buf;
-  int sz;
+  //   char *buf;
+  //   int sz;
   struct stat tmp;
   if (stat("data/money/money.db", &tmp) != -1) {
     FileBuffer fb("data/money/money.db");
@@ -56,7 +56,7 @@ void loadcfg() {
   Document dc;
   FileBuffer fb("config/money.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf("[Money] JSON ERROR pos: %d type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    printf("[Money] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   INIT_MONEY = dc["init_money"].GetInt();
@@ -117,7 +117,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   if (a[0] == "add") {
     if ((int) b.getPermissionsLevel() < 1) return;
     ARGSZ(2)
-    int amo;
+    // int amo;
     SPBuf buf;
     if (a.size() == 3) {
       add_money(a[1], atoi(a[2]));
