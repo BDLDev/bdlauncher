@@ -17,8 +17,9 @@ ifeq (1,$(RELEASE))
 	LDFLAGS+= -Wl,-z,relro,-z,now
 else
 	OBJ_SUFFIX=debug
-	CFLAGS+= -g -DDEBUG -O0
-	CXXFLAGS+= -g -DDEBUG -O0
+	CFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined
+	CXXFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined
+	LDFLAGS+= -fsanitize=undefined
 endif
 
 .SECONDARY: obj/%.d

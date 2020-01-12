@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[]) {
   char const *bedrock_server = "./bedrock_server";
-  if (argc >= 2) bedrock_server = argv[1];
+  if (argc >= 2) bedrock_server = (char const *) argv[1];
   char pathbuf[256], ldbuf[1024] = ".";
   readlink("/proc/self/exe", pathbuf, sizeof pathbuf);
   *strrchr(pathbuf, '/') = 0;
