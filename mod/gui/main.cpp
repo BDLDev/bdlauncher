@@ -24,8 +24,6 @@
 #include "gui.h"
 using std::string;
 using std::unordered_map;
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
 #define dbg_printf(...)                                                                                                \
   {}
 //#define dbg_printf printf

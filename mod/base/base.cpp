@@ -187,9 +187,8 @@ ServerPlayer *getplayer_byname2(string_view name) {
   auto vc          = ServLevel->getUsers();
   for (auto &tg : *vc) {
     string bf = tg->getName();
-#define min(a, b) ((a) < (b) ? (a) : (b))
-    int sz = min(bf.size(), name.size());
-    int eq = 1;
+    int sz    = std::min(bf.size(), name.size());
+    int eq    = 1;
     for (int i = 0; i < sz; ++i) {
       if (tolower(bf[i]) != tolower(name[i])) {
         eq = 0;

@@ -7,8 +7,6 @@
 using std::list;
 using std::swap;
 using std::unordered_map;
-#define max(a, b) (((a) > (b)) ? (a) : (b))
-#define min(a, b) (((a) < (b)) ? (a) : (b))
 static LDBImpl db("data_v2/land", true, 1048576 * 8);
 enum LandPerm : char {
   PERM_NULL           = 0,

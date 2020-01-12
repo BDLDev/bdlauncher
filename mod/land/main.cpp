@@ -101,10 +101,10 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
       return;
     }
     choose_state.erase(hash);
-    x  = min(startpos[hash].x, endpos[hash].x);
-    z  = min(startpos[hash].z, endpos[hash].z);
-    dx = max(startpos[hash].x, endpos[hash].x);
-    dz = max(startpos[hash].z, endpos[hash].z);
+    x  = std::min(startpos[hash].x, endpos[hash].x);
+    z  = std::min(startpos[hash].z, endpos[hash].z);
+    dx = std::max(startpos[hash].x, endpos[hash].x);
+    dz = std::max(startpos[hash].z, endpos[hash].z);
     // step -1 :sanitize pos
 
     // step 1 check money

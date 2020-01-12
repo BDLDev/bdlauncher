@@ -32,8 +32,6 @@ using std::string;
 using std::unordered_map;
 using std::unordered_set;
 
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
 #define dbg_printf(...)                                                                                                \
   {}
 //#define dbg_printf printf

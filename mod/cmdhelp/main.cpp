@@ -114,7 +114,7 @@ static void load() {
     printf("--Hint--\n");
     auto off = dc.GetErrorOffset();
     FileBuffer fb2("config/cmd.json");
-    auto hint = fb2.getsv().substr(max(0ul, off - 12), 24);
+    auto hint = fb2.getsv().substr(std::max(0ul, off - 12), 24);
     printf("%s\n", string(hint).c_str());
     exit(1);
   }
