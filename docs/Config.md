@@ -14,8 +14,9 @@ Now we can launch our server by `./bdlauncher`,which outputs like this
 
 # 2.Adding mods.
 
-edit mods/mod.list  
-Notice that the mod.list must in a right order.
-It means land.mod(requires money.mod) must be placed after money.mod
+* edit mods/mod.list
 
-Writing...
+> Notice that the mod.list must in a right order.<br>
+> It means land.mod(requires money.mod) must be placed after money.mod
+
+__Writing...__
