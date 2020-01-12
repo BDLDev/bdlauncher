@@ -19,7 +19,7 @@ Translate this document into English later :D
     },
 ```
 > 这是一个定时器  
-cmd为指令序列，具体用法请参见[base-cmd.md](https://github.com/Sysca11/bdlauncher/blob/master/docs/Plugins/Plugin_Base_cmd.md)  
+cmd为指令序列，具体用法请参见[base-cmd.md](Plugin_Base_cmd.md)  
 time为秒数，shift为余数，开服时间除time余shift时执行  
 可以有多个定时器
 ```
@@ -29,7 +29,7 @@ time为秒数，shift为余数，开服时间除time余shift时执行
     },
 ```
 > 这是进服指令   
-cmd为指令序列，具体用法请参见[base-cmd.md](https://github.com/Sysca11/bdlauncher/blob/master/docs/Plugins/Plugin_Base_cmd.md)
+cmd为指令序列，具体用法请参见[base-cmd.md](Plugin_Base_cmd.md)
 ```
     {
         "type":"form",

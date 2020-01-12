@@ -7,13 +7,12 @@ MIT with additional conditions
 If you want to redistribute software in a commercial manner,please read LICENSE carefully   
 商用用途请仔细阅读LICENSE   
 # Docs:
-- [Install](https://github.com/Sysca11/bdlauncher/blob/master/docs/Install.md)  
-- [docs folder](https://github.com/Sysca11/bdlauncher/blob/master/docs/Home.md)
+- [Install](docs/Install.md)  
+- [docs folder](docs/Home.md)
 # Credits:
-```
-HOOK Lib:https://github.com/Menooker/PFishHook
-Json Parser:https://github.com/Tencent/rapidjson
-BDS API:https://github.com/MCMrARM
-BDS API:https://github.com/codehz/cobblestone 
-```
-
+| name | link |
+|  ----|----  |
+| HOOK Lib | https://github.com/Menooker/PFishHook |
+| Json Parser | https://github.com/Tencent/rapidjson |
+| BDS API | https://github.com/MCMrARM |
+| BDS API | https://github.com/codehz/cobblestone  |
