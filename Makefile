@@ -7,7 +7,7 @@ DESTDIR=/opt/bdlauncher
 HEADERS=$(shell find include -type f -print)
 
 LANG=CN
-BDLTAG=$(file < version)
+BDLTAG=$(shell cat version)
 CFLAGS+= -fPIC -std=gnu11 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
 CXXFLAGS+= -fPIC -std=gnu++17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
 
