@@ -16,8 +16,7 @@ void load() {
   Document dc;
   FileBuffer fb("config/protect.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf(
-        "[WorldProtect] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   NoEnderPick    = dc["NoEnderPick"].GetBool();
