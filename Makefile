@@ -17,8 +17,8 @@ ifeq (1,$(RELEASE))
 	LDFLAGS+= -Wl,-z,relro,-z,now
 else
 	OBJ_SUFFIX=debug
-	CFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined
-	CXXFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined
+	CFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined -Wall -Werror
+	CXXFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined -Wall -Werror -Wno-invalid-offsetof
 	LDFLAGS+= -fsanitize=undefined
 endif
 

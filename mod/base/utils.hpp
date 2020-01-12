@@ -6,7 +6,7 @@ THook(
   return original(a1, a2, a3, a4, a5, 0x40);
 }
 /*command cheat perm fixer*/
-static ItemRegistry *ItemReg;
+USED static ItemRegistry *ItemReg;
 extern "C" {
 void _ZN12ItemRegistry12lookupByNameERiRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE(
     char *, int &, const string *);
@@ -48,7 +48,7 @@ ItemStack *createItemStack(short id, short aux, unsigned char amo) {
 ItemStack *createItemStack_static(short id, short aux, unsigned char amo, ItemStack *stk) {
   char filler[16];
   memset(filler, 0, sizeof(filler));
-  int unk = 0;
+  // int unk = 0;
   _ZN12ItemRegistry7getItemEs(filler, id);
   Item *ite = nullptr;
   if (access(filler, Item **, 0)) { ite = *access(filler, Item **, 0); }

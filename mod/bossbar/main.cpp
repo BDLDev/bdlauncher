@@ -38,7 +38,7 @@ struct FText : VEntBase {
     bs.writeUnsignedVarInt64(114514);
     bs.writeUnsignedVarInt64(114514);
     bs.writeStr("wtfwtf"); // platid
-    bs.writeVec3({x, y, z});
+    bs.writeVec3({static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)});
     bs.writeVec3({0, 0, 0});
     bs.writeVec3({0, 0, 0});
     bs.writeUnsignedVarInt(0); // item
@@ -108,8 +108,8 @@ void CreateEntBB(ServerPlayer *sp) {
 }
 static void cm(argVec &a, CommandOrigin const &b, CommandOutput &c) {
   FText ft;
-  auto sp  = getSP(b.getEntity());
-  auto pos = sp->getPos();
+  auto sp = getSP(b.getEntity());
+  //   auto pos = sp->getPos();
   /*ft.x=pos.x;ft.y=pos.y;ft.z=pos.z;
   ft.eid=1919810;
   ft.text="weddwedew";

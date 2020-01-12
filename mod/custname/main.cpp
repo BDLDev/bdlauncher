@@ -26,7 +26,7 @@ static void oncmd(argVec &av, CommandOrigin const &co, CommandOutput &outp) {
     return;
   }
   SPBuf<1024> buf;
-  for (int i = 0; i < av[1].size(); ++i) {
+  for (decltype(av[1].size()) i = 0; i < av[1].size(); ++i) {
     if (av[1][i] != '"')
       ;
     buf.buf[buf.ptr++] = av[1][i];

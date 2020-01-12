@@ -12,7 +12,7 @@ template <typename T, const int S = 96, const int SZ_MAX = sizeof(T) * S> struct
   inline T *end() { return ((T *) data) + tail; }
   inline void clear() {
     T *res = (T *) data;
-    for (int i = head; i < tail; ++i) res[i].~T();
+    for (decltype(tail) i = head; i < tail; ++i) res[i].~T();
     head = tail = 0;
   }
   static_deque() { clear(); }
@@ -38,13 +38,13 @@ template <typename T, const int S = 96, const int SZ_MAX = sizeof(T) * S> struct
   inline T &operator[](const int idx) { return ((T *) data)[idx]; }
   inline int count(const T &x) const {
     int cnt = 0;
-    for (int i = head; i != tail; ++i) {
+    for (decltype(tail) i = head; i != tail; ++i) {
       if (((T *) data)[i] == x) cnt++;
     }
     return cnt;
   }
   inline int has(const T &x) const {
-    for (int i = head; i != tail; ++i) {
+    for (decltype(tail) i = head; i != tail; ++i) {
       if (((T *) data)[i] == x) return true;
     }
     return false;

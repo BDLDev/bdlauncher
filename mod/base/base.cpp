@@ -41,11 +41,11 @@ THook(
     // seek for neti offset
     for (int i = 2000; i < 4000; ++i) {
       if (memcmp(((char *) a1) + i, a7, 0x98) == 0) {
-        if (SPEC_NETI_OFFSET) { printf("wtf!duplicate network iden??? first:%d next %d\n", SPEC_NETI_OFFSET, i); }
+        if (SPEC_NETI_OFFSET) { printf("wtf!duplicate network iden??? first:%ld next %d\n", SPEC_NETI_OFFSET, i); }
         SPEC_NETI_OFFSET = i;
       }
     }
-    printf("get offset %d\n", SPEC_NETI_OFFSET);
+    printf("get offset %ld\n", SPEC_NETI_OFFSET);
   }
   sp_net[a1] = a8;
   return ret;
@@ -83,7 +83,7 @@ void split_string(string_view s, static_deque<std::string_view> &v, string_view 
   if (pos1 != s.length() && !v.full()) v.push_back(string_view(s.data() + pos1, s.size() - pos1));
 }
 bool execute_cmd_random(const static_deque<string_view> &chain) {
-  int rd = rand() % chain.size();
+  auto rd = rand() % chain.size();
   return execute_cmdchain(chain[rd], "", false);
 }
 
@@ -93,7 +93,7 @@ bool execute_cmdchain(string_view chain, string_view sp, bool chained) {
   char buf[8192];
   const char *src = chain.data();
   int bufsz       = 0;
-  for (int i = 0; i < chain.size(); ++i) {
+  for (decltype(chain.size()) i = 0; i < chain.size(); ++i) {
     if (memcmp(src + i, "%name%", 6) == 0) {
       if (fg) buf[bufsz++] = '"';
       memcpy(buf + bufsz, sp.data(), sp.size());
@@ -182,7 +182,6 @@ void TeleportA(Actor &a, Vec3 b, AutomaticID<Dimension, int> c) {
   }
 }
 
-#define fcast(a, b) (*((a *) (&b)))
 ServerPlayer *getplayer_byname2(string_view name) {
   ServerPlayer *rt = NULL;
   auto vc          = ServLevel->getUsers();
@@ -310,7 +309,9 @@ static void dummy__() {}
 void mod_init(list<string> &modlist) {
   uintptr_t *pt = (uintptr_t *) _ZTV19ServerCommandOrigin;
   memcpy(fake_vtbl, (void *) _ZTV19ServerCommandOrigin, sizeof(fake_vtbl));
-  printf("[BASE] fake vtable pt %p %p %p %p\n", pt[0], pt[1], pt[2], _ZN19ServerCommandOriginD2Ev); // pt[3]=D0ev
+  printf(
+      "[BASE] fake vtable pt %p %p %p %p\n", (void *) pt[0], (void *) pt[1], (void *) pt[2],
+      _ZN19ServerCommandOriginD2Ev);              // pt[3]=D0ev
   fake_vtbl[2] = fake_vtbl[3] = (void *) dummy__; // fix free(ServerCommandOrigin)
   memcpy(fake_vtbl_ply, (void *) (void *) _ZTV19PlayerCommandOrigin, sizeof(fake_vtbl_ply));
   fake_vtbl_ply[2] = fake_vtbl_ply[3] = (void *) dummy__;

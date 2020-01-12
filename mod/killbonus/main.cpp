@@ -16,7 +16,7 @@ void load() {
   std::ifstream ff;
   FileBuffer fb("config/killbonus.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf("[KillBonus] JSON ERROR pos: %d type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    printf("[KillBonus] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   for (auto &i : dc.GetArray()) {

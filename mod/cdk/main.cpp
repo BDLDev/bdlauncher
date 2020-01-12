@@ -53,7 +53,7 @@ static void load() {
   Document dc;
   FileBuffer fb("config/cdk.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
-    printf("[CDK] JSON ERROR pos: %d type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    printf("[CDK] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   for (auto &i : dc.GetObject()) { cdks.emplace(i.name.GetString(), i.value.GetString()); }

@@ -134,7 +134,7 @@ void load_warps_new() {
   DataStream ds;
   if (!tp_db.Get("warps", ds.dat)) return; // fix crash
   ds >> warp_list;
-  printf("%d warps found\n", warp_list.size());
+  printf("%ld warps found\n", warp_list.size());
   for (auto &i : warp_list) {
     DataStream tmpds;
     tp_db.Get("warp_" + i, tmpds.dat);
@@ -223,7 +223,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     outp.error("Teleport not enabled on this server!");
     return;
   }
-  int pl      = (int) b.getPermissionsLevel();
+  //   int pl      = (int) b.getPermissionsLevel();
   string name = b.getName();
   ARGSZ(1)
   if (a[0] == "f") {
@@ -344,7 +344,7 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     outp.error("Home not enabled on this server!");
     return;
   }
-  int pl            = (int) b.getPermissionsLevel();
+  //   int pl            = (int) b.getPermissionsLevel();
   string name       = b.getName();
   string_view homen = a.size() == 2 ? string(a[1]) : "hape";
   Vec3 pos          = b.getWorldPosition();

@@ -97,7 +97,7 @@ static void load() {
   ff.close();
   if (strlen(buf) == 0) { strcpy(buf, "[]"); }
   if (dc.ParseInsitu(buf).HasParseError()) {
-    printf("[ChestShop] JSON ERROR pos: %d type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    printf("[ChestShop] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   if (dc.IsArray()) {

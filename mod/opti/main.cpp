@@ -3,6 +3,8 @@
 #include <MC.h>
 #include "rapidjson/document.h"
 #include <fstream>
+#include "util.h"
+
 typedef uint64_t u64;
 typedef uint32_t u32;
 typedef int64_t s64;
@@ -12,7 +14,7 @@ extern "C" {
 BDL_EXPORT void mod_init(std::list<string> &modlist);
 }
 extern void load_helper(std::list<string> &modlist);
-static void dummy() {}
+USED static void dummy() {}
 extern "C" {
 void _ZN14NetworkHandler16enableAsyncFlushERK17NetworkIdentifier(long a1, long a2);
 }
@@ -42,7 +44,7 @@ void load() {
   buf[ff.readsome(buf, 4096)] = 0;
   ff.close();
   if (dc.ParseInsitu(buf).HasParseError()) {
-    printf("[OPTI] JSON ERROR pos: %d type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+    printf("[OPTI] JSON ERROR pos: %ld type: %s!\n", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
     exit(1);
   }
   if (dc["FastMath"].GetBool()) {
