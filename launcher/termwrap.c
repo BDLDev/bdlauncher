@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -128,7 +129,7 @@ void sig_handler(copoll_co_ref_t co, void *priv) {
   while (copoll_fork(co, sfd, &evt)) {
     struct signalfd_siginfo fdsi;
     if (evt.evt == EPOLLIN) {
-      read(sfd, &fdsi, sizeof fdsi);
+      assert(read(sfd, &fdsi, sizeof fdsi) == sizeof fdsi);
       if (fdsi.ssi_signo == SIGCHLD) {
         int status;
         wait(&status);

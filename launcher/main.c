@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "shared.h"
 #include "exec_server.h"
@@ -14,7 +15,7 @@ int main(int argc, char *argv[]) {
   ssize_t len = readlink("/proc/self/exe", pathbuf, sizeof pathbuf);
   pathbuf[len] = 0;
   *strrchr(pathbuf, '/') = 0;
-  chdir(pathbuf);
+  assert(chdir(pathbuf) == 0);
 
   if (isatty(0)) return termwrap();
   return exec_server();
