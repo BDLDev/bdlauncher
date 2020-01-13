@@ -161,8 +161,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     int dim   = sp->getDimensionId();
     auto lp   = getFastLand(pos.x, pos.z, dim);
     if (lp && (lp->chkOwner(nm) == 2 || op)) {
-      DataLand dl;
-      Fland2Dland(lp, dl);
+      DataLand dl{*lp};
       dl.addOwner(a[1]);
       updLand(dl);
       sb.write("§bMake ");
@@ -180,8 +179,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     int dim   = sp->getDimensionId();
     auto lp   = getFastLand(pos.x, pos.z, dim);
     if (lp && (lp->chkOwner(nm) == 2 || op)) {
-      DataLand dl;
-      Fland2Dland(lp, dl);
+      DataLand dl{*lp};
       dl.delOwner(a[1]);
       updLand(dl);
       sb.write("§bMake ");
@@ -199,8 +197,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     int dim   = sp->getDimensionId();
     auto lp   = getFastLand(pos.x, pos.z, dim);
     if (lp && (lp->chkOwner(nm) == 2 || op)) {
-      DataLand dl;
-      Fland2Dland(lp, dl);
+      DataLand dl{*lp};
       auto pm = (LandPerm) atoi(a[1]);
       if ((pm & PERM_ADMIN_FLY) && !op) {
         outp.error("Permission denied");
@@ -220,8 +217,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     int dim   = sp->getDimensionId();
     auto lp   = getFastLand(pos.x, pos.z, dim);
     if (lp && (lp->chkOwner(nm) == 2 || op)) {
-      DataLand dl;
-      Fland2Dland(lp, dl);
+      DataLand dl{*lp};
       dl.addOwner(a[1], true);
       dl.delOwner(nm);
       updLand(dl);
@@ -271,8 +267,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     auto lp   = getFastLand(pos.x, pos.z, dim);
     if (lp && (lp->chkOwner(nm) == 2 || op)) {
       SharedForm *sf = getForm("Untrust a player", "Untrust a player");
-      DataLand dl;
-      Fland2Dland(lp, dl);
+      DataLand dl{*lp};
       static_deque<string_view> owners;
       split_string(dl.owner, owners, "||");
       for (auto &i : owners) {

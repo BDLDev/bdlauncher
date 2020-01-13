@@ -54,6 +54,18 @@ struct DataLand {
   char dim;
   LandPerm perm;
   string owner;
+  DataLand() {}
+  DataLand(FastLand &fastland) {
+    x     = fastland.x;
+    z     = fastland.z;
+    dx    = fastland.dx;
+    dz    = fastland.dz;
+    lid   = fastland.lid;
+    ver   = fastland.refcount;
+    dim   = fastland.dim;
+    perm  = fastland.perm;
+    owner = fastland.getOwner();
+  }
   void addOwner(string_view x, bool SuperOwner = false) {
     SPBuf sb;
     if (SuperOwner) {
@@ -346,13 +358,6 @@ static void removeLand(FastLand *land) {
   db.Del(key);
   proc_chunk_del(land->x, land->dx, land->z, land->dz, land->dim, land->lid); // BUG HERE
   purge_cache();
-}
-static inline void Fland2Dland(FastLand *ld, DataLand &d) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wclass-memaccess"
-  memcpy(&d, ld, 24);
-#pragma GCC diagnostic pop
-  d.owner = string(ld->owner, ld->owner_sz);
 }
 void iterLands(function<void(DataLand &)> cb) {
   vector<pair<string, string>> newdata;
