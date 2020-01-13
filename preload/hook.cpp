@@ -14,10 +14,10 @@ template <size_t size> struct StrictMem {
     return {current + use - 1};
   }
   template <typename T>
-  INLINE auto operator<<(T addr) -> std::enable_if_t<std::is_same_v<T, void *>, StrictMem<size - sizeof(void*)>> {
-    static_assert(size >= sizeof(void*));
-    memcpy(current, &addr, sizeof(void*));
-    return {current + sizeof(void*)};
+  INLINE auto operator<<(T addr) -> std::enable_if_t<std::is_same_v<T, void *>, StrictMem<size - sizeof(void *)>> {
+    static_assert(size >= sizeof(void *));
+    memcpy(current, &addr, sizeof(void *));
+    return {current + sizeof(void *)};
   }
   INLINE operator char *() { return current; }
 };
@@ -39,13 +39,16 @@ public:
     static_assert(use < base);
     if (current + use > top) realloc();
     auto tmp = current;
+#ifdef DEBUG
+    memset(tmp, 0xcc, use);
+#endif
     current += use;
     return {tmp};
   }
 };
 
 static AutoGrowMem<65536> jmpbed;
-// extern std::unordered_map<void*,char*> my_hooks;
+
 char *wr_jmp(void *addr) {
   auto mem = jmpbed.alloc<16>();
   mem << "\xff\x25\x00\x00\x00\x00" << addr;
@@ -66,6 +69,7 @@ char *wr_regcmd(void *call, void *arg) {
   mem << "\x57\x48\xb8" << call << "\x48\xbf" << arg << "\xff\xd0\x5f\x48\x89\x07\x48\x89\xf8\xc3";
   return mem;
 }
+
 void MyPatch(void *oldfunc, void *newfunc, size_t size) {
   auto start = ROUND_PAGE_DOWN((size_t) oldfunc);
   auto end   = ROUND_PAGE_UP((size_t) oldfunc + size);
@@ -73,6 +77,7 @@ void MyPatch(void *oldfunc, void *newfunc, size_t size) {
   memcpy(oldfunc, newfunc, size);
   mprotect((void *) start, end - start, PROT_READ | PROT_EXEC);
 }
+
 void *MyHook(void *oldfunc, void *newfunc) {
   void *ret;
   int res = HookIt(oldfunc, &ret, newfunc);
