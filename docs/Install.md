@@ -2,11 +2,11 @@
 
 # Requirements
 
-| Name | Version | Ubuntu/Debian |
-| - | - | - |
-| gcc | 9.2.0 | `apt install gcc` |
-| g++ | 9.2.0 | `apt install g++` |
-| readline | N/A | `apt install libreadline-dev` |
+| Name | Version | Ubuntu/Debian | Arch Linux |
+| - | - | - | - |
+| gcc | 9.2.0 | `apt install gcc` | `pacman -S gcc --needed` |
+| g++ | 9.2.0 | `apt install g++` | `pacman -S gcc --needed` |
+| readline | N/A | `apt install libreadline-dev` | `pacman -S readline --needed` |
 
 # Install it to BDS
 
