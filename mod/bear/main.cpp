@@ -93,7 +93,7 @@ THook(
     ServerNetworkHandler *snh, NetworkIdentifier &a, Certificate &b) {
   string pn   = ExtendedCertificate::getIdentityName(b);
   string xuid = ExtendedCertificate::getXuid(b);
-  async_log("[JOIN]%s joined game with xuid <%s>\n", pn.c_str(), xuid.c_str());
+  async_log("[JOIN] %s joined game with xuid <%s>\n", pn.c_str(), xuid.c_str());
   string val;
   auto succ = ban_data.Get(xuid, val);
   if (!succ) { ban_data.Put(xuid, pn); }
@@ -130,7 +130,7 @@ static bool hkc(ServerPlayer *b, string &c) {
       return 0;
     }
   }
-  async_log("[CHAT]%s: %s\n", b->getName().c_str(), c.c_str());
+  async_log("[CHAT] %s: %s\n", b->getName().c_str(), c.c_str());
   return 1;
 }
 static void oncmd_mute(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
