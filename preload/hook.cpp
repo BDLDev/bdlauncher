@@ -1,5 +1,6 @@
 #include "myhook.h"
 #include "hook.h"
+#include <cassert>
 #include <global.h>
 #include <type_traits>
 
@@ -7,16 +8,16 @@ template <size_t size> struct StrictMem {
   char *current;
 
   INLINE StrictMem(char *ptr) { current = ptr; }
-  template <size_t use> INLINE auto operator<<(char const (&data)[use]) -> StrictMem<size - use> {
-    static_assert(size >= use);
-    memcpy(current, data, use);
-    return {current + use};
+  template <size_t use> INLINE auto operator<<(char const (&data)[use]) -> StrictMem<size - use + 1> {
+    static_assert(size >= use - 1);
+    memcpy(current, data, use - 1);
+    return {current + use - 1};
   }
   template <typename T>
-  INLINE auto operator<<(T addr) -> std::enable_if_t<std::is_same_v<T, void *>, StrictMem<size - 8>> {
-    static_assert(size >= 8);
-    memcpy(current, &addr, 8);
-    return {current + 8};
+  INLINE auto operator<<(T addr) -> std::enable_if_t<std::is_same_v<T, void *>, StrictMem<size - sizeof(void*)>> {
+    static_assert(size >= sizeof(void*));
+    memcpy(current, &addr, sizeof(void*));
+    return {current + sizeof(void*)};
   }
   INLINE operator char *() { return current; }
 };
@@ -27,6 +28,7 @@ template <size_t base> class AutoGrowMem {
   INLINE void realloc() {
     current =
         static_cast<char *>(mmap(0, base, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
+    assert(current);
     top = current + base;
   }
 
@@ -60,7 +62,7 @@ char *wr_regcmd(void *call, void *arg) {
  0x00000000000011ab <+27>:	48 89 f8	mov    rax,rdi
  0x00000000000011ae <+30>:	c3	ret
  */
-  auto mem = jmpbed.alloc<48>();
+  auto mem = jmpbed.alloc<32>();
   mem << "\x57\x48\xb8" << call << "\x48\xbf" << arg << "\xff\xd0\x5f\x48\x89\x07\x48\x89\xf8\xc3";
   return mem;
 }
