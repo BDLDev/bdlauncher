@@ -68,7 +68,7 @@ BDL_EXPORT void forceKickPlayer(ServerPlayer &sp);
 #define ARGSZ(b)                                                                                                       \
   if (a.size() < b) {                                                                                                  \
     char buf[256];                                                                                                     \
-    sprintf(buf, "check your arg.%d required ,%d found\n", b, a.size());                                               \
+    sprintf(buf, "check your arg.%d required ,%d found", b, a.size());                                                 \
     outp.error(buf);                                                                                                   \
     return;                                                                                                            \
   }

@@ -45,7 +45,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   async_log("[CDK] %s uses CDK %s\n", b.getName().c_str(), cdk.c_str());
   execute_cmdchain(run, b.getName(), false);
   save();
-  outp.success("§bYou used cdk: " + cdk + "\n");
+  outp.success("§bYou used cdk: " + cdk);
 }
 using namespace rapidjson;
 static void load() {

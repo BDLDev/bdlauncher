@@ -207,7 +207,7 @@ struct FileBuffer {
   FileBuffer(const char *fn) {
     int fd = open(fn, O_RDONLY);
     if (fd == -1) {
-      do_log("cannot open %s\n", fn);
+      do_log("cannot open %s", fn);
       perror("open");
       size = 0;
       data = nullptr;
