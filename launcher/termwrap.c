@@ -66,6 +66,7 @@ void wrap_output(char *data, ssize_t length) {
         PUTCOL('d', #FF55FF, "38;2;255;85;255");
         PUTCOL('e', #FFFF55, "38;2;255;255;85");
         PUTCOL('f', #FFFFFF, "97;40");
+        PUTCOL('g', #DDD605, "38;2;221;214;5");
         // Special effect
         PUTCOL('k', Obfuscated, "5");
         PUTCOL('l', Bold, "1");
