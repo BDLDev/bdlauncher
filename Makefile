@@ -9,14 +9,17 @@ HEADERS=$(shell find include -type f -print)
 LANG=CN
 BDLTAG=$(shell cat version)
 CFLAGS= -Os
+CFLAGS+= -fPIC -std=gnu17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
 CXXFLAGS+= -fPIC -std=gnu++17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
 
 ifeq (1,$(RELEASE))
 	OBJ_SUFFIX=release
+	CFLAGS+= -s -O3
 	CXXFLAGS+= -s -O3
 	LDFLAGS+= -Wl,-z,relro,-z,now
 else
 	OBJ_SUFFIX=debug
+	CFLAGS+= -g -DDEBUG -O0 -Wall -Werror
 	CXXFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined -Wall -Werror -Wno-invalid-offsetof -Wno-unknown-warning-option
 	LDFLAGS+= -fsanitize=undefined
 endif

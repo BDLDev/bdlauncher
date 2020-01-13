@@ -19,8 +19,8 @@ typedef struct copoll_co_t copoll_co_t, *copoll_co_ref_t;
 typedef void (*copoll_func_t)(copoll_co_ref_t co, void *priv);
 
 struct copoll_co_t {
-  copoll_ctx_ref_t ctx;
   ctx_ref_t coctx;
+  copoll_ctx_ref_t ctx;
   copoll_func_t func;
   union {
     void *priv;
@@ -79,12 +79,22 @@ inline static void copoll_switch_next(copoll_ctx_ref_t ctx) {
   }
 }
 
+#define FREE_LIST(list)                                                                                                \
+  ({                                                                                                                   \
+    copoll_co_ref_t next;                                                                                              \
+    while ((next = STAILQ_FIRST(list))) {                                                                              \
+      STAILQ_REMOVE_HEAD(list, entry);                                                                                 \
+      free(next);                                                                                                      \
+    }                                                                                                                  \
+  })
+
 void copoll_fini(copoll_ctx_ref_t ctx) {
   // loop
   copoll_co_ref_t co;
   for (;;) {
     while ((co = STAILQ_FIRST(ctx))) { copoll_switch(co); }
     if (!ctx->count) break;
+    FREE_LIST(&ctx->dead);
     struct epoll_event evt[8];
     int ret = epoll_wait(ctx->epfd, evt, 8, -1);
     for (int i = 0; i < ret; i++) {
@@ -93,7 +103,7 @@ void copoll_fini(copoll_ctx_ref_t ctx) {
       STAILQ_INSERT_TAIL(ctx, co, entry);
     }
   };
-  // todo cleanup dead
+  FREE_LIST(&ctx->dead);
 
   // done!
   close(ctx->epfd);
@@ -129,7 +139,7 @@ void copoll_kill(copoll_co_ref_t co) {
   co->forked           = false;
   ctx->count--;
   epoll_ctl(ctx->epfd, EPOLL_CTL_DEL, co->fd, NULL);
-  if (ctx->running != co) copoll_switch(co);
+  if (co != ctx->running) STAILQ_INSERT_TAIL(ctx, co, entry);
 }
 
 static void trampoline(ctx_from_t from) {
@@ -141,6 +151,7 @@ static void trampoline(ctx_from_t from) {
   STAILQ_REMOVE(ctx, self, copoll_co_t, entry);
   STAILQ_INSERT_TAIL(&ctx->dead, self, entry);
   copoll_switch_next(ctx);
+  asm("int3");
 }
 
 void copoll_start(copoll_ctx_ref_t ref, copoll_func_t func, void *priv, size_t stacksize) {
