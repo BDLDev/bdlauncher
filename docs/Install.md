@@ -1,5 +1,13 @@
 # WARNING:1.14 only for testing
 
+# Requirements
+
+| Name | Version | Ubuntu/Debian |
+| - | - | - |
+| gcc | 9.2.0 | `apt install gcc` |
+| g++ | 9.2.0 | `apt install g++` |
+| readline | N/A | `apt install libreadline-dev` |
+
 # Install it to BDS
 
 If you do not have a bedrock server, please download it from the [official website](https://www.minecraft.net/download/server/bedrock/) first
@@ -8,7 +16,7 @@ If you do not have a bedrock server, please download it from the [official websi
 (In your bedrock server folder)
 git clone https://github.com/sysca11/bdlauncher bdlauncher-git -b master --depth=1
 pushd bdlauncher-git
-make install DESTDIR=..
+make install RELEASE=1 DESTDIR=..
 popd
 ```
 
@@ -17,7 +25,7 @@ popd
 ```
 pushd bdlauncher-git
 git pull
-make install DESTDIR=..
+make install RELEASE=1 DESTDIR=..
 popd
 ```
 
