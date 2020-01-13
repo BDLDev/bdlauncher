@@ -2,6 +2,7 @@ BIN_LAUNCHER=build/bdlauncher
 DLL_PRELOAD=build/preload.so
 MOD_LIST=$(filter-out DEPRECATED mod,$(patsubst mod/%,%,$(shell find mod -maxdepth 1 -type d -print)))
 MOD_OUTS=$(patsubst %,build/mods/%.mod,$(MOD_LIST))
+CFG_FILES=$(patsubst config/%.json,%,$(wildcard config/*.json))
 DESTDIR=/opt/bdlauncher
 
 HEADERS=$(shell find include -type f -print)
@@ -49,21 +50,23 @@ define makedep
 		sed 's,\($*\)\.o[ :]*,$(patsubst %.d,%.o,$1) $1 : ,g' < $1.$$$$ >$1; \
     	rm -f $1.$$$$
 endef
+define install-trim
+	./install.sh "$2" "$(DESTDIR)/$(patsubst $1/%,%,$2)"
+endef
+define install
+	./install.sh "$1" "$(DESTDIR)/$1"
+endef
 
 # Phony Targets
 
 .PHONY: all
 all: bdlauncher preload mods
-	@echo DONE!
+	@echo " DONE"
 
 .PHONY: bdlauncher preload mods
 bdlauncher: $(BIN_LAUNCHER)
 preload: $(DLL_PRELOAD)
-mods: $(MOD_OUTS) build/mods/mod.list
-
-build/mods/mod.list: mod.list
-	@echo " CP  $@"
-	@cp $< $@
+mods: $(MOD_OUTS)
 
 .PHONY: list-mod
 list-mod:
@@ -72,14 +75,11 @@ list-mod:
 .PHONY: clean
 clean:
 	@rm -rf obj/*.o obj/*.d
-	@rm -rf $(BIN_LAUNCHER) $(DLL_PRELOAD) $(MOD_OUTS) build/mods/mod.list
+	@rm -rf $(BIN_LAUNCHER) $(DLL_PRELOAD) $(MOD_OUTS)
 
 .PHONY: install
-install: all
-	@echo installing to $(DESTDIR)
-	@mkdir -p $(DESTDIR)
-	@cp -r build/* $(DESTDIR)
-	@cp -r config $(DESTDIR)
+install: $(addprefix install-,launcher preload modlist $(addprefix mod-,$(MOD_LIST)) $(addprefix config-,$(CFG_FILES)))
+	@echo " DONE"
 
 .PHONY: format
 format:
@@ -93,6 +93,28 @@ help:
 	@echo common target: all clean install help format
 	@echo group target: bdlauncher preload mods
 	@echo mods target: $(addprefix mod-,$(MOD_LIST))
+
+# Install Target
+
+.PHONY: install-launcher
+install-launcher: $(BIN_LAUNCHER)
+	@FORCE=1 $(call install-trim,build,$<)
+
+.PHONY: install-preload
+install-preload: $(DLL_PRELOAD)
+	@FORCE=1 $(call install-trim,build,$<)
+
+.PHONY: $(addprefix install-mod-,$(MOD_LIST))
+$(addprefix install-mod-,$(MOD_LIST)): install-mod-%: build/mods/%.mod
+	@FORCE=1 $(call install-trim,build,$<)
+
+.PHONY: $(addprefix install-config-,$(CFG_FILES))
+$(addprefix install-config-,$(CFG_FILES)): install-config-%: config/%.json
+	@$(call install,$<)
+
+.PHONY: install-modlist
+install-modlist: mod.list
+	@./install.sh mod.list "$(DESTDIR)/mods/mod.list"
 
 # Direct Target
 
