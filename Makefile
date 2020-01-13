@@ -15,7 +15,7 @@ CXXFLAGS+= -fPIC -std=gnu++17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
 
 ifeq (1,$(RELEASE))
 	OBJ_SUFFIX=release
-	CFLAGS+= -s -O3
+	CFLAGS+= -s -O3 -Wall -Werror
 	CXXFLAGS+= -s -O3
 	LDFLAGS+= -Wl,-z,relro,-z,now
 else

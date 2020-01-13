@@ -11,7 +11,8 @@ char const *bedrock_server = "./bedrock_server";
 int main(int argc, char *argv[]) {
   if (argc >= 2) bedrock_server = (char const *) argv[1];
   char pathbuf[256];
-  readlink("/proc/self/exe", pathbuf, sizeof pathbuf);
+  ssize_t len = readlink("/proc/self/exe", pathbuf, sizeof pathbuf);
+  pathbuf[len] = 0;
   *strrchr(pathbuf, '/') = 0;
   chdir(pathbuf);
 
