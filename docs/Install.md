@@ -6,8 +6,8 @@ If you do not have a bedrock server, please download it from the [official websi
 
 ```
 (In your bedrock server folder)
-git clone https://github.com/sysca11/bdlauncher -b master --depth=1
-pushd bdlauncher
+git clone https://github.com/sysca11/bdlauncher bdlauncher-git -b master --depth=1
+pushd bdlauncher-git
 make install DESTDIR=..
 popd
 ```
@@ -15,7 +15,7 @@ popd
 # Upgrade from an old version
 
 ```
-pushd bdlauncher
+pushd bdlauncher-git
 git pull
 make install DESTDIR=..
 popd
