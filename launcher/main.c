@@ -1,4 +1,6 @@
 #include <unistd.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -16,6 +18,11 @@ int main(int argc, char *argv[]) {
   pathbuf[len]           = 0;
   *strrchr(pathbuf, '/') = 0;
   assert(chdir(pathbuf) == 0);
+
+  if (access(bedrock_server, R_OK | X_OK) == -1) {
+    printf("The executable `%s` does not exists...\nPlease download it manually\n", bedrock_server);
+    return 1;
+  }
 
   if (isatty(0)) return termwrap();
   return exec_server();
