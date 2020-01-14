@@ -173,6 +173,6 @@ int termwrap() {
     printf("\rdone!\n");
     write_history(".bdlauncher_history");
     rl_callback_handler_remove();
+    return 0;
   }
-  return -1;
 }
