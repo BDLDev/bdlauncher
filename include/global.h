@@ -5,7 +5,8 @@
 #define ROUND_PAGE_UP(num) (((num) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 #define countof(expr) (sizeof(expr) / sizeof((expr)[0]))
 #define ABITAG(tag) __attribute__((abi_tag(#tag)))
-#define ALIAS(name) __attribute__((weakref, alias(#name)))
+#define WEAKREF(name) __attribute__((weakref(#name)))
+#define ALIAS(name) __attribute__((alias(#name)))
 #define CLEANUP(func) __attribute__((__cleanup__(func)))
 #define INLINE __attribute__((always_inline)) inline
 #define USED __attribute__((used))

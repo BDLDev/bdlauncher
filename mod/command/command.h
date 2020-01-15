@@ -1,5 +1,7 @@
+#pragma once
 #include <MC.h>
 #include <cmdhelper.h>
+#include <logger.h>
 
 #include <type_traits>
 #include <string_view>
@@ -116,17 +118,40 @@ public:
  * @brief The registry
  */
 class CustomCommandRegistry {
-  class Application {
-    virtual void apply(::CommandRegistry *registry) = 0;
+  template <typename Return, typename... Params> class Application {
+    virtual Return apply(Params... registry) = 0;
     friend class CustomCommandRegistry;
 
   public:
     virtual ~Application() {}
   };
 
+  template <typename Return, typename... Params> struct ApplicationArray {
+    std::vector<Application<Return, Params...> *> embed;
+
+    ApplicationArray()                         = default;
+    ApplicationArray(ApplicationArray const &) = delete;
+    ApplicationArray(ApplicationArray &&)      = delete;
+
+    inline auto begin() noexcept { return embed.begin(); }
+    inline auto end() noexcept { return embed.end(); }
+    inline void clear() {
+      // for (auto p : embed) delete p;
+      // embed.clear();
+    }
+
+    ~ApplicationArray() { clear(); }
+
+    template <typename Target, typename... ConsParams> inline Target &append(ConsParams... cons) {
+      Target *ret = new Target(std::forward<ConsParams>(cons)...);
+      embed.emplace_back(ret);
+      return *ret;
+    }
+  };
+
   template <typename DynEnum> friend class CustomDynEnumHandle;
   ::CommandRegistry *vanilla;
-  std::vector<std::unique_ptr<Application>> applications;
+  ApplicationArray<void, ::CommandRegistry *> applications;
 
 public:
   /**
@@ -134,7 +159,7 @@ public:
    *
    * @tparam Enum Target enum
    */
-  template <typename Enum> class EnumApplication : public Application {
+  template <typename Enum> class EnumApplication : public Application<void, ::CommandRegistry *> {
     std::string name;
     inline EnumApplication(std::string_view name) : name(name) {}
     EnumApplication(EnumApplication const &) = delete;
@@ -156,7 +181,7 @@ public:
    *
    * @tparam DynEnum The target
    */
-  template <typename DynEnum> class CustomDynEnumApplication : public Application {
+  template <typename DynEnum> class CustomDynEnumApplication : public Application<void, ::CommandRegistry *> {
     static_assert(std::is_base_of_v<CustomDynEnum<DynEnum>, DynEnum>);
     CustomDynEnumApplication(CustomDynEnumApplication const &) = delete;
     CustomDynEnumApplication(CustomDynEnumApplication &&)      = delete;
@@ -168,11 +193,10 @@ public:
    *
    * @tparam Desc The command description class
    */
-  template <typename Desc> class CommandApplication : public Application {
-    std::vector<::CommandRegistry::Overload> overloads;
-
+  template <typename Desc> class CommandApplication : public Application<void, ::CommandRegistry *> {
     CommandApplication(CommandApplication const &)     = delete;
     CommandApplication(CommandApplication &&) noexcept = delete;
+    ApplicationArray<::CommandRegistry::Overload> overload_applications;
     virtual void apply(::CommandRegistry *registry) override;
 
   public:
@@ -183,14 +207,23 @@ public:
      *
      * @tparam Impl Command host class
      */
-    template <typename Host> class OverloadApplication {
+    template <typename Host> class OverloadApplication : public Application<::CommandRegistry::Overload> {
       friend class CommandApplication;
-      CommandApplication *parent;
-      std::vector<CommandParameterData> params;
-      inline OverloadApplication(CommandApplication *parent) : parent(parent){};
-      operator CommandRegistry::Overload();
+      virtual ::CommandRegistry::Overload apply() override;
+      ApplicationArray<::CommandParameterData> param_applications;
 
     public:
+      template <typename Type> struct ParameterApplication : Application<::CommandParameterData> {
+        char const *name;
+        bool optional;
+        size_t offset;
+
+        ParameterApplication(char const *name, bool optional, size_t offset)
+            : name(name), optional(optional), offset(offset) {}
+
+        virtual ::CommandParameterData apply() override;
+      };
+
       /**
        * @brief Add parameter definition to overload
        *
@@ -198,12 +231,9 @@ public:
        * @param name The parameter name
        * @param optional Optional flag
        */
-      template <typename Type> void addParameter(std::string_view name, bool optional, size_t offset);
-
-      /**
-       * @brief Destroy the Overload Application object: commit to overload vector
-       */
-      ~OverloadApplication() { parent->overloads.emplace_back((CommandRegistry::Overload) * this); }
+      template <typename Type> void addParameter(char const *name, bool optional, size_t offset) {
+        param_applications.append<ParameterApplication<Type>>(name, optional, offset);
+      }
     };
 
     /**
@@ -212,10 +242,9 @@ public:
      * @tparam Host Command host class
      * @return OverloadApplication<Host> Command overload registering application
      */
-    template <typename Host> OverloadApplication<Host> registerOverload() { return {this}; };
-
-    /** @brief Destroy the Command Application object */
-    ~CommandApplication() {}
+    template <typename Host> OverloadApplication<Host> &registerOverload() {
+      return overload_applications.append<OverloadApplication<Host>>();
+    };
   };
 
   /**
@@ -242,9 +271,7 @@ public:
    */
   template <typename DynEnum>
   std::enable_if_t<std::is_base_of_v<CustomDynEnum<DynEnum>, CustomDynEnumHandle<DynEnum>>> registerDynEnum() {
-    auto obj = std::make_unique<CustomDynEnumApplication<DynEnum>>();
-    applications.push_back(obj);
-    return {this};
+    return applications.append<CustomDynEnumApplication<DynEnum>>();
   }
 
   /**
@@ -255,10 +282,7 @@ public:
    * @return EnumApplication<Enum> Enum registering application
    */
   template <typename Enum> EnumApplication<Enum> &registerEnum(std::string_view name) {
-    auto obj = std::make_unique<EnumApplication<Enum>>(name);
-    auto ret = obj.get();
-    applications.push_back(obj);
-    return *ret;
+    return applications.append<EnumApplication<Enum>>(name);
   }
 
   /**
@@ -268,10 +292,7 @@ public:
    * @return CommandApplication<Desc> Command registering application
    */
   template <typename Desc> CommandApplication<Desc> &registerCommand() {
-    auto obj = std::make_unique<CommandApplication<Desc>>();
-    auto ret = obj.get();
-    applications.emplace_back(std::move(obj));
-    return *ret;
+    return applications.append<CommandApplication<Desc>>();
   }
 };
 
@@ -282,46 +303,50 @@ public:
  * @{
  */
 
+void CustomCommandRegistry::startRegister(::CommandRegistry *registry) {
+  for (auto &application : applications) application->apply(registry);
+  applications.clear();
+}
+
 template <typename Desc> void CustomCommandRegistry::CommandApplication<Desc>::apply(::CommandRegistry *registry) {
   std::string name = Desc::name;
+  do_log("register command %s", name.c_str());
   registry->registerCommand(name, Desc::description, Desc::permission, (::CommandFlag) 0, (::CommandFlag) 0);
-  auto signature       = registry->findCommand(name);
-  signature->overloads = std::move(overloads);
-  for (auto &overload : signature->overloads) registry->registerOverloadInternal(*signature, overload);
+  auto signature = registry->findCommand(name);
+  for (auto &overload : overload_applications) {
+    signature->overloads.emplace_back(overload->apply());
+    registry->registerOverloadInternal(*signature, *signature->overloads.rbegin());
+  }
+  overload_applications.clear();
 }
 
 template <typename Desc>
 template <typename Host>
-CustomCommandRegistry::CommandApplication<Desc>::OverloadApplication<Host>::operator CommandRegistry::Overload() {
-  CommandRegistry::Overload ret{
+::CommandRegistry::Overload CustomCommandRegistry::CommandApplication<Desc>::OverloadApplication<Host>::apply() {
+  ::CommandRegistry::Overload ret{
       {1, std::numeric_limits<int>::max()},
       +[]() -> std::unique_ptr<::Command> { return std::make_unique<Host>(); },
   };
-  ret.params = std::move(params);
+  for (auto &param : param_applications) ret.params.emplace_back(param->apply());
+  param_applications.clear();
   return ret;
 }
 
 template <typename Desc>
 template <typename Host>
 template <typename Type>
-void CustomCommandRegistry::CommandApplication<Desc>::OverloadApplication<Host>::addParameter(
-    std::string_view name, bool optional, size_t offset) {
-  CommandParameterData param{
-      CommandParameterProxy<Type>::tid,
+::CommandParameterData
+CustomCommandRegistry::CommandApplication<Desc>::OverloadApplication<Host>::ParameterApplication<Type>::apply() {
+  return {
+      CommandParameterProxy<Type>::fetch_tid(),
       CommandParameterProxy<Type>::parser,
       name,
       CommandParameterProxy<Type>::type,
-      CommandParameterProxy<Type>::desc,
-      offset,
+      nullptr,
+      (int) offset,
       !optional,
-      0,
+      -1,
   };
-  params.emplace_back(param);
-}
-
-void CustomCommandRegistry::startRegister(::CommandRegistry *registry) {
-  for (auto &application : applications) { application->apply(registry); }
-  applications.clear();
 }
 
 /** @} */
