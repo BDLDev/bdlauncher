@@ -13,9 +13,12 @@ template <typename T> typeid_t<CommandRegistry> &tid;
   }                                                                                                                    \
   template <> typeid_t<CommandRegistry> &tid<type> = symbol;
 
+using DimensionID = AutomaticID<Dimension, int>;
+
 GENTYPE_ID(bool, _ZZ7type_idI15CommandRegistrybE8typeid_tIT_EvE2id);
 GENTYPE_ID(int, _ZZ7type_idI15CommandRegistryiE8typeid_tIT_EvE2id);
 GENTYPE_ID(float, _ZZ7type_idI15CommandRegistryfE8typeid_tIT_EvE2id);
+GENTYPE_ID(DimensionID, _ZZ7type_idI15CommandRegistry11AutomaticIDI9DimensioniEE8typeid_tIT_EvE2id);
 
 #undef GENTYPE_ID
 
@@ -34,5 +37,6 @@ GENTYPE_ID(float, _ZZ7type_idI15CommandRegistryfE8typeid_tIT_EvE2id);
 MakeCommonProxy(bool);
 MakeCommonProxy(int);
 MakeCommonProxy(float);
+MakeCommonProxy(DimensionID);
 
 } // namespace BDL::CustomCommand
