@@ -67,9 +67,10 @@ public:
     CommandVersion version;
     FactoryFn factory;
     std::vector<CommandParameterData> params;
-    bool unk;
+    int unk;
     Overload(CommandVersion, FactoryFn);
   };
+  static_assert(sizeof(Overload) == 48);
   struct Signature {
     std::string name;                // 0
     std::string desc;                // 32
