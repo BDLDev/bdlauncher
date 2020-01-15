@@ -4,6 +4,8 @@
 #include <type_traits>
 #include <string_view>
 #include <string>
+#include <vector>
+#include <memory>
 
 /**
  * @brief Custom Command Mod
@@ -53,7 +55,7 @@ template <typename Derived> class CustomDynEnum {
 protected:
   /**
    * @brief Construct a new Custom Dyn Enum object
-   * 
+   *
    * @param value The enum value
    */
   CustomDynEnum(std::string_view value) : value(value) {}
@@ -66,6 +68,13 @@ public:
    */
   inline operator std::string_view() noexcept {return value};
 };
+
+/**
+ * @brief Parameter type proxy
+ *
+ * @tparam RealType
+ */
+template <typename RealType> class CommandParameterProxy;
 
 class CustomCommandRegistry;
 
@@ -103,17 +112,17 @@ public:
 };
 
 /**
- * @brief Parameter type proxy
- *
- * @tparam RealType
- */
-template <typename RealType> class CommandParameterProxy;
-
-/**
  * @brief The registry
  */
 class CustomCommandRegistry {
-  ::CommandRegistry *registry;
+  class Application {
+    virtual void apply(::CommandRegistry *registry) = 0;
+    virtual ~Application() {}
+  };
+
+  template <typename DynEnum> friend class CustomDynEnumHandle;
+  ::CommandRegistry *vanilla;
+  std::vector<std::unique_ptr<Application>> applications;
 
 public:
   /**
@@ -121,12 +130,12 @@ public:
    *
    * @tparam Enum Target enum
    */
-  template <typename Enum> class EnumApplication {
-    CustomCommandRegistry *registry;
+  template <typename Enum> class EnumApplication : Application {
     std::string name;
-    inline EnumApplication(CustomCommandRegistry *registry, std::string_view name) : registry(registry), name(name) {}
+    inline EnumApplication(std::string_view name) : name(name) {}
     EnumApplication(EnumApplication const &) = delete;
     EnumApplication(EnumApplication &&)      = delete;
+    virtual void apply(::CommandRegistry *registry) override; // TODO
 
   public:
     /**
@@ -136,9 +145,18 @@ public:
      * @param value value
      */
     void addValue(std::string_view name, Enum value); // TODO
+  };
 
-    /** @brief Commit application */
-    ~EnumApplication(); // TODO
+  /**
+   * @brief Dynamic Enum Application
+   *
+   * @tparam DynEnum The target
+   */
+  template <typename DynEnum> class CustomDynEnumApplication : Application {
+    static_assert(std::is_base_of_v<CustomDynEnum<DynEnum>, DynEnum>);
+    EnumApplication(EnumApplication const &) = delete;
+    EnumApplication(EnumApplication &&)      = delete;
+    virtual void apply(::CommandRegistry *registry) override; // TODO
   };
 
   /**
@@ -146,11 +164,11 @@ public:
    *
    * @tparam Desc The command description class
    */
-  template <typename Desc> class CommandApplication {
-    CustomCommandRegistry *registry;
-    inline CommandApplication(CustomCommandRegistry *registry) : registry(registry) {}
+  template <typename Desc> class CommandApplication : Application {
+    inline CommandApplication() {}
     CommandApplication(CommandApplication const &) = delete;
     CommandApplication(CommandApplication &&)      = delete;
+    virtual void apply(::CommandRegistry *registry) override; // TODO
 
   public:
     /**
@@ -160,18 +178,24 @@ public:
      * @tparam T Argument definitions' type
      * @param args Argument definitions
      */
-    template <typename Overload, typename... T> void registerOverload(T... args);
-
-    /** @brief Commit application */
-    ~CommandApplication();
+    template <typename Overload, typename... T> void registerOverload(T... args); // TODO
   };
 
   /**
    * @brief Get the Instance object
    *
-   * @return CustomCommandRegistry&
+   * @return CustomCommandRegistry& instance
    */
-  static CustomCommandRegistry &getInstance();
+  static CustomCommandRegistry &getInstance(); // Note: implemented in cpp
+
+  /**
+   * @brief Starting registering
+   *
+   * Should not be call in user land
+   *
+   * @param registry Vanilla Command Registry
+   */
+  void startRegister(::CommandRegistry *registry); // Note: implemented in cpp
 
   /**
    * @brief Register dynamic enum
@@ -180,7 +204,11 @@ public:
    * @return CustomDynEnumHandle<DynEnum> The dynamic handle
    */
   template <typename DynEnum>
-  std::enable_if_t<std::is_base_of_v<CustomDynEnum<DynEnum>, CustomDynEnumHandle<DynEnum>>> registerDynEnum();
+  std::enable_if_t<std::is_base_of_v<CustomDynEnum<DynEnum>, CustomDynEnumHandle<DynEnum>>> registerDynEnum() {
+    auto obj = std::make_unique<CustomDynEnumApplication<DynEnum>>();
+    applications.push_back(obj);
+    return {this};
+  }
 
   /**
    * @brief Register static enum
@@ -189,7 +217,12 @@ public:
    * @param name Target enum name
    * @return EnumApplication<Enum> Enum registering application
    */
-  template <typename Enum> EnumApplication<Enum> registerEnum(std::string_view name);
+  template <typename Enum> EnumApplication<Enum> &registerEnum(std::string_view name) {
+    auto obj = std::make_unique<EnumApplication<Enum>>(name);
+    auto ret = obj.get();
+    applications.push_back(obj);
+    return *ret;
+  }
 
   /**
    * @brief Register command
@@ -197,7 +230,12 @@ public:
    * @tparam Desc CommandDescription type
    * @return CommandApplication<Desc> Command registering application
    */
-  template <typename Desc> CommandApplication<Desc> registerCommand();
+  template <typename Desc> CommandApplication<Desc> &registerCommand() {
+    auto obj = std::make_unique<CommandApplication<Desc>>();
+    auto ret = obj.get();
+    applications.push_back(obj);
+    return *ret;
+  }
 };
 
 /** @} */
