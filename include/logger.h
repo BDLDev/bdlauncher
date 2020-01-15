@@ -2,6 +2,11 @@
 
 #include "MC.h"
 
+#ifdef __INTELLISENSE__
+#  define MOD_NAME "intelisense"
+#  define BDL_TAG "intelisense"
+#endif
+
 #ifndef MOD_NAME
 #  error Please define mod name before include logger.h
 #endif
