@@ -28,7 +28,8 @@ public:
 
   Test2Command(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
 
-  void impl(AutomaticID<Dimension, int> did) { do_log("test %d", did.value()); }
+  void impl(AutomaticID<Dimension, int> did) { do_log("test -%d", did.value()); }
+  void impl(std::string const &str) { do_log("test %s", str.c_str()); }
 };
 
 struct TestImpl : Command {
@@ -48,6 +49,13 @@ struct Test2Impl : Command {
     ctx.impl(did);
   }
 };
+struct Test2ImplStr : Command {
+  BDL::CustomCommand::CommandParameterProxy<std::string> str;
+  virtual void execute(CommandOrigin const &origin, CommandOutput &output) {
+    Test2Command ctx{origin, output};
+    ctx.impl(str);
+  }
+};
 
 void mod_init(std::list<string> &modlist) {
   auto &instance = BDL::CustomCommand::CustomCommandRegistry::getInstance();
@@ -59,9 +67,15 @@ void mod_init(std::list<string> &modlist) {
     cmdovl.addParameter<bool>("flag", false, offsetof(TestImpl, flag));
   }
   {
-    auto &cmd    = instance.registerCommand<Test2Command>();
-    auto &cmdovl = cmd.registerOverload<Test2Impl>();
-    cmdovl.addParameter<AutomaticID<Dimension, int>>("dim", false, offsetof(Test2Impl, did));
+    auto &cmd = instance.registerCommand<Test2Command>();
+    {
+      auto &cmdovl = cmd.registerOverload<Test2ImplStr>();
+      cmdovl.addParameter<std::string>("str", false, offsetof(Test2ImplStr, str));
+    }
+    {
+      auto &cmdovl = cmd.registerOverload<Test2Impl>();
+      cmdovl.addParameter<AutomaticID<Dimension, int>>("dim", false, offsetof(Test2Impl, did));
+    }
   }
   load_helper(modlist);
 }
