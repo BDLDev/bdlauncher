@@ -32,6 +32,30 @@ public:
   void impl(std::string const &str) { do_log("test %s", str.c_str()); }
 };
 
+enum class TestEnum : int { A, B, C };
+
+class Test3Command : public BDL::CustomCommand::CustomCommandContext {
+public:
+  static constexpr auto name        = "test3";
+  static constexpr auto description = "test command3";
+  static constexpr auto permission  = (CommandPermissionLevel) 0;
+
+  Test3Command(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
+
+  void impl(TestEnum en) { do_log("%d", (int) en); }
+};
+
+template <> class BDL::CustomCommand::CommandParameterProxy<TestEnum> {
+  TestEnum value;
+
+public:
+  inline static typeid_t<CommandRegistry> fetch_tid() { return type_id<CommandRegistry, TestEnum>(); }
+  inline static constexpr CommandParameterData::ParseFn parser = &CommandRegistry::parse<TestEnum>;
+  inline static constexpr CommandParameterDataType type        = CommandParameterDataType::NORMAL;
+  inline static constexpr char const *enum_name                = "TestEnum";
+  operator TestEnum() const { return value; }
+};
+
 struct TestImpl : Command {
   BDL::CustomCommand::CommandParameterProxy<int> num;
   BDL::CustomCommand::CommandParameterProxy<float> flo;
@@ -57,6 +81,14 @@ struct Test2ImplStr : Command {
   }
 };
 
+struct Test3Impl : Command {
+  BDL::CustomCommand::CommandParameterProxy<TestEnum> en;
+  virtual void execute(CommandOrigin const &origin, CommandOutput &output) {
+    Test3Command ctx{origin, output};
+    ctx.impl(en);
+  }
+};
+
 void mod_init(std::list<string> &modlist) {
   auto &instance = BDL::CustomCommand::CustomCommandRegistry::getInstance();
   {
@@ -76,6 +108,17 @@ void mod_init(std::list<string> &modlist) {
       auto &cmdovl = cmd.registerOverload<Test2Impl>();
       cmdovl.addParameter<AutomaticID<Dimension, int>>("dim", false, offsetof(Test2Impl, did));
     }
+  }
+  {
+    auto &enu = instance.registerEnum<TestEnum>();
+    enu.addValue("a", TestEnum::A);
+    enu.addValue("b", TestEnum::B);
+    enu.addValue("c", TestEnum::C);
+  }
+  {
+    auto &cmd    = instance.registerCommand<Test3Command>();
+    auto &cmdovl = cmd.registerOverload<Test3Impl>();
+    cmdovl.addParameter<TestEnum>("en", false, offsetof(Test3Impl, en));
   }
   load_helper(modlist);
 }

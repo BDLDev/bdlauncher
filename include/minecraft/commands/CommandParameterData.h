@@ -13,16 +13,20 @@ struct CommandParameterData {
   using ParseFn = bool (CommandRegistry::*)(
       void *, CommandRegistry::ParseToken const &, CommandOrigin const &, int, std::string &,
       std::vector<std::string> &) const;
-  typeid_t<CommandRegistry> tid;
-  ParseFn parser;
-  std::string name;
-  char const *desc;
-  int unk64;
-  CommandParameterDataType type;
-  int unk72;
-  int offset;
-  bool optional;
+  typeid_t<CommandRegistry> tid; // 0-8
+  ParseFn parser;                // 8-24
+  std::string name;              // 24-56
+  char const *desc;              // 56-64
+  int unk64;                     // 64-68
+  CommandParameterDataType type; // 68-72
+  int unk72;                     // 72-76
+  int offset;                    // 76-80
+  bool optional;                 // 80-81
+  bool unk81;                    // 81-82
+  char padding[88 - 82];
   CommandParameterData(
       typeid_t<CommandRegistry> tid, ParseFn parser, char const *name, CommandParameterDataType type, char const *desc,
       int offset, bool mand, int flag_offset);
 };
+
+static_assert(sizeof(CommandParameterData) == 88);

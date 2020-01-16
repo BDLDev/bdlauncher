@@ -136,8 +136,8 @@ class CustomCommandRegistry {
     inline auto begin() noexcept { return embed.begin(); }
     inline auto end() noexcept { return embed.end(); }
     inline void clear() {
-      // for (auto p : embed) delete p;
-      // embed.clear();
+      for (auto p : embed) delete p;
+      embed.clear();
     }
 
     ~ApplicationArray() { clear(); }
@@ -160,11 +160,14 @@ public:
    * @tparam Enum Target enum
    */
   template <typename Enum> class EnumApplication : public Application<void, ::CommandRegistry *> {
-    std::string name;
-    inline EnumApplication(std::string_view name) : name(name) {}
+    friend class CustomCommandRegistry;
+    inline EnumApplication() {}
+
+    std::vector<std::pair<std::string, Enum>> values;
+
     EnumApplication(EnumApplication const &) = delete;
     EnumApplication(EnumApplication &&)      = delete;
-    virtual void apply(::CommandRegistry *registry) override; // TODO
+    virtual void apply(::CommandRegistry *registry) override;
 
   public:
     /**
@@ -173,7 +176,7 @@ public:
      * @param name name
      * @param value value
      */
-    void addValue(std::string_view name, Enum value); // TODO
+    void addValue(std::string_view name, Enum value) noexcept { values.emplace_back(name, value); }
   };
 
   /**
@@ -278,11 +281,10 @@ public:
    * @brief Register static enum
    *
    * @tparam Enum Target static enum type
-   * @param name Target enum name
    * @return EnumApplication<Enum> Enum registering application
    */
-  template <typename Enum> EnumApplication<Enum> &registerEnum(std::string_view name) {
-    return applications.append<EnumApplication<Enum>>(name);
+  template <typename Enum> EnumApplication<Enum> &registerEnum() {
+    return applications.append<EnumApplication<Enum>>();
   }
 
   /**
@@ -308,6 +310,12 @@ void CustomCommandRegistry::startRegister(::CommandRegistry *registry) {
   applications.clear();
 }
 
+// EnumApplication
+template <typename Enum> void CustomCommandRegistry::EnumApplication<Enum>::apply(::CommandRegistry *registry) {
+  std::string enum_name = CommandParameterProxy<Enum>::enum_name;
+  registry->addEnumValues<Enum>(enum_name, values);
+}
+
 template <typename Desc> void CustomCommandRegistry::CommandApplication<Desc>::apply(::CommandRegistry *registry) {
   std::string name = Desc::name;
   do_log("register command %s", name.c_str());
@@ -324,7 +332,7 @@ template <typename Desc>
 template <typename Host>
 ::CommandRegistry::Overload CustomCommandRegistry::CommandApplication<Desc>::OverloadApplication<Host>::apply() {
   ::CommandRegistry::Overload ret{
-      {1, std::numeric_limits<int>::max()},
+      {0, std::numeric_limits<int>::max()},
       +[]() -> std::unique_ptr<::Command> { return std::make_unique<Host>(); },
   };
   for (auto &param : param_applications) ret.params.emplace_back(param->apply());
@@ -344,7 +352,7 @@ CustomCommandRegistry::CommandApplication<Desc>::OverloadApplication<Host>::Para
       CommandParameterProxy<Type>::type,
       nullptr,
       (int) offset,
-      !optional,
+      optional,
       -1,
   };
 }

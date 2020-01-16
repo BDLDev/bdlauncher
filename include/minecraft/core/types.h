@@ -53,7 +53,7 @@ enum class RegistrationType { SYSTEM, CUSTOM, UNKNOWN };
 
 template <typename Type, typename Store> struct AutomaticID {
   Store v;
-  inline AutomaticID() {};
+  inline AutomaticID(){};
   inline AutomaticID(Store v) : v(v) {}
   Store value() const;
   bool operator!=(AutomaticID const &) const;
