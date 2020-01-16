@@ -50,7 +50,7 @@ template <> class BDL::CustomCommand::CommandParameterProxy<TestEnum> {
 
 public:
   inline static typeid_t<CommandRegistry> fetch_tid() { return type_id<CommandRegistry, TestEnum>(); }
-  inline static constexpr CommandParameterData::ParseFn parser = &CommandRegistry::parse<TestEnum>;
+  inline static constexpr CommandParameterData::ParseFn parser = &CommandRegistry::fake_parse;
   inline static constexpr CommandParameterDataType type        = CommandParameterDataType::NORMAL;
   inline static constexpr char const *enum_name                = "TestEnum";
   operator TestEnum() const { return value; }

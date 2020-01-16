@@ -118,7 +118,9 @@ public:
   unsigned addEnumValues(std::string const &, std::vector<std::string> const &);
   void addEnumValueConstraints(std::string const &, std::vector<std::string> const &, SemanticConstraint);
   template <typename Type>
-  bool parse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const {
+  bool parse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const;
+
+  bool fake_parse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const {
     return false;
   }
 
