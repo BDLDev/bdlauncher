@@ -4,8 +4,8 @@
 
 | Command | Description |
 | - | - |
-| `/reload_kbonus` | reload config |
-| `/dbg_kbonus` | turn on debug,kill mobs to get eid |
+| `/kbonus reload` | reload config |
+| `/kbonus debug` | turn on debug,kill mobs to get eid |
 ```json
 [
     {
@@ -15,13 +15,13 @@
     }
 ]
 ```
-> Give money randomly, eid is the entity id, which can be obtained through /dbg_kbonus, such as: 4874 = chicken, 1 = player
+> Give money randomly, eid is the entity id, which can be obtained through /kbonus debug, such as: 4874 = chicken, 1 = player
 
 ## 简体中文
 | 指令 | 功能 |
 | - | - |
-| `/reload_kbonus` | 重载配置 |
-| `/dbg_kbonus` | 打开debug，杀死生物后显示eid |
+| `/kbonus reload` | 重载配置 |
+| `/kbonus debug` | 打开debug，杀死生物后显示eid |
 ```json
 [
     {
@@ -32,4 +32,4 @@
 ]
 ```
 
-> 随机给钱，eid为实体id，通过命令/dbg_kbonus可以获得，例如: 4874是鸡，1是玩家
+> 随机给钱，eid为实体id，通过命令/kbonus debug可以获得，例如: 4874是鸡，1是玩家
