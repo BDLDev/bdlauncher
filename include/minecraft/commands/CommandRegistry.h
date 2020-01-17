@@ -104,6 +104,8 @@ public:
     Type operator()(unsigned long value) const { return convert<Type, unsigned long>(value); }
   };
 
+  unsigned addSoftEnum(std::string const &, std::vector<std::string> = {});
+
   Symbol addEnumValuesInternal(
       std::string const &, std::vector<std::pair<unsigned long, unsigned long>> const &, typeid_t<CommandRegistry>,
       bool (CommandRegistry::*)(
@@ -120,7 +122,8 @@ public:
   template <typename Type>
   bool parse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const;
 
-  bool fake_parse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const {
+  bool
+  fake_parse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const {
     return false;
   }
 

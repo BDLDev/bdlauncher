@@ -34,6 +34,13 @@ public:
 
 enum class TestEnum : int { A, B, C };
 
+class TestDynEnum : public BDL::CustomCommand::CustomDynEnum<TestDynEnum> {
+public:
+  static constexpr auto name = "TestDynEnum";
+  TestDynEnum() : CustomDynEnum("") {}
+  TestDynEnum(std::string value) : CustomDynEnum(value) {}
+};
+
 class Test3Command : public BDL::CustomCommand::CustomCommandContext {
 public:
   static constexpr auto name        = "test3";
@@ -43,6 +50,7 @@ public:
   Test3Command(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
 
   void impl(TestEnum en) { do_log("%d", (int) en); }
+  void impl(int v, TestDynEnum en) { do_log("> %d [%s]", v, en.c_str()); }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<TestEnum> {
@@ -53,7 +61,16 @@ public:
   inline static constexpr CommandParameterData::ParseFn parser = &CommandRegistry::fake_parse;
   inline static constexpr CommandParameterDataType type        = CommandParameterDataType::NORMAL;
   inline static constexpr char const *enum_name                = "TestEnum";
-  operator TestEnum() const { return value; }
+  operator TestEnum() const noexcept { return value; }
+};
+
+template <>
+class BDL::CustomCommand::CommandParameterProxy<TestDynEnum>
+    : public BDL::CustomCommand::CommandParameterProxy<std::string> {
+public:
+  inline static constexpr CommandParameterDataType type = CommandParameterDataType::SOFT_ENUM;
+
+  operator TestDynEnum() const noexcept { return {value}; }
 };
 
 struct TestImpl : Command {
@@ -89,6 +106,15 @@ struct Test3Impl : Command {
   }
 };
 
+struct Test3DynImpl : Command {
+  BDL::CustomCommand::CommandParameterProxy<int> v;
+  BDL::CustomCommand::CommandParameterProxy<TestDynEnum> en;
+  virtual void execute(CommandOrigin const &origin, CommandOutput &output) {
+    Test3Command ctx{origin, output};
+    ctx.impl(v, en);
+  }
+};
+
 void mod_init(std::list<string> &modlist) {
   auto &instance = BDL::CustomCommand::CustomCommandRegistry::getInstance();
   {
@@ -115,10 +141,18 @@ void mod_init(std::list<string> &modlist) {
     enu.addValue("b", TestEnum::B);
     enu.addValue("c", TestEnum::C);
   }
+  { instance.registerDynEnum<TestDynEnum>({"x", "y", "z"}); }
   {
-    auto &cmd    = instance.registerCommand<Test3Command>();
-    auto &cmdovl = cmd.registerOverload<Test3Impl>();
-    cmdovl.addParameter<TestEnum>("en", false, offsetof(Test3Impl, en));
+    auto &cmd = instance.registerCommand<Test3Command>();
+    {
+      auto &cmdovl = cmd.registerOverload<Test3Impl>();
+      cmdovl.addParameter<TestEnum>("en", false, offsetof(Test3Impl, en));
+    }
+    {
+      auto &cmdovl = cmd.registerOverload<Test3DynImpl>();
+      cmdovl.addParameter<int>("v", false, offsetof(Test3DynImpl, v));
+      cmdovl.addParameter<TestDynEnum>("en", false, offsetof(Test3DynImpl, en));
+    }
   }
   load_helper(modlist);
 }

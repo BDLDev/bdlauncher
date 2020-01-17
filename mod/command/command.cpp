@@ -8,8 +8,8 @@ BDL_EXPORT CustomCommandRegistry &CustomCommandRegistry::getInstance() {
   return registry;
 }
 
-THook(void *, _ZN11ListCommand5setupER15CommandRegistry, CommandRegistry &thi) {
-  auto &instance = BDL::CustomCommand::CustomCommandRegistry::getInstance();
+THook(void *, _ZN9XPCommand5setupER15CommandRegistry, CommandRegistry &thi) {
+  auto &instance = CustomCommandRegistry::getInstance();
   instance.startRegister(&thi);
   return original(thi);
 }

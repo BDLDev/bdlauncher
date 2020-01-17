@@ -53,7 +53,7 @@ protected:
  * @tparam Derived The real DynEnum class
  */
 template <typename Derived> class CustomDynEnum {
-  std::string_view value;
+  std::string value;
 
 protected:
   /**
@@ -61,15 +61,22 @@ protected:
    *
    * @param value The enum value
    */
-  CustomDynEnum(std::string_view value) : value(value) {}
+  CustomDynEnum(std::string value) : value(value) {}
 
 public:
   /**
-   * @brief get value
+   * @brief Get the value
    *
-   * @return std::string_view
+   * @return std::string const& value
    */
-  inline operator std::string_view() noexcept { return value; };
+  inline operator std::string const &() const noexcept { return value; };
+
+  /**
+   * @brief Get c string
+   *
+   * @return char const* cstring
+   */
+  char const *c_str() const noexcept { return value.c_str(); }
 };
 
 /**
@@ -186,9 +193,12 @@ public:
    */
   template <typename DynEnum> class CustomDynEnumApplication : public Application<void, ::CommandRegistry *> {
     static_assert(std::is_base_of_v<CustomDynEnum<DynEnum>, DynEnum>);
+    template <typename Return, typename... Params> friend class ApplicationArray;
+    std::vector<std::string> values;
     CustomDynEnumApplication(CustomDynEnumApplication const &) = delete;
     CustomDynEnumApplication(CustomDynEnumApplication &&)      = delete;
     virtual void apply(::CommandRegistry *registry) override; // TODO
+    CustomDynEnumApplication(std::vector<std::string> values) : values(values) {}
   };
 
   /**
@@ -273,8 +283,9 @@ public:
    * @return CustomDynEnumHandle<DynEnum> The dynamic handle
    */
   template <typename DynEnum>
-  std::enable_if_t<std::is_base_of_v<CustomDynEnum<DynEnum>, CustomDynEnumHandle<DynEnum>>> registerDynEnum() {
-    return applications.append<CustomDynEnumApplication<DynEnum>>();
+  std::enable_if_t<std::is_base_of_v<CustomDynEnum<DynEnum>, DynEnum>>
+  registerDynEnum(std::initializer_list<std::string> values) {
+    applications.append<CustomDynEnumApplication<DynEnum>>(values);
   }
 
   /**
@@ -310,7 +321,12 @@ void CustomCommandRegistry::startRegister(::CommandRegistry *registry) {
   applications.clear();
 }
 
-// EnumApplication
+template <typename DynEnum>
+void CustomCommandRegistry::CustomDynEnumApplication<DynEnum>::apply(::CommandRegistry *registry) {
+  std::string name = DynEnum::name;
+  registry->addSoftEnum(name, values);
+}
+
 template <typename Enum> void CustomCommandRegistry::EnumApplication<Enum>::apply(::CommandRegistry *registry) {
   std::string enum_name = CommandParameterProxy<Enum>::enum_name;
   registry->addEnumValues<Enum>(enum_name, values);
@@ -345,16 +361,28 @@ template <typename Host>
 template <typename Type>
 ::CommandParameterData
 CustomCommandRegistry::CommandApplication<Desc>::OverloadApplication<Host>::ParameterApplication<Type>::apply() {
-  return {
-      CommandParameterProxy<Type>::fetch_tid(),
-      CommandParameterProxy<Type>::parser,
-      name,
-      CommandParameterProxy<Type>::type,
-      nullptr,
-      (int) offset,
-      optional,
-      -1,
-  };
+  if constexpr (CommandParameterProxy<Type>::type == CommandParameterDataType::SOFT_ENUM)
+    return {
+        CommandParameterProxy<Type>::fetch_tid(),
+        &::CommandRegistry::parse<std::string>,
+        name,
+        CommandParameterDataType::SOFT_ENUM,
+        Type::name,
+        (int) offset,
+        optional,
+        -1,
+    };
+  else
+    return {
+        CommandParameterProxy<Type>::fetch_tid(),
+        CommandParameterProxy<Type>::parser,
+        name,
+        CommandParameterProxy<Type>::type,
+        nullptr,
+        (int) offset,
+        optional,
+        -1,
+    };
 }
 
 /** @} */

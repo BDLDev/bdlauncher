@@ -24,7 +24,6 @@ template <typename T> typeid_t<CommandRegistry> &tid;
     inline static typeid_t<CommandRegistry> fetch_tid() { return tid<real>; }                                          \
     inline static constexpr CommandParameterData::ParseFn parser = &CommandRegistry::parse<real>;                      \
     inline static constexpr CommandParameterDataType type        = CommandParameterDataType::NORMAL;                   \
-    inline static constexpr char const *subtype                  = nullptr;                                            \
                                                                                                                        \
     operator real() const noexcept { return value; }                                                                   \
   }
