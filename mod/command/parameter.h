@@ -4,6 +4,7 @@
 #include <global.h>
 
 #include <minecraft/core/GameType.h>
+#include <minecraft/commands/CommandSelector.h>
 
 namespace BDL::CustomCommand {
 
@@ -22,7 +23,7 @@ namespace BDL::CustomCommand {
     inline static constexpr CommandParameterData::ParseFn parser = &CommandRegistry::parse<real>;                      \
     inline static constexpr CommandParameterDataType type        = CommandParameterDataType::NORMAL;                   \
                                                                                                                        \
-    operator real() const noexcept { return value; }                                                                   \
+    operator real const &() const noexcept { return value; }                                                           \
   }
 
 #define GENALL(real, symbol)                                                                                           \
@@ -39,6 +40,10 @@ GENALL(Block const *, _ZZ7type_idI15CommandRegistryPK5BlockE8typeid_tIT_EvE2id);
 GENALL(GameType, _ZZ7type_idI15CommandRegistry8GameTypeE8typeid_tIT_EvE2id);
 GENALL(
     std::string, _ZZ7type_idI15CommandRegistryNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEE8typeid_tIT_EvE2id);
+GENALL(CommandSelector<Actor>, _ZZ7type_idI15CommandRegistry15CommandSelectorI5ActorEE8typeid_tIT_EvE2id);
+GENALL(CommandSelector<Player>, _ZZ7type_idI15CommandRegistry15CommandSelectorI6PlayerEE8typeid_tIT_EvE2id);
+GENALL(
+    WildcardCommandSelector<Actor>, _ZZ7type_idI15CommandRegistry23WildcardCommandSelectorI5ActorEE8typeid_tIT_EvE2id);
 
 #undef GENTYPE_ID
 

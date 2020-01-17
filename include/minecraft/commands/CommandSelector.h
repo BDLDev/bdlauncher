@@ -13,11 +13,18 @@ class CommandSelectorBase {
 
 public:
   CommandSelectorBase(bool);
+  CommandSelectorBase(CommandSelectorBase const &) = delete;
   ~CommandSelectorBase();
 };
 
 template <typename T> class CommandSelector : public CommandSelectorBase {
 public:
-  CommandSelector() : CommandSelectorBase(!std::is_same_v<T, Actor>) {}
-  std::shared_ptr<std::vector<Actor *>> results(CommandOrigin const &) const;
+  CommandSelector();
+  std::shared_ptr<std::vector<T *>> results(CommandOrigin const &) const;
+};
+
+template <typename T> class WildcardCommandSelector : public CommandSelectorBase {
+public:
+  WildcardCommandSelector();
+  std::shared_ptr<std::vector<T *>> results(CommandOrigin const &) const;
 };

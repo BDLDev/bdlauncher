@@ -28,8 +28,8 @@ namespace BDL::CustomCommand {
  * Used for codegen
  */
 class CustomCommandContext {
-  ::CommandOrigin const *origin;
-  ::CommandOutput *output;
+  ::CommandOrigin const &origin;
+  ::CommandOutput &output;
 
   CustomCommandContext(CustomCommandContext const &) = delete;
   CustomCommandContext(CustomCommandContext &&)      = delete;
@@ -41,10 +41,10 @@ protected:
    * @param origin CommandOrigin
    * @param output CommandOutput
    */
-  CustomCommandContext(CommandOrigin const &origin, CommandOutput &output) noexcept
-      : origin(&origin), output(&output) {}
+  CustomCommandContext(CommandOrigin const &origin, CommandOutput &output) noexcept : origin(origin), output(output) {}
 
-  // TODO: add more interface
+  CommandOrigin const &getOrigin() const { return origin; }
+  CommandOutput &getOutput() { return output; }
 };
 
 /**

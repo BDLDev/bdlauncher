@@ -49,4 +49,21 @@ public:
   void impl(mandatory<int> v, mandatory<TestDynEnum> en) { do_log("> %d [%s]", v, en.c_str()); }
 };
 
+class TestSelectorCommand : public CustomCommandContext {
+public:
+  static constexpr auto name = "test-select";
+  static constexpr auto description = "Test selector";
+  static constexpr auto permission = (CommandPermissionLevel) 0;
+
+  TestSelectorCommand(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
+
+  void impl(mandatory<CommandSelector<Actor>> selector) {
+    auto result = selector.results(getOrigin());
+    for (auto pact : *result) {
+      do_log("%p", pact);
+    }
+    do_log("done");
+  }
+};
+
 command_register_function register_commands();

@@ -64,6 +64,14 @@ struct Test3Command_1 : Command {
   }
 };
 
+struct TestSelectorCommand_0 : Command {
+  CommandParameterProxy<CommandSelector<Actor>> selector;
+  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+    TestSelectorCommand context{origin, output};
+    context.impl(selector);
+  }
+};
+
 void register_commands() {
   auto &instance = CustomCommandRegistry::getInstance();
   instance.registerDynEnum<TestDynEnum>();
@@ -103,6 +111,13 @@ void register_commands() {
       auto &ovl = cmd.registerOverload<Test3Command_1>();
       ovl.addParameter<int>("v", false, offsetof(Test3Command_1, v));
       ovl.addParameter<TestDynEnum>("en", false, offsetof(Test3Command_1, en));
+    }
+  }
+  {
+    auto &cmd = instance.registerCommand<TestSelectorCommand>();
+    {
+      auto &ovl = cmd.registerOverload<TestSelectorCommand_0>();
+      ovl.addParameter<CommandSelector<Actor>>("selector", false, offsetof(TestSelectorCommand_0, selector));
     }
   }
 }
