@@ -149,6 +149,7 @@ public:
   }
 
   void registerCommand(std::string const &, char const *, CommandPermissionLevel, CommandFlag, CommandFlag);
+  void registerAlias(std::string src, std::string alias);
   void buildOverload(CommandRegistry::Overload &);
   void registerOverloadInternal(Signature &, Overload &);
   Signature *findCommand(std::string const &);

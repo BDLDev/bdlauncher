@@ -2,6 +2,7 @@
 #include <MC.h>
 #include <cmdhelper.h>
 #include <logger.h>
+#include <magic.h>
 
 #include <type_traits>
 #include <string_view>
@@ -312,6 +313,7 @@ template <typename Type> using mandatory = Type const &;
 template <typename Type> using optional = Type const &;
 
 using enum_initial_list = std::initializer_list<std::string>;
+using alias_list        = std::initializer_list<std::string>;
 
 using command_register_function = void;
 
@@ -338,6 +340,9 @@ template <typename Enum> void CustomCommandRegistry::EnumApplication<Enum>::appl
   registry->addEnumValues<Enum>(enum_name, values);
 }
 
+template <typename T> using has_aliases_t = decltype(T::aliases);
+template <typename T> using has_aliases   = is_detected<has_aliases_t, T>;
+
 template <typename Desc> void CustomCommandRegistry::CommandApplication<Desc>::apply(::CommandRegistry *registry) {
   std::string name = Desc::name;
   do_log("register command %s", name.c_str());
@@ -348,6 +353,8 @@ template <typename Desc> void CustomCommandRegistry::CommandApplication<Desc>::a
     registry->registerOverloadInternal(*signature, *signature->overloads.rbegin());
   }
   overload_applications.clear();
+  if constexpr (has_aliases<Desc>::value)
+    for (auto &alias : Desc::aliases) registry->registerAlias(name, alias);
 }
 
 template <typename Desc>

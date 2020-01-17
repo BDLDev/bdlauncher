@@ -5,6 +5,7 @@
 #include <minecraft/core/types.h>
 
 class Actor;
+class Player;
 
 template <typename T> class CommandSelectorResults;
 

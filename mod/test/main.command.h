@@ -1,6 +1,5 @@
 #include "../command/command.h"
 #include "../command/parameter.h"
-#include <vector>
 
 using namespace BDL::CustomCommand;
 
@@ -51,26 +50,26 @@ public:
 
 class TestSelectorCommand : public CustomCommandContext {
 public:
-  static constexpr auto name = "test-select";
+  static constexpr auto name        = "test-select";
   static constexpr auto description = "Test selector";
-  static constexpr auto permission = (CommandPermissionLevel) 0;
+  static constexpr auto permission  = (CommandPermissionLevel) 0;
 
-  TestSelectorCommand(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
+  TestSelectorCommand(CommandOrigin const &origin, CommandOutput &output) noexcept
+      : CustomCommandContext(origin, output) {}
 
   void impl(mandatory<CommandSelector<Actor>> selector) {
     auto result = selector.results(getOrigin());
-    for (auto pact : *result) {
-      do_log("%p", pact);
-    }
+    for (auto pact : *result) do_log("%p", pact);
     do_log("done");
   }
 };
 
 class TestJsonCommand : public CustomCommandContext {
 public:
-  static constexpr auto name = "test-json";
+  inline static alias_list aliases  = {"json"};
+  static constexpr auto name        = "test-json";
   static constexpr auto description = "Test json";
-  static constexpr auto permission = (CommandPermissionLevel) 0;
+  static constexpr auto permission  = (CommandPermissionLevel) 0;
 
   TestJsonCommand(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
 
