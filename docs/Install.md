@@ -7,6 +7,8 @@
 | gcc | 9.2.0 | `apt install gcc` | `pacman -S gcc --needed` |
 | g++ | 9.2.0 | `apt install g++` | `pacman -S gcc --needed` |
 | readline | N/A | `apt install libreadline-dev` | `pacman -S readline --needed` |
+| python | 3.7+ | `apt install python3 python3-pip` | `pacman -S python python-pip --needed` |
+| ply[pip] | N/A | `pip3 install --user ply` | `pip install --user ply` |
 
 # Install it to BDS
 
