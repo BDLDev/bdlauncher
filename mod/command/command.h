@@ -282,10 +282,9 @@ public:
    * @tparam DynEnum Target dynamic enum type
    * @return CustomDynEnumHandle<DynEnum> The dynamic handle
    */
-  template <typename DynEnum>
-  std::enable_if_t<std::is_base_of_v<CustomDynEnum<DynEnum>, DynEnum>>
-  registerDynEnum(std::initializer_list<std::string> values) {
-    applications.append<CustomDynEnumApplication<DynEnum>>(values);
+  template <typename DynEnum> std::enable_if_t<std::is_base_of_v<CustomDynEnum<DynEnum>, DynEnum>> registerDynEnum() {
+    std::vector<std::string> temp{DynEnum::initial};
+    applications.append<CustomDynEnumApplication<DynEnum>>(temp);
   }
 
   /**
@@ -309,6 +308,12 @@ public:
   }
 };
 
+template <typename Type> using mandatory = Type const &;
+
+template <typename Type> using optional = Type const &;
+
+using command_register_function = void;
+
 /** @} */
 
 /**
@@ -316,7 +321,7 @@ public:
  * @{
  */
 
-void CustomCommandRegistry::startRegister(::CommandRegistry *registry) {
+inline void CustomCommandRegistry::startRegister(::CommandRegistry *registry) {
   for (auto &application : applications) application->apply(registry);
   applications.clear();
 }

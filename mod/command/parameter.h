@@ -7,21 +7,18 @@
 
 namespace BDL::CustomCommand {
 
-template <typename T> typeid_t<CommandRegistry> &tid;
-
-#define GENTYPE_ID(real, symbol)                                                                                       \
+#define GENTYPE_ID(symbol)                                                                                             \
   extern "C" {                                                                                                         \
   extern typeid_t<CommandRegistry> symbol;                                                                             \
-  }                                                                                                                    \
-  template <> typeid_t<CommandRegistry> &tid<real> = symbol;
+  }
 
-#define MakeCommonProxy(real)                                                                                          \
+#define MakeCommonProxy(real, symbol)                                                                                  \
   template <> class CommandParameterProxy<real> {                                                                      \
   protected:                                                                                                           \
     real value;                                                                                                        \
                                                                                                                        \
   public:                                                                                                              \
-    inline static typeid_t<CommandRegistry> fetch_tid() { return tid<real>; }                                          \
+    inline static typeid_t<CommandRegistry> fetch_tid() { return symbol; }                                             \
     inline static constexpr CommandParameterData::ParseFn parser = &CommandRegistry::parse<real>;                      \
     inline static constexpr CommandParameterDataType type        = CommandParameterDataType::NORMAL;                   \
                                                                                                                        \
@@ -29,8 +26,8 @@ template <typename T> typeid_t<CommandRegistry> &tid;
   }
 
 #define GENALL(real, symbol)                                                                                           \
-  GENTYPE_ID(real, symbol);                                                                                            \
-  MakeCommonProxy(real)
+  GENTYPE_ID(symbol);                                                                                                  \
+  MakeCommonProxy(real, symbol)
 
 using DimensionID = AutomaticID<Dimension, int>;
 

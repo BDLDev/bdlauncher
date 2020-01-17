@@ -3,8 +3,12 @@ DLL_PRELOAD=build/preload.so
 MOD_LIST=$(filter-out DEPRECATED mod,$(patsubst mod/%,%,$(shell find mod -maxdepth 1 -type d -print)))
 MOD_OUTS=$(patsubst %,build/mods/%.mod,$(MOD_LIST))
 CFG_FILES=$(patsubst config/%.json,%,$(wildcard config/*.json))
+GEN_COMMAND_SRC=$(shell find mod -regex '.*\.command\.\(h\)' -type f -print)
+GEN_COMMAND_TGT=$(patsubst %.h,%.gen.cpp,$(GEN_COMMAND_SRC))
 DESTDIR=/opt/bdlauncher
 INSTALL_SH=./scripts/install.sh
+GENERATE_COMMAND=./scripts/generate_command_definition.py
+CLANG_FORMAT=clang-format
 
 HEADERS=$(shell find include -type f -print)
 
@@ -64,10 +68,11 @@ endef
 all: bdlauncher preload mods
 	@echo " DONE"
 
-.PHONY: bdlauncher preload mods
+.PHONY: bdlauncher preload generate-commands mods
 bdlauncher: $(BIN_LAUNCHER)
 preload: $(DLL_PRELOAD)
-mods: $(MOD_OUTS)
+generate-commands: $(GEN_COMMAND_TGT)
+mods: generate-commands $(MOD_OUTS)
 
 .PHONY: list-mod
 list-mod:
@@ -156,6 +161,11 @@ obj/preload_%_$(OBJ_SUFFIX).d: preload/%.cpp
 	$(call makedep,$@,$< -I include)
 
 # Mod Target
+
+.DELETE_ON_ERROR:
+$(GEN_COMMAND_TGT) : %.gen.cpp: %.h $(GENERATE_COMMAND)
+	@echo " GENERATE $@"
+	@$(GENERATE_COMMAND) $< | $(CLANG_FORMAT) >$@
 
 define build-mods-rules
 MOD_$1=build/mods/$1.mod
