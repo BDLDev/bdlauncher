@@ -5,6 +5,8 @@
 
 #include <minecraft/core/GameType.h>
 #include <minecraft/commands/CommandSelector.h>
+#include <minecraft/commands/CommandPosition.h>
+#include <minecraft/json.h>
 
 namespace BDL::CustomCommand {
 
@@ -44,6 +46,10 @@ GENALL(CommandSelector<Actor>, _ZZ7type_idI15CommandRegistry15CommandSelectorI5A
 GENALL(CommandSelector<Player>, _ZZ7type_idI15CommandRegistry15CommandSelectorI6PlayerEE8typeid_tIT_EvE2id);
 GENALL(
     WildcardCommandSelector<Actor>, _ZZ7type_idI15CommandRegistry23WildcardCommandSelectorI5ActorEE8typeid_tIT_EvE2id);
+GENALL(RelativeFloat, _ZZ7type_idI15CommandRegistry13RelativeFloatE8typeid_tIT_EvE2id);
+GENALL(CommandPosition, _ZZ7type_idI15CommandRegistry15CommandPositionE8typeid_tIT_EvE2id);
+GENALL(CommandPositionFloat, _ZZ7type_idI15CommandRegistry20CommandPositionFloatE8typeid_tIT_EvE2id);
+GENALL(Json::Value, _ZZ7type_idI15CommandRegistryN4Json5ValueEE8typeid_tIT_EvE2id);
 
 #undef GENTYPE_ID
 

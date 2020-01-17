@@ -72,6 +72,15 @@ struct TestSelectorCommand_0 : Command {
   }
 };
 
+struct TestJsonCommand_0 : Command {
+  CommandParameterProxy<Json::Value> value;
+  CommandParameterProxy<RelativeFloat> rf;
+  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+    TestJsonCommand context{origin, output};
+    context.impl(value, rf);
+  }
+};
+
 void register_commands() {
   auto &instance = CustomCommandRegistry::getInstance();
   instance.registerDynEnum<TestDynEnum>();
@@ -118,6 +127,14 @@ void register_commands() {
     {
       auto &ovl = cmd.registerOverload<TestSelectorCommand_0>();
       ovl.addParameter<CommandSelector<Actor>>("selector", false, offsetof(TestSelectorCommand_0, selector));
+    }
+  }
+  {
+    auto &cmd = instance.registerCommand<TestJsonCommand>();
+    {
+      auto &ovl = cmd.registerOverload<TestJsonCommand_0>();
+      ovl.addParameter<Json::Value>("value", false, offsetof(TestJsonCommand_0, value));
+      ovl.addParameter<RelativeFloat>("rf", false, offsetof(TestJsonCommand_0, rf));
     }
   }
 }

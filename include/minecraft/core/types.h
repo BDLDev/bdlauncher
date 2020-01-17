@@ -111,3 +111,25 @@ public:
   bool operator<(HashedString const &) const;
   HashedString &operator=(HashedString const &) const;
 };
+
+struct RelativeFloat {
+  float value;
+  bool rel;
+
+  RelativeFloat();
+
+  float getValue(float) const;
+};
+
+struct Vec3 {
+  float x, y, z;
+  Vec3(){};
+  Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+  Vec3(BlockPos const &);
+  inline float L2dist(const Vec3 &a) const {
+    return (x - a.x) * (x - a.x) + (y - a.y) * (y - a.y) + (z - a.z) * (z - a.z);
+  }
+  inline float L2distxz(const Vec3 &a) const {
+    return (x - a.x) * (x - a.x) + (y - a.y) * (y - a.y) * 0.01 + (z - a.z) * (z - a.z);
+  }
+};

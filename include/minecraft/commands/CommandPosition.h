@@ -10,6 +10,10 @@ class CommandPosition {
   bool op;
 
 public:
-  BlockPos getBlockPos(CommandOrigin const &) const;
-  Vec3 getPosition(CommandOrigin const &) const;
+  BlockPos getBlockPos(CommandOrigin const &, Vec3 const &) const;
+  BlockPos getBlockPos(Vec3 const &, Vec3 const &) const;
+  Vec3 getPosition(CommandOrigin const &, Vec3 const &) const;
+  Vec3 getPosition(Vec3 const &, Vec3 const &) const;
 };
+
+class CommandPositionFloat : public CommandPosition {};

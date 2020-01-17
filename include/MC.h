@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string_view>
+#include <minecraft/core/types.h>
 
 #define BDL_EXPORT __attribute__((visibility("default")))
 
@@ -32,19 +33,6 @@ using std::unordered_set;
 #  define fp(x) ((void *) (x))
 #endif
 struct BlockPos;
-class Vec3 {
-public:
-  float x, y, z;
-  Vec3(){};
-  Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
-  Vec3(BlockPos const &);
-  inline float L2dist(const Vec3 &a) const {
-    return (x - a.x) * (x - a.x) + (y - a.y) * (y - a.y) + (z - a.z) * (z - a.z);
-  }
-  inline float L2distxz(const Vec3 &a) const {
-    return (x - a.x) * (x - a.x) + (y - a.y) * (y - a.y) * 0.01 + (z - a.z) * (z - a.z);
-  }
-};
 typedef unsigned long STRING_HASH;
 
 constexpr STRING_HASH do_hash(string_view x) {

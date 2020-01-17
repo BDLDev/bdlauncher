@@ -66,4 +66,20 @@ public:
   }
 };
 
+class TestJsonCommand : public CustomCommandContext {
+public:
+  static constexpr auto name = "test-json";
+  static constexpr auto description = "Test json";
+  static constexpr auto permission = (CommandPermissionLevel) 0;
+
+  TestJsonCommand(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
+
+  void impl(mandatory<Json::Value> value, mandatory<RelativeFloat> rf) {
+    Json::FastWriter writer;
+    auto data = writer.write(value);
+    do_log("json: %s", data.c_str());
+    do_log("rf: %f", rf.getValue(30.f));
+  }
+};
+
 command_register_function register_commands();
