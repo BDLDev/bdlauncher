@@ -24,9 +24,7 @@ struct MCRESULT {
   bool isSuccess() const;
 };
 */
-enum class CommandPermissionLevel : unsigned char {
-  NORMAL, OP, TERMINAL
-};
+enum class CommandPermissionLevel : unsigned char { NORMAL, OP, TERMINAL };
 enum class CommandOutputType : char {};
 
 struct Vec3;

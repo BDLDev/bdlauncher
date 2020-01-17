@@ -13,7 +13,8 @@ public:
   static constexpr auto description = "Kill bonus operation";
   static constexpr auto permission  = CommandPermissionLevel::OP;
 
-  CommandKillbonus(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
+  CommandKillbonus(CommandOrigin const &origin, CommandOutput &output) noexcept
+      : CustomCommandContext(origin, output) {}
 
   void invoke(mandatory<KillbonusMode> mode);
 };
