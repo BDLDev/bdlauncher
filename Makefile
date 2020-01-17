@@ -4,6 +4,7 @@ MOD_LIST=$(filter-out DEPRECATED mod,$(patsubst mod/%,%,$(shell find mod -maxdep
 MOD_OUTS=$(patsubst %,build/mods/%.mod,$(MOD_LIST))
 CFG_FILES=$(patsubst config/%.json,%,$(wildcard config/*.json))
 DESTDIR=/opt/bdlauncher
+INSTALL_SH=./scripts/install.sh
 
 HEADERS=$(shell find include -type f -print)
 
@@ -51,10 +52,10 @@ define makedep
     	rm -f $1.$$$$
 endef
 define install-trim
-	./install.sh "$2" "$(DESTDIR)/$(patsubst $1/%,%,$2)"
+	$(INSTALL_SH) "$2" "$(DESTDIR)/$(patsubst $1/%,%,$2)"
 endef
 define install
-	./install.sh "$1" "$(DESTDIR)/$1"
+	$(INSTALL_SH) "$1" "$(DESTDIR)/$1"
 endef
 
 # Phony Targets
@@ -114,7 +115,7 @@ $(addprefix install-config-,$(CFG_FILES)): install-config-%: config/%.json
 
 .PHONY: install-modlist
 install-modlist: mod.list
-	@./install.sh mod.list "$(DESTDIR)/mods/mod.list"
+	@$(INSTALL_SH) mod.list "$(DESTDIR)/mods/mod.list"
 
 # Direct Target
 
