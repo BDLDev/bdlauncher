@@ -7,7 +7,7 @@ class TestCommand : public CustomCommandContext {
 public:
   static constexpr auto name        = "test";
   static constexpr auto description = "test command";
-  static constexpr auto permission  = (CommandPermissionLevel) 0;
+  static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
   TestCommand(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
 
@@ -18,7 +18,7 @@ class Test2Command : public CustomCommandContext {
 public:
   static constexpr auto name        = "test2";
   static constexpr auto description = "test command2";
-  static constexpr auto permission  = (CommandPermissionLevel) 0;
+  static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
   Test2Command(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
 
@@ -40,7 +40,7 @@ class Test3Command : public CustomCommandContext {
 public:
   static constexpr auto name        = "test3";
   static constexpr auto description = "test command3";
-  static constexpr auto permission  = (CommandPermissionLevel) 0;
+  static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
   Test3Command(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
 
@@ -52,7 +52,7 @@ class TestSelectorCommand : public CustomCommandContext {
 public:
   static constexpr auto name        = "test-select";
   static constexpr auto description = "Test selector";
-  static constexpr auto permission  = (CommandPermissionLevel) 0;
+  static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
   TestSelectorCommand(CommandOrigin const &origin, CommandOutput &output) noexcept
       : CustomCommandContext(origin, output) {}
@@ -69,7 +69,7 @@ public:
   inline static alias_list aliases  = {"json"};
   static constexpr auto name        = "test-json";
   static constexpr auto description = "Test json";
-  static constexpr auto permission  = (CommandPermissionLevel) 0;
+  static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
   TestJsonCommand(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
 
