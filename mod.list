@@ -1,5 +1,6 @@
 base.mod
 opti.mod
+command.mod
 gui.mod
 bear.mod
 money.mod
@@ -12,5 +13,4 @@ tp.mod
 land.mod
 custname.mod
 bossbar.mod
-command.mod
 test.mod

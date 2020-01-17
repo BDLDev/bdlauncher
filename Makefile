@@ -65,13 +65,14 @@ endef
 # Phony Targets
 
 .PHONY: all
-all: bdlauncher preload mods
+all: bdlauncher preload generate-commands mods
 	@echo " DONE"
 
 .PHONY: bdlauncher preload generate-commands mods
 bdlauncher: $(BIN_LAUNCHER)
 preload: $(DLL_PRELOAD)
 generate-commands: $(GEN_COMMAND_TGT)
+	@echo $(GEN_COMMAND_TGT)
 mods: generate-commands $(MOD_OUTS)
 
 .PHONY: list-mod

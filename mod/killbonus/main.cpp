@@ -5,19 +5,26 @@
 #include "base.h"
 #include "../money/money.h"
 #include <fstream>
+#include "main.command.h"
+
 using namespace rapidjson;
 extern "C" {
 BDL_EXPORT void mod_init(std::list<string> &modlist);
 }
 extern void load_helper(std::list<string> &modlist);
 unordered_map<int, std::pair<int, int>> bonus_mp;
-void load() {
+
+void load(CommandOutput *out) {
   Document dc;
   std::ifstream ff;
   FileBuffer fb("config/killbonus.json");
   if (dc.ParseInsitu(fb.data).HasParseError()) {
     do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
-    exit(1);
+    if (out)
+      out->error("Failed to parse json");
+    else
+      exit(1);
+    return;
   }
   for (auto &i : dc.GetArray()) {
     auto bMin     = i["MinMoney"].GetInt();
@@ -25,9 +32,13 @@ void load() {
     auto eid      = i["eid"].GetInt();
     bonus_mp[eid] = {bMin, bMax};
   }
+  if (out) out->success("Reloaded!");
 }
 static int dbg_die;
-static void toggle_dbg() { dbg_die = !dbg_die; }
+static void toggle_dbg(CommandOutput *out) {
+  dbg_die = !dbg_die;
+  if (out) out->success(std::string("Debug mode ") + (dbg_die ? "on" : "off"));
+}
 static void handle_die(Mob &a, ActorDamageSource const &b) {
   if (b.isChildEntitySource() || b.isEntitySource()) {
     auto ent         = getSrvLevel()->fetchEntity(b.getEntityUniqueID(), false);
@@ -45,10 +56,19 @@ static void handle_die(Mob &a, ActorDamageSource const &b) {
     }
   }
 }
+
+void CommandKillbonus::invoke(mandatory<KillbonusMode> mode) {
+  auto out = &getOutput();
+  switch (mode) {
+  case KillbonusMode::Reload: load(out); break;
+  case KillbonusMode::Debug: toggle_dbg(out); break;
+  default: getOutput().error("Unknown mode"); return;
+  }
+}
+
 void mod_init(std::list<string> &modlist) {
-  load();
-  register_cmd("reload_kbonus", load, "reload kill bonus", 1);
-  register_cmd("dbg_kbonus", toggle_dbg, "debug kill bonus", 1);
+  load(nullptr);
+  register_commands();
   reg_mobdie(handle_die);
   do_log("Loaded " BDL_TAG "");
   load_helper(modlist);
