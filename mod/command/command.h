@@ -198,7 +198,7 @@ public:
     CustomDynEnumApplication(CustomDynEnumApplication const &) = delete;
     CustomDynEnumApplication(CustomDynEnumApplication &&)      = delete;
     virtual void apply(::CommandRegistry *registry) override; // TODO
-    CustomDynEnumApplication(std::vector<std::string> values) : values(values) {}
+    CustomDynEnumApplication(std::initializer_list<std::string> values) : values(values) {}
   };
 
   /**
@@ -283,8 +283,7 @@ public:
    * @return CustomDynEnumHandle<DynEnum> The dynamic handle
    */
   template <typename DynEnum> std::enable_if_t<std::is_base_of_v<CustomDynEnum<DynEnum>, DynEnum>> registerDynEnum() {
-    std::vector<std::string> temp{DynEnum::initial};
-    applications.append<CustomDynEnumApplication<DynEnum>>(temp);
+    applications.append<CustomDynEnumApplication<DynEnum>>(DynEnum::initial);
   }
 
   /**
@@ -311,6 +310,8 @@ public:
 template <typename Type> using mandatory = Type const &;
 
 template <typename Type> using optional = Type const &;
+
+using enum_initial_list = std::initializer_list<std::string>;
 
 using command_register_function = void;
 

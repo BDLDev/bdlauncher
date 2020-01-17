@@ -31,8 +31,8 @@ enum class TestEnum : int { A, B, C };
 
 class TestDynEnum : public CustomDynEnum<TestDynEnum> {
 public:
-  static constexpr auto name                     = "TestDynEnum";
-  inline static std::vector<std::string> initial = {"x", "y", "z"};
+  static constexpr auto name              = "TestDynEnum";
+  inline static enum_initial_list initial = {"x", "y", "z"};
   TestDynEnum() : CustomDynEnum("") {}
   TestDynEnum(std::string const &value) : CustomDynEnum(value) {}
 };
