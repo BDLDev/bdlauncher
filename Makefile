@@ -87,11 +87,15 @@ clean:
 install: $(addprefix install-,launcher preload modlist $(addprefix mod-,$(MOD_LIST)) $(addprefix config-,$(CFG_FILES)))
 	@echo " DONE"
 
+FORMAT_SRCS=$(patsubst ./%,%,$(shell find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|c\|h\)' -and -not -path "./include/*" -and -not -path '*/\.*')) $(shell find include/minecraft -regex '.*\.\(cpp\|hpp\|cc\|cxx\|c\|h\)') $(wildcard include/*.h include/*.hpp)
 .PHONY: format
-format:
-	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|c\|h\)' -and -not -path "./include/*" -exec clang-format -i {} \;
-	find include/minecraft -regex '.*\.\(cpp\|hpp\|cc\|cxx\|c\|h\)' -exec clang-format -i {} \;
-	clang-format -i include/*.h include/*.hpp
+format: $(addprefix format-,$(FORMAT_SRCS))
+	@echo " DONE"
+
+.PHONY: format-%
+$(addprefix format-,$(FORMAT_SRCS)): format-%: %
+	@echo " FORMAT $<"
+	@$(CLANG_FORMAT) -i $<
 
 .PHONY: help
 help:
