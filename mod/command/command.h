@@ -348,13 +348,13 @@ template <typename Desc> void CustomCommandRegistry::CommandApplication<Desc>::a
   do_log("register command %s", name.c_str());
   registry->registerCommand(name, Desc::description, Desc::permission, (::CommandFlag) 0, (::CommandFlag) 0);
   auto signature = registry->findCommand(name);
+  if constexpr (has_aliases<Desc>::value)
+    for (auto &alias : Desc::aliases) registry->registerAlias(name, alias);
   for (auto &overload : overload_applications) {
     signature->overloads.emplace_back(overload->apply());
     registry->registerOverloadInternal(*signature, *signature->overloads.rbegin());
   }
   overload_applications.clear();
-  if constexpr (has_aliases<Desc>::value)
-    for (auto &alias : Desc::aliases) registry->registerAlias(name, alias);
 }
 
 template <typename Desc>
