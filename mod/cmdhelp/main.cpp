@@ -1,9 +1,7 @@
 #include <Loader.h>
 #include <MC.h>
 #include "base.h"
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include <minecraft/json.h>
 #include <fstream>
 #include <cstdarg>
 #include "../gui/gui.h"
@@ -103,48 +101,42 @@ THook(void *, _ZN5Level4tickEv, Level &a) {
   return original(a);
 }
 static int menuitem;
-using namespace rapidjson;
 static void load() {
   timers.clear();
   forms.clear();
-  Document dc;
-  FileBuffer fb("config/cmd.json");
-  if (dc.ParseInsitu(fb.data).HasParseError()) {
-    do_log("JSON ERROR pos: %ld type: %s !", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
-    do_log("--Hint--");
-    auto off = dc.GetErrorOffset();
-    FileBuffer fb2("config/cmd.json");
-    auto hint = fb2.getsv().substr(std::max(0ul, off - 12), 24);
-    do_log("%s", string(hint).c_str());
+  std::ifstream ifs{"config/cmd.json"};
+  Json::Value value;
+  Json::Reader reader;
+  if (!reader.parse(ifs, value)) {
+    auto msg = reader.getFormattedErrorMessages();
+    do_log("%s", msg.c_str());
     exit(1);
   }
-  for (auto &i : dc.GetArray()) {
-    auto &&x = i.GetObject();
-    auto typ = string(x["type"].GetString());
-    if (typ == "menuitem") { menuitem = x["itemid"].GetInt(); }
-    if (typ == "join") { joinHook = {"", string(x["cmd"].GetString())}; }
+  for (auto &i : value) {
+    auto typ = i["type"].asString("");
+    if (typ == "menuitem") { menuitem = i["itemid"].asInt(0); }
+    if (typ == "join") { joinHook = {"", string(i["cmd"].asString(""))}; }
     if (typ == "form") {
-      auto &&buttons = x["buttons"];
-      auto &&cont    = x["text"].GetString();
-      auto &&title   = x["title"].GetString();
-      auto &&name    = x["name"];
-      assert(buttons.IsArray());
-      auto &cf = forms[do_hash(name.GetString())];
-      for (auto &i : buttons.GetArray()) {
-        assert(i.IsArray());
-        auto &&but = i.GetArray();
-        if (but.Size() != 3) {
-          do_log("wtf!cmdchain size mismatch.3 required,%d found", but.Size());
+      auto &buttons = i["buttons"];
+      auto cont     = i["text"].asString("");
+      auto title    = i["title"].asString("");
+      auto &name    = i["name"];
+      assert(buttons.isArray());
+      auto &cf = forms[do_hash(name.asString(""))];
+      for (auto &i : buttons) {
+        assert(i.isArray());
+        if (i.size() != 3) {
+          do_log("wtf!cmdchain size mismatch.3 required,%d found", i.size());
           do_log("Hint:");
-          for (auto &j : but) { do_log("%s", j.GetString()); }
+          for (auto &j : i) do_log("%s", j.asCString() ?: "<undefined>");
           exit(0);
         }
         cf.ordered_cmds.emplace_back(
-            make_pair(string(but[0].GetString()), CMD(but[1].GetString(), but[2].GetString())));
+            make_pair(i[0].asString(""), CMD(i[1].asString(""), i[2].asString(""))));
       }
       cf.init(cont, title);
     }
-    if (typ == "timer") { timers.emplace_back(x["time"].GetInt(), x["shift"].GetInt(), CMD("", x["cmd"].GetString())); }
+    if (typ == "timer") { timers.emplace_back(i["time"].asInt(0), i["shift"].asInt(0), CMD("", i["cmd"].asString(""))); }
   }
 }
 static clock_t lastclk;

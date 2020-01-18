@@ -1,10 +1,10 @@
 #include "myhook.h"
 #include <Loader.h>
 #include <MC.h>
-#include "rapidjson/document.h"
 #include <fstream>
 #include <global.h>
 #include <logger.h>
+#include <minecraft/json.h>
 
 typedef uint64_t u64;
 typedef uint32_t u32;
@@ -37,26 +37,22 @@ THook(void *, _ZN13CircuitSystem8evaluateEP11BlockSource, void *a, void *b) {
 }
 void fast_math() { asm("stmxcsr -0x4(%rsp)\norl $0x8040,-0x4(%rsp)\nldmxcsr -0x4(%rsp)"); }
 void load() {
-  using namespace rapidjson;
-  Document dc;
-  ifstream ff;
-  ff.open("config/opti.json", ios::in);
-  char buf[4096];
-  buf[ff.readsome(buf, 4096)] = 0;
-  ff.close();
-  if (dc.ParseInsitu(buf).HasParseError()) {
-    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+  ifstream ifs{"config/opti.json"};
+  Json::Value value;
+  Json::Reader reader;
+  if (!reader.parse(ifs, value)) {
+    auto msg = reader.getFormattedErrorMessages();
+    do_log("%s", msg.c_str());
     exit(1);
   }
-  if (dc["FastMath"].GetBool()) {
+  if (value["FastMath"].asBool(false)) {
     fast_math();
-    do_log("FastMath");
+    do_log("FastMath enabled");
   }
   // 1.13.1 26581604 1.13.2 26587812 1.14 0x9287ed8 0x78d6840
-  RedStoneMUL = dc["RedStoneMUL"].GetInt();
+  RedStoneMUL = value["RedStoneMUL"].asInt(0);
   float *pp   = (float *) (((uintptr_t) dlsym(NULL, "_ZN10LevelChunk4tickER11BlockSourceRK4Tick")) + 0x19b1698);
-  // to +10000 bytes 26590000
-  int newSpawnDist = dc["pVal"].GetInt();
+  int newSpawnDist = value["pVal"].asInt(0);
   int hit          = -114514;
   for (int i = -5000; i < 10000; ++i) {
     if (pp[i] == 9216) {

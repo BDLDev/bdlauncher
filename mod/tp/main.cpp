@@ -16,6 +16,8 @@
 #include <cstdlib>
 #include <ctime>
 #include "../gui/gui.h"
+#include <fstream>
+#include <minecraft/json.h>
 
 using std::forward_list;
 using std::string;
@@ -499,22 +501,23 @@ THook(void *, _ZN12ServerPlayer9tickWorldERK4Tick, ServerPlayer *sp, unsigned lo
   return res;
 }
 
-#include "rapidjson/document.h"
-using namespace rapidjson;
 static void load_cfg() {
-  Document d;
-  FileBuffer fb("config/tp.json");
-  if (d.ParseInsitu(fb.data).HasParseError()) {
-    do_log("JSON ERROR!");
+  std::ifstream ifs{"config/tp.json"};
+  Json::Value value;
+  Json::Reader reader;
+  if (!reader.parse(ifs, value)){
+    auto msg = reader.getFormattedErrorMessages();
+    do_log("%s", msg.c_str());
     exit(1);
   }
-  CanBack  = d["can_back"].GetBool();
-  CanHome  = d["can_home"].GetBool();
-  CanTP    = d["can_tp"].GetBool();
-  MaxHomes = d["max_homes"].GetInt();
-  if (d.HasMember("TP_TIMEOUT"))
-    TP_TIMEOUT = d["TP_TIMEOUT"].GetInt();
-  else {
+  CanBack  = value["can_back"].asBool(false);
+  CanHome  = value["can_home"].asBool(false);
+  CanTP    = value["can_tp"].asBool(false);
+  MaxHomes = value["max_homes"].asBool(false);
+  auto &timeout = value["TP_TIMEOUT"];
+  if (timeout.isInt()) {
+    TP_TIMEOUT = timeout.asInt(0);
+  } else {
     do_log("NO TP_TIMEOUT FOUND!USE 30s AS DEFAULT!!!");
   }
 }

@@ -1,9 +1,6 @@
 #include <Loader.h>
 #include <MC.h>
 #include "base.h"
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
 #include <fstream>
 #include <cstdarg>
 
@@ -47,33 +44,24 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   save();
   outp.success("§bYou used cdk: " + cdk);
 }
-using namespace rapidjson;
 static void load() {
   cdks.clear();
-  Document dc;
-  FileBuffer fb("config/cdk.json");
-  if (dc.ParseInsitu(fb.data).HasParseError()) {
-    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+  std::ifstream ifs{"config/cdk.json"};
+  Json::Value value;
+  Json::Reader reader;
+  if (!reader.parse(ifs, value)) {
+    auto msg = reader.getFormattedErrorMessages();
+    do_log("%s", msg.c_str());
     exit(1);
   }
-  for (auto &i : dc.GetObject()) { cdks.emplace(i.name.GetString(), i.value.GetString()); }
+  for (auto it = value.begin(); it != value.end(); it++) cdks.emplace(it.key().asString(""), it->asString(""));
 }
 static void save() {
-  Document dc;
-  dc.SetObject();
-  Value v(kStringType), vv(kStringType);
-  for (auto &i : cdks) {
-    v.SetString(i.second.c_str(), dc.GetAllocator());
-    vv.SetString(i.first.c_str(), dc.GetAllocator());
-    dc.AddMember(vv, v, dc.GetAllocator());
-  }
-  StringBuffer buf;
-  Writer<StringBuffer> writer(buf);
-  dc.Accept(writer);
-  ofstream ff;
-  ff.open("config/cdk.json", ios::trunc | ios::out);
-  ff.write(buf.GetString(), buf.GetSize());
-  ff.close();
+  Json::Value value{Json::ValueType::objectValue};
+  for (auto &i : cdks) value[i.first] = {i.second};
+  Json::FastWriter writer;
+  std::ofstream ofs{"config/cdk.json", ios::trunc | ios::out};
+  ofs << writer.write(value);
 }
 void mod_init(std::list<string> &modlist) {
   initlog();

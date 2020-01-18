@@ -17,7 +17,7 @@
 #include <deque>
 #include <dlfcn.h>
 #include <tuple>
-#include "rapidjson/document.h"
+#include <minecraft/json.h>
 #include <fstream>
 #include "../gui/gui.h"
 #include "data.hpp"
@@ -40,17 +40,18 @@ static unordered_map<string, int> choose_state;
 
 int LAND_PRICE, LAND_PRICE2;
 static bool land_tip = true;
-using namespace rapidjson;
 static void loadcfg() {
-  Document dc;
-  FileBuffer fb("config/land.json");
-  if (dc.ParseInsitu(fb.data).HasParseError()) {
-    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+  std::ifstream ifs{"config/land.json"};
+  Json::Value value;
+  Json::Reader reader;
+  if (!reader.parse(ifs, value)) {
+    auto msg = reader.getFormattedErrorMessages();
+    do_log("%s", msg.c_str());
     exit(1);
   }
-  LAND_PRICE  = dc["buy_price"].GetInt();
-  LAND_PRICE2 = dc["sell_price"].GetInt();
-  if (dc.HasMember("land_tip")) land_tip = dc["land_tip"].GetBool();
+  LAND_PRICE  = value["buy_price"].asInt(0);
+  LAND_PRICE2 = value["sell_price"].asInt(0);
+  land_tip    = value["land_tip"].asBool(land_tip);
   if (getenv("NO_LTIP")) land_tip = false;
 }
 static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {

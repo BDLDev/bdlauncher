@@ -1,27 +1,28 @@
 #include <Loader.h>
 #include <MC.h>
 #include "cmdhelper.h"
-#include "rapidjson/document.h"
 #include "base.h"
 #include <fstream>
 #include "seral.hpp"
+#include <minecraft/json.h>
 
-using namespace rapidjson;
 extern "C" {
 BDL_EXPORT void mod_init(std::list<string> &modlist);
 }
 extern void load_helper(std::list<string> &modlist);
 int NoEnderPick, NoExplodeBreak, NoFarm;
 void load() {
-  Document dc;
-  FileBuffer fb("config/protect.json");
-  if (dc.ParseInsitu(fb.data).HasParseError()) {
-    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+  std::ifstream ifs{"config/protect.json"};
+  Json::Reader reader;
+  Json::Value value;
+  if (!reader.parse(ifs, value)) {
+    auto msg = reader.getFormattedErrorMessages();
+    do_log("%s", msg.c_str());
     exit(1);
   }
-  NoEnderPick    = dc["NoEnderPick"].GetBool();
-  NoExplodeBreak = dc["NoExplodeBreak"].GetBool();
-  NoFarm         = dc["NoFarm"].GetBool();
+  NoEnderPick    = value["NoEnderPick"].asBool(false);
+  NoExplodeBreak = value["NoExplodeBreak"].asBool(false);
+  NoFarm         = value["NoFarm"].asBool(false);
 }
 void *dummy() { return nullptr; }
 struct Explosion {

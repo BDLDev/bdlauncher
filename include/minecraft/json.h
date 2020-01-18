@@ -155,8 +155,8 @@ public:
   Value &operator[](const std::string &key);
   const Value &operator[](const std::string &key) const;
   Value &operator[](const StaticString &key);
-  Value get(const char *key, const Value &defaultValue) const;
-  Value get(const std::string &key, const Value &defaultValue) const;
+  Value get(const char *key, const Value &defaultValue = {}) const;
+  Value get(const std::string &key, const Value &defaultValue = {}) const;
   void removeMember(const char *key);
   void removeMember(const std::string &key);
   bool isMember(const char *key) const;
@@ -266,6 +266,8 @@ public:
   SelfType operator--(int);
   SelfType &operator--();
   SelfType &operator++();
+  reference operator*() const;
+  pointer operator->() const { return &deref(); }
 };
 
 class Features {
@@ -293,6 +295,8 @@ public:
   bool parse(const char *beginDoc, const char *endDoc, Value &root, bool collectComments = true);
   bool parse(const char *beginDoc, unsigned long long length, Value &root, bool collectComments = true);
   bool parse(std::istream &is, Value &root, bool collectComments = true);
+
+  std::string getFormattedErrorMessages() const;
 
 private:
   enum TokenType {

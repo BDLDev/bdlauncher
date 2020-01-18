@@ -18,9 +18,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
 #include "gui.h"
 using std::string;
 using std::unordered_map;
@@ -32,7 +29,6 @@ BDL_EXPORT void mod_init(std::list<string> &modlist);
 }
 extern void load_helper(std::list<string> &modlist);
 
-using namespace rapidjson;
 using std::unordered_map;
 using std::vector;
 unordered_map<int, SharedForm *> id_forms;

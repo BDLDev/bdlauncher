@@ -15,6 +15,8 @@
 #include <MC.h>
 #include <unistd.h>
 #include <cstdarg>
+#include <fstream>
+#include <minecraft/json.h>
 #include "base.h"
 #include "../gui/gui.h"
 
@@ -196,7 +198,6 @@ static bool handle_u(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos c
   return 1;
 }
 static void handle_left(ServerPlayer *a1) { async_log("[LEFT] %s left game\n", a1->getName().c_str()); }
-#include "rapidjson/document.h"
 
 static int FPushBlock, FExpOrb, FDest;
 enum CheatType { FLY, NOCLIP, INV, MOVE };
@@ -398,36 +399,31 @@ THook(unsigned long, _ZNK20InventoryTransaction11executeFullER6Playerb, void *_t
   }
   return original(_thi, player, b);
 }
-using namespace rapidjson;
 
 static void _load_config() {
   banitems.clear();
   warnitems.clear();
   banword.clear();
-  Document d;
-  FileBuffer fb("config/bear.json");
-  if (d.ParseInsitu(fb.data).HasParseError()) {
-    do_log("JSON ERROR pos: %ld type: %s!", d.GetErrorOffset(), GetParseErrorFunc(d.GetParseError()));
+  std::ifstream ifs{"config/bear.json"};
+  Json::Value value;
+  Json::Reader reader;
+  if (!reader.parse(ifs, value)) {
+    auto msg = reader.getFormattedErrorMessages();
+    do_log("%s", msg.c_str());
     exit(1);
   }
-  FPushBlock = d["FPushChest"].GetBool();
-  FExpOrb    = d["FSpwanExp"].GetBool();
-  FDest      = d["FDestroyCheck"].GetBool();
-  FChatLimit = d["FChatLimit"].GetBool();
-  LOG_CHEST  = d.HasMember("LogChest") ? d["LogChest"].GetBool() : false;
-  auto &&x   = d["banitems"].GetArray();
-  for (auto &i : x) {
-    if (!banitems.full()) banitems.push_back((short) i.GetInt());
-  }
-  auto &&y = d["warnitems"].GetArray();
-  for (auto &i : y) {
-    if (!warnitems.full()) warnitems.push_back((short) i.GetInt());
-  }
-  auto &&z = d["banwords"].GetArray();
-  for (auto &i : z) {
-    if (!banword.full()) banword.push_back(i.GetString());
-  }
-  MAX_CHAT_SIZE = d.HasMember("MAX_CHAT_LEN") ? d["MAX_CHAT_LEN"].GetInt() : 1000;
+  FPushBlock = value["FPushChest"].asBool(false);
+  FExpOrb    = value["FSpwanExp"].asBool(false);
+  FDest      = value["FDestroyCheck"].asBool(false);
+  FChatLimit = value["FChatLimit"].asBool(false);
+  LOG_CHEST  = value["LogChest"].asBool(false);
+  for (auto &i : value["banitems"]) 
+    if (!banitems.full()) banitems.push_back((short) i.asInt(0));
+  for (auto &i : value["warnitems"]) 
+    if (!warnitems.full()) warnitems.push_back((short) i.asInt(0));
+  for (auto &i : value["banwords"])
+    if (!banword.full()) banword.push_back(i.asString(""));
+  MAX_CHAT_SIZE = value["MAX_CHAT_LEN"].asInt(1000);
 }
 static void load_config(argVec &a, CommandOrigin const &b, CommandOutput &outp) { _load_config(); }
 static Shash_t lastn;

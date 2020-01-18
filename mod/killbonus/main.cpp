@@ -1,13 +1,13 @@
 #include <Loader.h>
 #include <MC.h>
 #include "cmdhelper.h"
-#include "rapidjson/document.h"
+#include <minecraft/json.h>
+#include <fstream>
 #include "base.h"
 #include "../money/money.h"
 #include <fstream>
 #include "main.command.h"
 
-using namespace rapidjson;
 extern "C" {
 BDL_EXPORT void mod_init(std::list<string> &modlist);
 }
@@ -15,21 +15,21 @@ extern void load_helper(std::list<string> &modlist);
 unordered_map<int, std::pair<int, int>> bonus_mp;
 
 void load(CommandOutput *out) {
-  Document dc;
-  std::ifstream ff;
-  FileBuffer fb("config/killbonus.json");
-  if (dc.ParseInsitu(fb.data).HasParseError()) {
-    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+  std::ifstream ifs{"config/killbonus.json"};
+  Json::Value value;
+  Json::Reader reader;
+  if (!reader.parse(ifs, value)) {
+    auto msg = reader.getFormattedErrorMessages();
+    do_log("%s", msg.c_str());
     if (out)
-      out->error("Failed to parse json");
+      out->error(msg);
     else
       exit(1);
-    return;
   }
-  for (auto &i : dc.GetArray()) {
-    auto bMin     = i["MinMoney"].GetInt();
-    auto bMax     = i["MaxMoney"].GetInt();
-    auto eid      = i["eid"].GetInt();
+  for (auto &i : value) {
+    auto bMin     = i["MinMoney"].asInt(0);
+    auto bMax     = i["MaxMoney"].asInt(0);
+    auto eid      = i["eid"].asInt(0);
     bonus_mp[eid] = {bMin, bMax};
   }
   if (out) out->success("Reloaded!");

@@ -1,15 +1,12 @@
 #include <Loader.h>
 #include <MC.h>
 #include "base.h"
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include <minecraft/json.h>
 #include "../money/money.h"
 #include <fstream>
 #include <list>
 
 using namespace std;
-using namespace rapidjson;
 
 extern "C" {
 BDL_EXPORT void mod_init(std::list<string> &modlist);
@@ -59,59 +56,50 @@ static void save() {
   //}
 }
 static void r_save() {
+  using namespace Json;
   if (!DIRTY) return;
   DIRTY = 0;
-  Document dc;
-  dc.SetArray();
+  Value value{ValueType::arrayValue};
   for (auto &i : lc) {
-    Value vv(kObjectType);
-    vv.AddMember("x", i.x, dc.GetAllocator());
-    vv.AddMember("y", i.y, dc.GetAllocator());
-    vv.AddMember("z", i.z, dc.GetAllocator());
-    Value va(kArrayType);
+    Value vv{ValueType::objectValue};
+    vv["x"] = i.x;
+    vv["y"] = i.y;
+    vv["z"] = i.z;
+    Value va{ValueType::arrayValue};
     for (int j = 0; j < 27; ++j) {
-      Value vs(kArrayType);
-      Value vss(kStringType);
-      vss.SetString(i.slots[j].owner.c_str(), dc.GetAllocator());
-      vs.PushBack(vss, dc.GetAllocator());
-      vs.PushBack(i.slots[j].price, dc.GetAllocator());
-      va.PushBack(vs, dc.GetAllocator());
+      Value vs(ValueType::arrayValue);
+      Value vss(i.slots[j].owner);
+      vs.append({i.slots[j].owner});
+      vs.append({i.slots[j].price});
+      va.append(vs);
     }
-    vv.AddMember("slots", va, dc.GetAllocator());
-    dc.PushBack(vv, dc.GetAllocator());
+    vv["slots"] = va;
+    value.append(vv);
   }
-  StringBuffer buf;
-  Writer<StringBuffer> writer(buf);
-  dc.Accept(writer);
-  ofstream ff;
-  ff.open("data/chestshop.json", ios::trunc | ios::out);
-  ff.write(buf.GetString(), buf.GetSize());
+  FastWriter writer;
+  auto data = writer.write(value);
+  ofstream ff{"data/chestshop.json", ios::trunc | ios::out};
+  ff << data;
   ff.close();
 }
 char buf[1024 * 1024 * 16];
 static void load() {
-  Document dc;
-  ifstream ff;
-  ff.open("data/chestshop.json", ios::in);
-  buf[ff.readsome(buf, 1024 * 1024 * 16)] = 0;
-  ff.close();
-  if (strlen(buf) == 0) { strcpy(buf, "[]"); }
-  if (dc.ParseInsitu(buf).HasParseError()) {
-    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+  std::ifstream ifs{"config/chestshop.json"};
+  Json::Value value;
+  Json::Reader reader;
+  if (!reader.parse(ifs, value)) {
+    auto msg = reader.getFormattedErrorMessages();
+    do_log("%s", msg.c_str());
     exit(1);
   }
-  if (dc.IsArray()) {
-    for (auto &i : dc.GetArray()) {
-      Chest ch;
-      ch.x   = i["x"].GetInt();
-      ch.y   = i["y"].GetInt();
-      ch.z   = i["z"].GetInt();
-      int ct = 0;
-      for (auto &j : i["slots"].GetArray()) {
-        ch.slots[ct++] = Slot(string(j.GetArray()[0].GetString()), j.GetArray()[1].GetInt());
-      }
-      lc.emplace_back(ch);
-    }
+  for (auto &i : value) {
+    Chest ch;
+    ch.x   = i["x"].asInt(0);
+    ch.y   = i["y"].asInt(0);
+    ch.z   = i["z"].asInt(0);
+    int ct = 0;
+    for (auto &j : i["slots"]) ch.slots[ct++] = Slot(j[0].asString(""), j[1].asInt(0));
+    lc.emplace_back(ch);
   }
 }
 

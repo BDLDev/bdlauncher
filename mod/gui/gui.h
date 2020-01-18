@@ -1,12 +1,8 @@
 #pragma once
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
 #include <functional>
 #include <vector>
 using std::string;
 using std::vector;
-using namespace rapidjson;
 constexpr string_view button_json = "{\"type\":\"form\",\"title\":\"";
 constexpr string_view input_json  = "{\"type\":\"custom_form\",\"title\":\""; // content
 struct SharedForm {

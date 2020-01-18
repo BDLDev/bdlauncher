@@ -14,7 +14,7 @@
 #include <memory>
 #include "money.h"
 #include <dlfcn.h>
-#include "rapidjson/document.h"
+#include <minecraft/json.h>
 #include <fstream>
 #include "../gui/gui.h"
 #include "lang.h"
@@ -51,15 +51,16 @@ static void load() {
   }
 }
 int INIT_MONEY;
-using namespace rapidjson;
 void loadcfg() {
-  Document dc;
-  FileBuffer fb("config/money.json");
-  if (dc.ParseInsitu(fb.data).HasParseError()) {
-    do_log("JSON ERROR pos: %ld type: %s!", dc.GetErrorOffset(), GetParseErrorFunc(dc.GetParseError()));
+  std::ifstream ifs {"config/money.json"};
+  Json::Value value;
+  Json::Reader reader;
+  if (!reader.parse(ifs, value)) {
+    auto msg = reader.getFormattedErrorMessages();
+    do_log("%s", msg.c_str());
     exit(1);
   }
-  INIT_MONEY = dc["init_money"].GetInt();
+  INIT_MONEY = value["init_money"].asInt(0);
 }
 int get_money(string_view pn) {
   // lazy init
