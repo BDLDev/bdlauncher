@@ -24,6 +24,6 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  if (isatty(0)) return termwrap();
+  if (isatty(0) && getenv("FANCY")) return termwrap();
   return exec_server();
 }
