@@ -112,7 +112,6 @@ void BossbarCommand::show(mandatory<Show>, mandatory<CommandSelector<Player>> ta
   if (!Command::checkHasTargets(results, getOutput())) return;
   for (auto &player : results) {
     auto sp = getSP(player);
-    do_log("%p %p", &player, sp);
     if (!sp) continue;
     SendBB(sp, "", false);
     CreateEntBB(sp);
@@ -141,7 +140,6 @@ void BossbarCommand::pin(mandatory<Pin>, mandatory<std::string> text) {
   PinnedBBar = text;
   for (auto &player : *getSrvLevel()->getUsers()) {
     auto sp = getSP(player);
-    do_log("%p", sp);
     SendBB(sp, "", false);
     CreateEntBB(sp);
     SendBB(sp, text, true);
