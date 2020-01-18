@@ -54,5 +54,6 @@ public:
       CommandOutputMessageType = CommandOutputMessageType::DEFAULT);
   void addToResultList(std::string const &, Actor const &);
   void addToResultList(std::string const &, std::string const &);
+  bool wantsData() const;
   template <typename T> void set(char const *, T);
 };
