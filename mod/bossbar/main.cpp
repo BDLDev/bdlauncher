@@ -1,12 +1,12 @@
 #include <cstdio>
 #include <string>
 #include <unordered_map>
-#include "cmdhelper.h"
 #include <vector>
 #include <Loader.h>
 #include <MC.h>
 #include <unistd.h>
 #include <cstdarg>
+#include "bossbar.command.h"
 
 #include "base.h"
 #include <sys/types.h>
@@ -106,78 +106,72 @@ void CreateEntBB(ServerPlayer *sp) {
   });
   sp->sendNetworkPacket(pk);
 }
-static void cm(argVec &a, CommandOrigin const &b, CommandOutput &c) {
-  FText ft;
-  auto sp = getSP(b.getEntity());
-  //   auto pos = sp->getPos();
-  /*ft.x=pos.x;ft.y=pos.y;ft.z=pos.z;
-  ft.eid=1919810;
-  ft.text="weddwedew";
-  ft.sendTo(sp);*/
-  if (a[0] == "all") {
-    auto *x = getSrvLevel()->getUsers();
-    for (auto &i : *x) {
-      auto sp = i.get();
-      SendBB(sp, "", false);
-      CreateEntBB(sp);
-      SendBB(sp, a[1], true);
-    }
-    c.success();
-    return;
-  }
-  sp = getuser_byname(a[0]);
-  if (sp) {
+
+void BossbarCommand::show(mandatory<Show>, mandatory<CommandSelector<Player>> targets, mandatory<std::string> text) {
+  auto results = targets.results(getOrigin());
+  if (!Command::checkHasTargets(results, getOutput())) return;
+  for (auto &player : results) {
+    auto sp = getSP(player);
+    do_log("%p %p", &player, sp);
+    if (!sp) continue;
     SendBB(sp, "", false);
     CreateEntBB(sp);
-    SendBB(sp, a[1], true);
-    c.success();
+    SendBB(sp, text, true);
+    if (getOutput().wantsData()) getOutput().addToResultList("target", *sp);
   }
+  if (getOutput().wantsData()) getOutput().set("text", text);
+  getOutput().success();
 }
-static void cm2(argVec &a, CommandOrigin const &b, CommandOutput &c) {
-  if (a[0] == "all") {
-    auto *x = getSrvLevel()->getUsers();
-    for (auto &i : *x) {
-      auto sp = i.get();
-      SendBB(sp, "", false);
-    }
-    c.success();
-    return;
-  }
-  auto sp = getuser_byname(a[0]); // getSP(b.getEntity());
-  if (sp) {
+
+void BossbarCommand::hide(mandatory<Hide>, mandatory<CommandSelector<Player>> targets) {
+  auto results = targets.results(getOrigin());
+  if (!Command::checkHasTargets(results, getOutput())) return;
+  for (auto &player : results) {
+    auto sp = getSP(player);
+    if (!sp) continue;
     SendBB(sp, "", false);
-    c.success();
+    if (getOutput().wantsData()) getOutput().addToResultList("target", *sp);
   }
+  getOutput().success();
 }
+
 static string PinnedBBar;
-static void cm_pin(argVec &a, CommandOrigin const &b, CommandOutput &c) {
-  if (a[0] == "unpin") {
-    PinnedBBar.clear();
-    db.Del("pinned");
-    runcmd("hidebb all");
-  } else {
-    SPBuf<1024> sb;
-    sb.write("sendbb all \"");
-    sb.write(a[0]);
-    sb.write("\"");
-    runcmd(sb.get());
-    PinnedBBar = a[0];
-    db.Put("pinned", a[0]);
+
+void BossbarCommand::pin(mandatory<Pin>, mandatory<std::string> text) {
+  PinnedBBar = text;
+  for (auto &player : *getSrvLevel()->getUsers()) {
+    auto sp = getSP(player);
+    do_log("%p", sp);
+    SendBB(sp, "", false);
+    CreateEntBB(sp);
+    SendBB(sp, text, true);
+    if (getOutput().wantsData()) getOutput().addToResultList("target", *sp);
   }
-  c.success();
+  if (getOutput().wantsData()) getOutput().set("text", text);
+  getOutput().success();
 }
+
+void BossbarCommand::unpin(mandatory<Unpin>) {
+  PinnedBBar.clear();
+  for (auto &player : *getSrvLevel()->getUsers()) {
+    auto sp = getSP(player);
+    SendBB(sp, "", false);
+    if (getOutput().wantsData()) getOutput().addToResultList("target", *sp);
+  }
+  getOutput().success();
+}
+
 static void onJoin(ServerPlayer *sp) {
   if (PinnedBBar.size()) {
     CreateEntBB(sp);
     SendBB(sp, PinnedBBar, true);
   }
 }
+
 void mod_init(std::list<string> &modlist) {
   db.Get("pinned", PinnedBBar);
+  register_commands();
   do_log("Loaded " BDL_TAG "");
-  register_cmd("sendbb", cm, "send bb", 1);
-  register_cmd("hidebb", cm2, "hide bb", 1);
-  register_cmd("pinbb", cm_pin, "pin bb", 1);
   reg_player_join(onJoin);
   load_helper(modlist);
 }

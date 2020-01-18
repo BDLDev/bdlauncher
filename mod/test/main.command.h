@@ -59,7 +59,7 @@ public:
 
   void impl(mandatory<CommandSelector<Actor>> selector) {
     auto result = selector.results(getOrigin());
-    for (auto pact : *result) do_log("%p", pact);
+    for (auto &pact : result) do_log("%p %p", &pact, getSP(pact));
     do_log("done");
   }
 };
