@@ -16,7 +16,7 @@ LANG=CN
 BDLTAG=$(shell cat version)
 CFLAGS= -Os
 CFLAGS+= -fPIC -std=gnu17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
-CXXFLAGS+= -fPIC -std=gnu++17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
+CXXFLAGS+= -fPIC -std=gnu++17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\" -Wno-class-memaccess
 
 ifeq (1,$(RELEASE))
 	OBJ_SUFFIX=release
@@ -26,7 +26,7 @@ ifeq (1,$(RELEASE))
 else
 	OBJ_SUFFIX=debug
 	CFLAGS+= -g -DDEBUG -O0 -Wall -Werror
-	CXXFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined -Wall -Werror -Wno-invalid-offsetof -Wno-unknown-warning-option
+	CXXFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined -Wall -Werror -Wno-invalid-offsetof
 	LDFLAGS+= -fsanitize=undefined
 endif
 

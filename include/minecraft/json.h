@@ -91,6 +91,7 @@ public:
   Value(double value);
   Value(const char *value);                  ///< Copy til first 0. (NULL causes to seg-fault.)
   Value(const char *begin, const char *end); ///< Copy all, incl zeroes.
+  Value(std::string_view view) : Value(&view[0], &view[0] + view.size()) {}
   Value(const StaticString &value);
   Value(const std::string &value);
   Value(bool value);
@@ -293,7 +294,7 @@ public:
 
   bool parse(const std::string &document, Value &root, bool collectComments = true);
   bool parse(const char *beginDoc, const char *endDoc, Value &root, bool collectComments = true);
-  bool parse(const char *beginDoc, unsigned long long length, Value &root, bool collectComments = true);
+  bool parse(const char *beginDoc, unsigned long length, Value &root, bool collectComments = true);
   bool parse(std::istream &is, Value &root, bool collectComments = true);
 
   std::string getFormattedErrorMessages() const;

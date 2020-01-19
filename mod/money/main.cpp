@@ -52,7 +52,7 @@ static void load() {
 }
 int INIT_MONEY;
 void loadcfg() {
-  std::ifstream ifs {"config/money.json"};
+  std::ifstream ifs{"config/money.json"};
   Json::Value value;
   Json::Reader reader;
   if (!reader.parse(ifs, value)) {

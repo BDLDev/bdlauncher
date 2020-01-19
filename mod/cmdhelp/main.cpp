@@ -131,12 +131,13 @@ static void load() {
           for (auto &j : i) do_log("%s", j.asCString() ?: "<undefined>");
           exit(0);
         }
-        cf.ordered_cmds.emplace_back(
-            make_pair(i[0].asString(""), CMD(i[1].asString(""), i[2].asString(""))));
+        cf.ordered_cmds.emplace_back(make_pair(i[0].asString(""), CMD(i[1].asString(""), i[2].asString(""))));
       }
       cf.init(cont, title);
     }
-    if (typ == "timer") { timers.emplace_back(i["time"].asInt(0), i["shift"].asInt(0), CMD("", i["cmd"].asString(""))); }
+    if (typ == "timer") {
+      timers.emplace_back(i["time"].asInt(0), i["shift"].asInt(0), CMD("", i["cmd"].asString("")));
+    }
   }
 }
 static clock_t lastclk;

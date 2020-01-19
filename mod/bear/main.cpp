@@ -417,9 +417,9 @@ static void _load_config() {
   FDest      = value["FDestroyCheck"].asBool(false);
   FChatLimit = value["FChatLimit"].asBool(false);
   LOG_CHEST  = value["LogChest"].asBool(false);
-  for (auto &i : value["banitems"]) 
+  for (auto &i : value["banitems"])
     if (!banitems.full()) banitems.push_back((short) i.asInt(0));
-  for (auto &i : value["warnitems"]) 
+  for (auto &i : value["warnitems"])
     if (!warnitems.full()) warnitems.push_back((short) i.asInt(0));
   for (auto &i : value["banwords"])
     if (!banword.full()) banword.push_back(i.asString(""));

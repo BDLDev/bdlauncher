@@ -505,15 +505,15 @@ static void load_cfg() {
   std::ifstream ifs{"config/tp.json"};
   Json::Value value;
   Json::Reader reader;
-  if (!reader.parse(ifs, value)){
+  if (!reader.parse(ifs, value)) {
     auto msg = reader.getFormattedErrorMessages();
     do_log("%s", msg.c_str());
     exit(1);
   }
-  CanBack  = value["can_back"].asBool(false);
-  CanHome  = value["can_home"].asBool(false);
-  CanTP    = value["can_tp"].asBool(false);
-  MaxHomes = value["max_homes"].asBool(false);
+  CanBack       = value["can_back"].asBool(false);
+  CanHome       = value["can_home"].asBool(false);
+  CanTP         = value["can_tp"].asBool(false);
+  MaxHomes      = value["max_homes"].asBool(false);
   auto &timeout = value["TP_TIMEOUT"];
   if (timeout.isInt()) {
     TP_TIMEOUT = timeout.asInt(0);

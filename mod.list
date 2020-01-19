@@ -1,4 +1,5 @@
 base.mod
+rpc.mod
 opti.mod
 command.mod
 gui.mod
