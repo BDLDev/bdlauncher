@@ -94,6 +94,7 @@ void get_input(copoll_co_ref_t co, void *priv) {
   copoll_evt_t evt = {EPOLLIN | EPOLLERR | EPOLLHUP};
   while (copoll_fork(co, 0, &evt)) {
     if (evt.evt == EPOLLIN) { rl_callback_read_char(); }
+    else break;
   }
   readline_co = 0;
 }
@@ -106,7 +107,7 @@ void get_output(copoll_co_ref_t co, void *priv) {
     if (evt.evt == EPOLLIN) {
       ssize_t size = read(ptyfd, output_buffer, sizeof output_buffer);
       wrap_output(output_buffer, size);
-    }
+    } else break;
   }
   output_co = 0;
 }
@@ -120,6 +121,8 @@ void sig_handler(copoll_co_ref_t co, void *priv) {
   sigaddset(&mask, SIGCHLD);
   sigprocmask(SIG_BLOCK, &mask, NULL);
 
+  pid_t pid = *(int *)priv;
+
   int sfd = signalfd(-1, &mask, 0);
   if (sfd == -1) {
     perror("signalfd");
@@ -132,8 +135,7 @@ void sig_handler(copoll_co_ref_t co, void *priv) {
       assert(read(sfd, &fdsi, sizeof fdsi) == sizeof fdsi);
       if (fdsi.ssi_signo == SIGCHLD) {
         int status;
-        wait(&status);
-        if (!WIFEXITED(status)) continue;
+        waitpid(pid, &status, 0);
         if (readline_co) copoll_kill(readline_co);
         if (output_co) copoll_kill(output_co);
         copoll_kill(co);
@@ -142,6 +144,11 @@ void sig_handler(copoll_co_ref_t co, void *priv) {
         kill(pid, SIGINT);
         if (readline_co) copoll_kill(readline_co);
       }
+    } else {
+      if (readline_co) copoll_kill(readline_co);
+      if (output_co) copoll_kill(output_co);
+      copoll_kill(co);
+      break;
     }
   }
 }
@@ -168,7 +175,7 @@ int termwrap() {
     copoll_ctx_ref_t ctx = copoll_init();
     copoll_start(ctx, get_input, NULL, 1024 * 8);
     copoll_start(ctx, get_output, NULL, 1024 * 8);
-    copoll_start(ctx, sig_handler, NULL, 1024 * 8);
+    copoll_start(ctx, sig_handler, &pid, 1024 * 8);
     copoll_fini(ctx);
     printf("\rdone!\n");
     write_history(".bdlauncher_history");
