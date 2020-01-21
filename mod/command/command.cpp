@@ -1,12 +1,12 @@
 #include "command.h"
 #include <Loader.h>
 
-const char meta[] __attribute__((used,section(".meta")))="name:command\n"\
-"version:20200121\n"\
-"author:BDLDev\n"\
-"depend:base@20200121\n"\
-"prio:1"
-;
+const char meta[] __attribute__((used, section("meta"))) =
+    "name:command\n"
+    "version:20200121\n"
+    "author:BDLDev\n"
+    "depend:base@20200121\n"
+    "prio:1";
 
 namespace BDL::CustomCommand {
 

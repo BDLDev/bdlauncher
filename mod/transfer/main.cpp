@@ -3,11 +3,11 @@
 #include "base.h"
 #include "main.command.h"
 
-const char meta[] __attribute__((used,section(".meta")))="name:trans\n"\
-"version:20200121\n"\
-"author:sysca11\n"\
-"depend:base@20200121,command@20200121\n"\
-;
+const char meta[] __attribute__((used, section("meta"))) =
+    "name:trans\n"
+    "version:20200121\n"
+    "author:sysca11\n"
+    "depend:base@20200121,command@20200121\n";
 
 extern "C" {
 BDL_EXPORT void mod_init(std::list<string> &modlist);

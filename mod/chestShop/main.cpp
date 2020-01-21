@@ -6,11 +6,11 @@
 #include <fstream>
 #include <list>
 
-const char meta[] __attribute__((used,section(".meta")))="name:chestshop\n"\
-"version:20200121\n"\
-"author:sysca11\n"\
-"depend:base@20200121,command@20200121,money@20200121\n"\
-;
+const char meta[] __attribute__((used, section("meta"))) =
+    "name:chestshop\n"
+    "version:20200121\n"
+    "author:sysca11\n"
+    "depend:base@20200121,command@20200121,money@20200121\n";
 
 using namespace std;
 
@@ -81,10 +81,10 @@ static void r_save() {
 char buf[1024 * 1024 * 16];
 static void load() {
   struct stat buf;
-  if(stat("config/chestshop.json",&buf)!=0){
-    int fd=open("config/chestshop.json",O_WRONLY|O_CREAT,S_IRUSR|S_IWUSR);
-    static const char empty_json[]="[]";
-    write(fd,empty_json,strlen(empty_json));
+  if (stat("config/chestshop.json", &buf) != 0) {
+    int fd                         = open("config/chestshop.json", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+    static const char empty_json[] = "[]";
+    write(fd, empty_json, strlen(empty_json));
     close(fd);
   }
   std::ifstream ifs{"config/chestshop.json"};
