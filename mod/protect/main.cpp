@@ -6,10 +6,11 @@
 #include "seral.hpp"
 #include <minecraft/json.h>
 
-const char meta[] __attribute__((used,section(".meta")))="name:wprotect\n"\
-"version:20200121\n"\
-"author:sysca11\n"\
-"depend:base@20200121";
+const char meta[] __attribute__((used, section("meta"))) =
+    "name:wprotect\n"
+    "version:20200121\n"
+    "author:sysca11\n"
+    "depend:base@20200121";
 
 extern "C" {
 BDL_EXPORT void mod_init(std::list<string> &modlist);

@@ -24,10 +24,8 @@ void load_helper(std::list<std::string> &modlist) {
 }
 void mod_loadall() {
   std::list<std::string> modlist;
-  modlist=solveAll();
+  modlist = solveAll();
   printf("[MOD] start loading\n");
-  for(auto& i:modlist){
-    printf("%s\n",i.c_str());
-  }
+  for (auto &i : modlist) { printf("%s\n", i.c_str()); }
   load_helper(modlist);
 }

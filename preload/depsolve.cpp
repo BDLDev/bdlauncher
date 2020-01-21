@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <queue>
-using std::string, std::vector, std::list, std::unordered_map,std::priority_queue;
+using std::string, std::vector, std::list, std::unordered_map, std::priority_queue;
 struct TopoDepSolver {
   struct Node {
     string name;
@@ -24,9 +24,7 @@ struct TopoDepSolver {
       int version;
     };
     vector<DepDetail> deps;
-    bool operator<(const Node& c){
-        return load_prio<c.load_prio;
-    }
+    bool operator<(const Node &c) { return load_prio < c.load_prio; }
   };
   unordered_map<string, Node> nodes;
   string getMetaData(const string &fname) {
@@ -54,7 +52,7 @@ struct TopoDepSolver {
       pread(fd, &shdr, sizeof(shdr), shoff);
       // printf("%s\n",buff+shdr.sh_name);
       string secname = buff + shdr.sh_name;
-      if (secname == ".meta") {
+      if (secname == "meta") {
         char *buff2 = (char *) malloc(shdr.sh_size);
         pread(fd, buff2, shdr.sh_size, shdr.sh_offset);
         rv = buff2;
@@ -64,12 +62,12 @@ struct TopoDepSolver {
     close(fd);
     free(buff);
     if (rv == "wtf") {
-      printf("cannot find .meta in %s\n", fname.c_str());
+      printf("cannot find section 'meta' in %s\n", fname.c_str());
       exit(1);
     }
     return rv;
   }
-  void split_string(const string& s, vector<string> &v, char c) {
+  void split_string(const string &s, vector<string> &v, char c) {
     std::string::size_type pos1, pos2;
     pos2 = s.find(c);
     pos1 = 0;
@@ -83,62 +81,56 @@ struct TopoDepSolver {
   Node getNode(const string &meta) {
     Node rv;
     vector<string> kv;
-    split_string(meta,kv,'\n');
-    for(auto& i:kv){
-        auto pos=i.find(':');
-        if(pos==string::npos) continue;
-        string key=i.substr(0,pos);
-        string val=i.substr(pos+1);
-        //printf("key %s val %s\n",key.c_str(),val.c_str());
-        if(key=="name"){
-            rv.name=val;
+    split_string(meta, kv, '\n');
+    for (auto &i : kv) {
+      auto pos = i.find(':');
+      if (pos == string::npos) continue;
+      string key = i.substr(0, pos);
+      string val = i.substr(pos + 1);
+      // printf("key %s val %s\n",key.c_str(),val.c_str());
+      if (key == "name") { rv.name = val; }
+      if (key == "prio") { rv.load_prio = atoi(val.c_str()); }
+      if (key == "version") { rv.version = atoi(val.c_str()); }
+      if (key == "depend") {
+        vector<string> deps;
+        split_string(val, deps, ',');
+        for (auto &j : deps) {
+          auto pos2 = j.find('@');
+          if (pos2 != string::npos) {
+            rv.deps.push_back({j.substr(0, pos2), atoi(j.substr(pos2 + 1).c_str())});
+          } else {
+            rv.deps.push_back({j, 0});
+          }
         }
-        if(key=="prio"){
-            rv.load_prio=atoi(val.c_str());
-        }
-        if(key=="version"){
-            rv.version=atoi(val.c_str());
-        }
-        if(key=="depend"){
-            vector<string> deps;
-            split_string(val,deps,',');
-            for(auto& j:deps){
-                auto pos2=j.find('@');
-                if(pos2!=string::npos){
-                    rv.deps.push_back({j.substr(0,pos2),atoi(j.substr(pos2+1).c_str())});
-                }else{
-                    rv.deps.push_back({j,0});
-                }
-            }
-        }
+      }
     }
     return rv;
   }
   list<string> topoSort() {
-      list<string> rv;
-      priority_queue<Node*> que;
-      for(auto& [mname,i]:nodes){
-          if(i.topo_indeg==0) que.push(&i);
+    list<string> rv;
+    priority_queue<Node *> que;
+    for (auto &[mname, i] : nodes) {
+      if (i.topo_indeg == 0) que.push(&i);
+    }
+    while (!que.empty()) {
+      Node &i = *que.top();
+      que.pop();
+      rv.push_back(i.path);
+      for (Node *out : i.topo_out) {
+        out->topo_indeg--;
+        if (out->topo_indeg == 0) que.push(out);
       }
-      while(!que.empty()){
-          Node& i=*que.top();
-          que.pop();
-          rv.push_back(i.path);
-          for(Node* out:i.topo_out){
-              out->topo_indeg--;
-              if(out->topo_indeg==0) que.push(out);
-          }
-      }
-      if(rv.size()!=nodes.size()){
-        printf("ERROR: unsolved dependency,loop dependency detected???\n");
-        exit(1);
-      }
-      return rv;
+    }
+    if (rv.size() != nodes.size()) {
+      printf("ERROR: unsolved dependency,loop dependency detected???\n");
+      exit(1);
+    }
+    return rv;
   }
   list<string> solve(vector<string> list) {
     for (auto &i : list) {
       auto &&node = getNode(getMetaData(i));
-      node.path=i;
+      node.path   = i;
       nodes.insert({node.name, node});
     }
     // step 1.check dep
@@ -157,12 +149,10 @@ struct TopoDepSolver {
         }
       }
     }
-    //step 2.build edges
+    // step 2.build edges
     for (auto &[mname, i] : nodes) {
-      for (auto &[name, ver] : i.deps) {
-          nodes[name].topo_out.push_back(&i);
-      }
-      i.topo_indeg=i.deps.size();
+      for (auto &[name, ver] : i.deps) { nodes[name].topo_out.push_back(&i); }
+      i.topo_indeg = i.deps.size();
     }
     // step 3.do topoSort
     return topoSort();
@@ -178,14 +168,14 @@ struct TopoDepSolver {
     while ((entry = readdir(dp)) != NULL) {
       if (entry->d_type & DT_REG) {
         string name = entry->d_name;
-        if (name.find(".mod") == name.length() - 4) { modlist.push_back("mods/"+name); }
+        if (name.find(".mod") == name.length() - 4) { modlist.push_back("mods/" + name); }
       }
     }
     closedir(dp);
     return solve(modlist);
   }
 };
-list<string> solveAll(){
-    TopoDepSolver sv;
-    return sv.loadall();
+list<string> solveAll() {
+  TopoDepSolver sv;
+  return sv.loadall();
 }
