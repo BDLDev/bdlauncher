@@ -18,6 +18,13 @@
 #include <fstream>
 #include "../gui/gui.h"
 #include "lang.h"
+
+const char meta[] __attribute__((used,section(".meta")))="name:money\n"\
+"version:20200121\n"\
+"author:sysca11\n"\
+"depend:base@20200121,command@20200121,gui@20200121\n"\
+;
+
 using std::string;
 using std::to_string;
 extern "C" {

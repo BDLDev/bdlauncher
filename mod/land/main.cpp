@@ -22,6 +22,13 @@
 #include "../gui/gui.h"
 #include "data.hpp"
 
+
+const char meta[] __attribute__((used,section(".meta")))="name:land\n"\
+"version:20200121\n"\
+"author:sysca11\n"\
+"depend:base@20200121,command@20200121,gui@20200121,money@20200121\n"\
+;
+
 using std::deque;
 using std::string;
 #define dbg_printf(...)                                                                                                \

@@ -1,4 +1,5 @@
 #include "mods.h"
+#include "depsolve.h"
 void load_helper(std::list<std::string> &modlist) {
   if (modlist.size() == 0) return;
   std::string fplug;
@@ -21,32 +22,12 @@ void load_helper(std::list<std::string> &modlist) {
   }
   ((typeof(&load_helper)) init)(modlist);
 }
-
-static void cook(char *a) {
-  while (*a != 0) {
-    if (*a == '\n') {
-      *a = 0;
-      return;
-    }
-    a++;
-  }
-}
-std::list<std::string> mod_loadall() {
-  std::list<std::string> modlist, ret_list;
-  FILE *fp = fopen("mods/mod.list", "r");
-  if (fp == nullptr) {
-    perror("[MOD] cannot open mods/mod.list\n");
-    exit(1);
-  }
-  char str[108];
-  strcpy(str, "./mods/");
-  while (fgets(str + 7, 100, fp) != nullptr) {
-    cook(str);
-    printf("[MOD] loading %s\n", str);
-    modlist.emplace_back(std::string(str));
-  }
-  ret_list = modlist;
+void mod_loadall() {
+  std::list<std::string> modlist;
+  modlist=solveAll();
   printf("[MOD] start loading\n");
+  for(auto& i:modlist){
+    printf("%s\n",i.c_str());
+  }
   load_helper(modlist);
-  return ret_list;
 }
