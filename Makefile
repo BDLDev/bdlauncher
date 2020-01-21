@@ -17,12 +17,12 @@ BDLTAG=$(shell cat version)
 CFLAGS= -Os
 CFLAGS+= -fPIC -std=gnu17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
 CXXFLAGS+= -fPIC -std=gnu++17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
+#LDFLAGS= -T ldscript
 
 ifeq (1,$(RELEASE))
 	OBJ_SUFFIX=release
 	CFLAGS+= -s -O3 -Wall -Werror
 	CXXFLAGS+= -s -O3
-	LDFLAGS+= -Wl,-z,relro,-z,now
 else
 	OBJ_SUFFIX=debug
 	CFLAGS+= -g -DDEBUG -O0 -Wall -Werror

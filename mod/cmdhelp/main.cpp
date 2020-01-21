@@ -7,6 +7,12 @@
 #include "../gui/gui.h"
 #include <queue>
 
+const char meta[] __attribute__((used,section(".meta")))="name:cmdhelp\n"\
+"version:20200121\n"\
+"author:sysca11\n"\
+"depend:base@20200121,command@20200121,gui@20200121\n"\
+;
+
 using namespace std;
 LDBImpl db("data_v2/joinhook");
 extern "C" {

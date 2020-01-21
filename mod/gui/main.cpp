@@ -21,6 +21,13 @@
 #include "gui.h"
 using std::string;
 using std::unordered_map;
+
+const char meta[] __attribute__((used,section(".meta")))="name:gui\n"\
+"version:20200121\n"\
+"author:sysca11\n"\
+"depend:base@20200121,command@20200121\n"\
+;
+
 #define dbg_printf(...)                                                                                                \
   {}
 //#define dbg_printf printf
