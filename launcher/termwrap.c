@@ -12,7 +12,7 @@
 #include <sys/wait.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-
+#include<pty.h>
 #include <sys/poll.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -22,15 +22,14 @@
 #include "exec_server.h"
 
 static int pid;
-static char *prompt                = "> ";
+static char *prompt = "> ";
 static int logfd;
-static int bds_la_pipe[2];
-static int la_bds_pipe[2];
+static int ptyfd    = 0;
+static FILE *ptyfile;
 void handle_line(char *line) {
   if (line) {
     add_history(line);
-    write(la_bds_pipe[1], line, strlen(line));
-    write(la_bds_pipe[1], "\n", 1);
+    fprintf(ptyfile,"%s\n",line);
   } else
     printf("\r");
 }
@@ -120,23 +119,20 @@ int make_sig_handler() {
 }
 
 int termwrap(const char *logfile) {
-  pipe(bds_la_pipe);
-  pipe(la_bds_pipe);
-  pid = vfork();
+  pid = forkpty(&ptyfd, NULL, NULL, NULL);
   if (pid == -1) {
     perror("vfork");
     return -errno;
   } else if (pid == 0) {
-    dup2(bds_la_pipe[1], STDOUT_FILENO);
-    close(bds_la_pipe[0]);
-    dup2(la_bds_pipe[0], STDIN_FILENO);
-    close(la_bds_pipe[1]);
     prctl(PR_SET_PDEATHSIG, SIGTERM);
     setsid();
     return exec_server();
   } else {
-    close(bds_la_pipe[1]);
-    close(la_bds_pipe[0]);
+    struct termios t;
+    tcgetattr(ptyfd, &t);
+    t.c_lflag &= ~((tcflag_t) ECHO);
+    tcsetattr(ptyfd, TCSANOW, &t);
+    ptyfile = fdopen(ptyfd, "w");
     if (logfile) { init_log(logfile); }
     rl_callback_handler_install(prompt, handle_line);
     rl_bind_key('\t', rl_insert);
@@ -144,11 +140,11 @@ int termwrap(const char *logfile) {
     struct pollfd pollfds[3];
     pollfds[0].fd     = STDIN_FILENO;
     pollfds[0].events = POLLIN;
-    pollfds[1].fd     = bds_la_pipe[0];
+    pollfds[1].fd     = ptyfd;
     pollfds[1].events = POLLIN | POLLERR;
     pollfds[2].fd     = make_sig_handler();
     pollfds[2].events = POLLIN;
-    int DO_POLL=1;
+    int DO_POLL       = 1;
     while (DO_POLL) {
       switch (poll(pollfds, 3, 120000)) {
       case -1: perror("poll"); break;
@@ -156,13 +152,13 @@ int termwrap(const char *logfile) {
       default: {
         if (pollfds[0].revents & POLLIN) { rl_callback_read_char(); }
         if (pollfds[1].revents & POLLIN) {
-          char l_buf[1024];
-          ssize_t sz = read(bds_la_pipe[0], l_buf, 1024);
+          char l_buf[4096];
+          ssize_t sz = read(ptyfd, l_buf, 4096);
           if (sz > 0) wrap_output(l_buf, sz);
         }
         if (pollfds[1].revents & POLLERR) {
           printf("err\n");
-          DO_POLL=0;
+          DO_POLL = 0;
         }
         if (pollfds[2].revents & POLLIN) {
           struct signalfd_siginfo fdsi;
@@ -170,19 +166,17 @@ int termwrap(const char *logfile) {
           if (fdsi.ssi_signo == SIGCHLD) {
             int status;
             wait(&status);
-            if(WIFEXITED(status)){
+            if (WIFEXITED(status)) {
               char buf[512];
-              wrap_output(buf, snprintf(buf,512,"---server stopped and returned %d---\n",WEXITSTATUS(status)));
-              DO_POLL=0;
+              wrap_output(buf, snprintf(buf, 512, "---server stopped and returned %d---\n", WEXITSTATUS(status)));
+              DO_POLL = 0;
             }
-            if(WIFSIGNALED(status)){
+            if (WIFSIGNALED(status)) {
               char buf[512];
-              wrap_output(buf, snprintf(buf,512,"---server stopped by signal %d---\n",WTERMSIG(status)));
-              DO_POLL=0;
+              wrap_output(buf, snprintf(buf, 512, "---server stopped by signal %d---\n", WTERMSIG(status)));
+              DO_POLL = 0;
             }
-            if(WIFSTOPPED(status)){
-              printf("---server stopped by signal,attached by a debugger?? ---\n");
-            }
+            if (WIFSTOPPED(status)) { printf("---server stopped by signal,attached by a debugger?? ---\n"); }
             break;
           } else {
             kill(pid, SIGINT);

@@ -1,3 +1,3 @@
 #pragma once
 
-int termwrap(const char*);
+int termwrap(const char *);
