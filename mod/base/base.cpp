@@ -17,10 +17,11 @@ using std::vector;
 #include <sstream>
 #include <logger.h>
 
-const char meta[] __attribute__((used,section(".meta")))="name:base\n"\
-"version:20200121\n"\
-"author:sysca11\n"\
-"prio:1";
+const char meta[] __attribute__((used, section("meta"))) =
+    "name:base\n"
+    "version:20200121\n"
+    "author:sysca11\n"
+    "prio:1";
 
 extern void load_helper(list<string> &modlist);
 
@@ -317,6 +318,6 @@ void mod_init(list<string> &modlist) {
   fake_vtbl_ply[2] = fake_vtbl_ply[3] = (void *) dummy__;
   mkdir("data_v2", S_IRWXU);
   do_log("loaded! " BDL_TAG);
-  signal(SIGINT,(sighandler_t)autostop);
+  signal(SIGINT, (sighandler_t) autostop);
   load_helper(modlist);
 }
