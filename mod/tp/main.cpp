@@ -19,6 +19,13 @@
 #include <fstream>
 #include <minecraft/json.h>
 
+const char meta[] __attribute__((used,section(".meta")))="name:tp\n"\
+"version:20200121\n"\
+"author:sysca11\n"\
+"depend:base@20200121,command@20200121,gui@20200121\n"\
+;
+
+
 using std::forward_list;
 using std::string;
 using std::unordered_map;

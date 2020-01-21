@@ -6,19 +6,25 @@
 #include <fstream>
 #include <list>
 
+const char meta[] __attribute__((used,section(".meta")))="name:chestshop\n"\
+"version:20200121\n"\
+"author:sysca11\n"\
+"depend:base@20200121,command@20200121,money@20200121\n"\
+;
+
 using namespace std;
 
 extern "C" {
 BDL_EXPORT void mod_init(std::list<string> &modlist);
 }
 extern void load_helper(std::list<string> &modlist);
+static void r_save();
 struct Slot {
   string owner;
   int price; // 0 means no owner
   Slot() { price = 0; }
   Slot(string a, int b) { owner = a, price = b; }
 };
-static void save();
 struct Chest {
   Slot slots[27];
   int x, y, z;
@@ -31,7 +37,7 @@ struct Chest {
       add_money(slots[slot].owner, price);
       slots[slot].price = 0;
       slots[slot].owner = ply;
-      save();
+      r_save();
       return true;
     } else {
       return false;
@@ -42,23 +48,13 @@ struct Chest {
     if (get_price(slot)) return false;
     slots[slot].owner = ply;
     slots[slot].price = price;
-    save();
+    r_save();
     return true;
   }
 };
 list<Chest> lc;
-static int DIRTY;
-static void r_save();
-static void save() {
-  DIRTY++;
-  // if(DIRTY==3){
-  r_save();
-  //}
-}
 static void r_save() {
   using namespace Json;
-  if (!DIRTY) return;
-  DIRTY = 0;
   Value value{ValueType::arrayValue};
   for (auto &i : lc) {
     Value vv{ValueType::objectValue};
@@ -84,6 +80,13 @@ static void r_save() {
 }
 char buf[1024 * 1024 * 16];
 static void load() {
+  struct stat buf;
+  if(stat("config/chestshop.json",&buf)!=0){
+    int fd=open("config/chestshop.json",O_WRONLY|O_CREAT,S_IRUSR|S_IWUSR);
+    static const char empty_json[]="[]";
+    write(fd,empty_json,strlen(empty_json));
+    close(fd);
+  }
   std::ifstream ifs{"config/chestshop.json"};
   Json::Value value;
   Json::Reader reader;
@@ -197,7 +200,7 @@ THook(unsigned long, _ZNK20InventoryTransaction11executeFullER6Playerb, void *_t
       return 6;
     }
     chest->slots[lastslot] = Slot(name, price);
-    save();
+    r_save();
     return original(_thi, player, b);
   }
   if (pullcnt) {
@@ -209,7 +212,7 @@ THook(unsigned long, _ZNK20InventoryTransaction11executeFullER6Playerb, void *_t
         return 6;
       } else {
         x.owner = ""; // release slot
-        save();
+        r_save();
         return original(_thi, player, b);
       }
     }
@@ -277,7 +280,7 @@ static bool handle_u(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos c
     ch.y = a2->y;
     ch.z = a2->z;
     lc.emplace_back(ch);
-    save();
+    r_save();
     sendText(sp, "okay!add shop chest");
     ply_price.erase(it);
     return 0;
@@ -287,7 +290,6 @@ static bool handle_u(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos c
 void mod_init(std::list<string> &modlist) {
   load();
   reg_useitemon(handle_u);
-  register_shutdown(fp(r_save));
   do_log("Loaded");
   register_cmd("cshop", oncmd);
   load_helper(modlist);

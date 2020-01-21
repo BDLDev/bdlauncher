@@ -12,7 +12,7 @@
 #include <sys/wait.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-#include<pty.h>
+#include <pty.h>
 #include <sys/poll.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -24,12 +24,12 @@
 static int pid;
 static char *prompt = "> ";
 static int logfd;
-static int ptyfd    = 0;
+static int ptyfd = 0;
 static FILE *ptyfile;
 void handle_line(char *line) {
   if (line) {
     add_history(line);
-    fprintf(ptyfile,"%s\n",line);
+    fprintf(ptyfile, "%s\n", line);
   } else
     printf("\r");
 }
@@ -146,7 +146,7 @@ int termwrap(const char *logfile) {
     pollfds[2].events = POLLIN;
     int DO_POLL       = 1;
     while (DO_POLL) {
-      switch (poll(pollfds, 3, 120000)) {
+      switch (poll(pollfds, 3, 1200000)) {
       case -1: perror("poll"); break;
       case 0: break;
       default: {

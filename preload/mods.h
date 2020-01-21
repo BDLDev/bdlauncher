@@ -6,4 +6,4 @@
 #include <dlfcn.h>
 #include <string>
 
-std::list<std::string> mod_loadall();
+void mod_loadall();

@@ -17,6 +17,11 @@ using std::vector;
 #include <sstream>
 #include <logger.h>
 
+const char meta[] __attribute__((used,section(".meta")))="name:base\n"\
+"version:20200121\n"\
+"author:sysca11\n"\
+"prio:1";
+
 extern void load_helper(list<string> &modlist);
 
 extern "C" {
@@ -36,7 +41,6 @@ THook(
     ServerPlayer *a1, Level *a2, void *a3, void *a4, void *a5, void *a6, NetworkIdentifier *a7, unsigned char a8,
     void *a9, void *a10, void *a10_1, string *a11, Certificate *a12, void *a13) {
   auto ret = original(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a10_1, a11, a12, a13);
-  // memcpy(sp_net[a1].first,a7,0x98);
   if (SPEC_NETI_OFFSET == 0) {
     // seek for neti offset
     for (int i = 2000; i < 4000; ++i) {
@@ -237,7 +241,6 @@ THook(
   dserver = t;
   return original(t, b);
 }
-void set_int_handler(void *fn);
 static int ctrlc;
 static void autostop() {
   ctrlc++;
@@ -314,6 +317,6 @@ void mod_init(list<string> &modlist) {
   fake_vtbl_ply[2] = fake_vtbl_ply[3] = (void *) dummy__;
   mkdir("data_v2", S_IRWXU);
   do_log("loaded! " BDL_TAG);
-  set_int_handler(fp(autostop));
+  signal(SIGINT,(sighandler_t)autostop);
   load_helper(modlist);
 }
