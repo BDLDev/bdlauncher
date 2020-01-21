@@ -130,7 +130,7 @@ install-modlist: mod.list
 
 _BIN_LAUNCHER_SRC=$(wildcard launcher/*.c)
 _BIN_LAUNCHER_OBJ=$(patsubst launcher/%.c,obj/launcher_%_$(OBJ_SUFFIX).o,$(_BIN_LAUNCHER_SRC))
-_BIN_LAUNCHER_LIB=obj/copoll.a -lreadline -lutil
+_BIN_LAUNCHER_LIB=-lreadline -lutil
 
 $(BIN_LAUNCHER): $(_BIN_LAUNCHER_OBJ) $(_BIN_LAUNCHER_LIB)
 	$(call link,$@,,$^)
@@ -144,16 +144,8 @@ $(DLL_PRELOAD): $(_DLL_PRELOAD_OBJ) $(_DLL_PRELOAD_LIB)
 
 # Object Target
 
-obj/copoll.a: obj/copoll_copoll.o obj/copoll_ctx.o
-	$(call makearchive,$@,$^)
-
-obj/copoll_%.o: copoll/%.c
-	$(call compilec,$@,$< -Wall -Werror)
-obj/copoll_%.o: copoll/%.S
-	$(call compilec,$@,$< -Wall -Werror)
-
 obj/launcher_%_$(OBJ_SUFFIX).o: launcher/%.c obj/launcher_%_$(OBJ_SUFFIX).d
-	$(call compilec,$@,$< -Wall -Werror -I copoll)
+	$(call compilec,$@,$< -Wall -Werror)
 .PRECIOUS: obj/launcher_%_$(OBJ_SUFFIX).d
 obj/launcher_%_$(OBJ_SUFFIX).d: launcher/%.c
 	$(call makedep,$@,$<)
