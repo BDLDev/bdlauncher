@@ -8,6 +8,7 @@
 #include "shared.h"
 #include "exec_server.h"
 #include "termwrap.h"
+#include <getopt.h>
 
 char const *bedrock_server = "./bedrock_server";
 
@@ -24,6 +25,6 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  if (isatty(0) && getenv("FANCY")) return termwrap();
+  if (isatty(0) && getenv("FANCY")) return termwrap(argc >= 3 ? argv[2] : NULL);
   return exec_server();
 }

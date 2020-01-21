@@ -5,7 +5,6 @@
 #include <signal.h>
 #include <errno.h>
 #include <stdio.h>
-#include <pty.h>
 #include <sys/socket.h>
 #include <sys/prctl.h>
 #include <sys/epoll.h>
@@ -13,24 +12,37 @@
 #include <sys/wait.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-
-#include <copoll.h>
+#include<pty.h>
+#include <sys/poll.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "termwrap.h"
 #include "exec_server.h"
 
 static int pid;
 static char *prompt = "> ";
+static int logfd;
 static int ptyfd    = 0;
 static FILE *ptyfile;
-static copoll_co_ref_t readline_co = NULL, output_co = NULL;
-
 void handle_line(char *line) {
   if (line) {
     add_history(line);
-    fprintf(ptyfile, "%s\n", line);
+    fprintf(ptyfile,"%s\n",line);
   } else
     printf("\r");
+}
+void write_log(char *data, ssize_t length) {
+  if (logfd) write(logfd, data, length);
+}
+void init_log(const char *logname) {
+  logfd = open(logname, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+  if (logfd == -1) {
+    perror("open log");
+    exit(1);
+  }
+  write_log("---starting server---\n", strlen("---starting server---\n"));
 }
 
 void wrap_output(char *data, ssize_t length) {
@@ -41,6 +53,7 @@ void wrap_output(char *data, ssize_t length) {
   rl_set_prompt("");
   rl_replace_line("", 0);
   rl_redisplay();
+  write_log(data, length);
   while (length--) {
     char unsigned ch = (char unsigned) *data++;
     switch (ch) {
@@ -86,33 +99,10 @@ void wrap_output(char *data, ssize_t length) {
   rl_replace_line(saved_line, 0);
   rl_point = saved_point;
   rl_redisplay();
-  free(saved_line);
+  rl_free(saved_line);
 }
 
-void get_input(copoll_co_ref_t co, void *priv) {
-  readline_co      = co;
-  copoll_evt_t evt = {EPOLLIN | EPOLLERR | EPOLLHUP};
-  while (copoll_fork(co, 0, &evt)) {
-    if (evt.evt == EPOLLIN) { rl_callback_read_char(); }
-    else break;
-  }
-  readline_co = 0;
-}
-
-void get_output(copoll_co_ref_t co, void *priv) {
-  static char output_buffer[16384];
-  output_co        = co;
-  copoll_evt_t evt = {EPOLLIN | EPOLLERR | EPOLLHUP};
-  while (copoll_fork(co, ptyfd, &evt)) {
-    if (evt.evt == EPOLLIN) {
-      ssize_t size = read(ptyfd, output_buffer, sizeof output_buffer);
-      wrap_output(output_buffer, size);
-    } else break;
-  }
-  output_co = 0;
-}
-
-void sig_handler(copoll_co_ref_t co, void *priv) {
+int make_sig_handler() {
   sigset_t mask;
   sigemptyset(&mask);
   sigaddset(&mask, SIGINT);
@@ -120,43 +110,18 @@ void sig_handler(copoll_co_ref_t co, void *priv) {
   sigaddset(&mask, SIGTERM);
   sigaddset(&mask, SIGCHLD);
   sigprocmask(SIG_BLOCK, &mask, NULL);
-
-  pid_t pid = *(int *)priv;
-
   int sfd = signalfd(-1, &mask, 0);
   if (sfd == -1) {
     perror("signalfd");
-    return;
+    exit(1);
   }
-  copoll_evt_t evt = {EPOLLIN | EPOLLERR | EPOLLHUP};
-  while (copoll_fork(co, sfd, &evt)) {
-    struct signalfd_siginfo fdsi;
-    if (evt.evt == EPOLLIN) {
-      assert(read(sfd, &fdsi, sizeof fdsi) == sizeof fdsi);
-      if (fdsi.ssi_signo == SIGCHLD) {
-        int status;
-        waitpid(pid, &status, 0);
-        if (readline_co) copoll_kill(readline_co);
-        if (output_co) copoll_kill(output_co);
-        copoll_kill(co);
-        break;
-      } else {
-        kill(pid, SIGINT);
-        if (readline_co) copoll_kill(readline_co);
-      }
-    } else {
-      if (readline_co) copoll_kill(readline_co);
-      if (output_co) copoll_kill(output_co);
-      copoll_kill(co);
-      break;
-    }
-  }
+  return sfd;
 }
 
-int termwrap() {
+int termwrap(const char *logfile) {
   pid = forkpty(&ptyfd, NULL, NULL, NULL);
   if (pid == -1) {
-    perror("fork");
+    perror("vfork");
     return -errno;
   } else if (pid == 0) {
     prctl(PR_SET_PDEATHSIG, SIGTERM);
@@ -168,15 +133,58 @@ int termwrap() {
     t.c_lflag &= ~((tcflag_t) ECHO);
     tcsetattr(ptyfd, TCSANOW, &t);
     ptyfile = fdopen(ptyfd, "w");
+    if (logfile) { init_log(logfile); }
     rl_callback_handler_install(prompt, handle_line);
     rl_bind_key('\t', rl_insert);
     read_history(".bdlauncher_history");
-
-    copoll_ctx_ref_t ctx = copoll_init();
-    copoll_start(ctx, get_input, NULL, 1024 * 8);
-    copoll_start(ctx, get_output, NULL, 1024 * 8);
-    copoll_start(ctx, sig_handler, &pid, 1024 * 8);
-    copoll_fini(ctx);
+    struct pollfd pollfds[3];
+    pollfds[0].fd     = STDIN_FILENO;
+    pollfds[0].events = POLLIN;
+    pollfds[1].fd     = ptyfd;
+    pollfds[1].events = POLLIN | POLLERR;
+    pollfds[2].fd     = make_sig_handler();
+    pollfds[2].events = POLLIN;
+    int DO_POLL       = 1;
+    while (DO_POLL) {
+      switch (poll(pollfds, 3, 120000)) {
+      case -1: perror("poll"); break;
+      case 0: break;
+      default: {
+        if (pollfds[0].revents & POLLIN) { rl_callback_read_char(); }
+        if (pollfds[1].revents & POLLIN) {
+          char l_buf[4096];
+          ssize_t sz = read(ptyfd, l_buf, 4096);
+          if (sz > 0) wrap_output(l_buf, sz);
+        }
+        if (pollfds[1].revents & POLLERR) {
+          printf("err\n");
+          DO_POLL = 0;
+        }
+        if (pollfds[2].revents & POLLIN) {
+          struct signalfd_siginfo fdsi;
+          assert(read(pollfds[2].fd, &fdsi, sizeof fdsi) == sizeof fdsi);
+          if (fdsi.ssi_signo == SIGCHLD) {
+            int status;
+            wait(&status);
+            if (WIFEXITED(status)) {
+              char buf[512];
+              wrap_output(buf, snprintf(buf, 512, "---server stopped and returned %d---\n", WEXITSTATUS(status)));
+              DO_POLL = 0;
+            }
+            if (WIFSIGNALED(status)) {
+              char buf[512];
+              wrap_output(buf, snprintf(buf, 512, "---server stopped by signal %d---\n", WTERMSIG(status)));
+              DO_POLL = 0;
+            }
+            if (WIFSTOPPED(status)) { printf("---server stopped by signal,attached by a debugger?? ---\n"); }
+            break;
+          } else {
+            kill(pid, SIGINT);
+          }
+        }
+      } break;
+      }
+    }
     printf("\rdone!\n");
     write_history(".bdlauncher_history");
     rl_callback_handler_remove();
