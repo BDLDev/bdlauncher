@@ -33,22 +33,22 @@ public:
   void query(mandatory<Query> mode);
   void buy(mandatory<Buy> mode);
   void sell(mandatory<Sell> mode);
-  void trust(mandatory<Trust> mode,mandatory<std::string> target);
-  void untrust(mandatory<Untrust> mode,mandatory<std::string> target);
+  void trust(mandatory<Trust> mode, mandatory<std::string> target);
+  void untrust(mandatory<Untrust> mode, mandatory<std::string> target);
   void trustgui(mandatory<Trustgui> mode);
   void untrustgui(mandatory<Untrustgui> mode);
-  void perm(mandatory<Perm> mode,mandatory<int> perm);
-  void give(mandatory<Give> mode,mandatory<CommandSelector<Player>> target);
+  void perm(mandatory<Perm> mode, mandatory<int> perm);
+  void give(mandatory<Give> mode, mandatory<CommandSelector<Player>> target);
 };
 
-//op
+// op
 enum class Forceperm { forceperm };
 enum class Dumpall { dumpall };
 enum class Fix { fix };
 enum class Reload { reload };
 struct LDOCommand : CustomCommandContext {
 public:
-  //inline static alias_list aliases  = {"ld"};
+  // inline static alias_list aliases  = {"ld"};
   static constexpr auto name        = "land_op";
   static constexpr auto description = "Land functions";
   static constexpr auto permission  = CommandPermissionLevel::OP;

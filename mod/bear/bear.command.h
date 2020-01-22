@@ -11,8 +11,7 @@ enum class Invchk { invchk };
 enum class Reload { reload };
 enum class Kick { kick };
 enum class Mute { mute };
-enum class Bangui {bangui};
-
+enum class Bangui { bangui };
 
 struct ACCommand : CustomCommandContext {
 public:
@@ -27,7 +26,7 @@ public:
   void unban(mandatory<Unban> mode, mandatory<std::string> target);
   void invchk(mandatory<Invchk> mode, mandatory<CommandSelector<Player>> target);
   void reload(mandatory<Reload> mode);
-  void kick(mandatory<Kick> mode,mandatory<std::string> target);
-  void mute(mandatory<Mute> mode,mandatory<CommandSelector<Player>> target,mandatory<int> time);
+  void kick(mandatory<Kick> mode, mandatory<std::string> target);
+  void mute(mandatory<Mute> mode, mandatory<CommandSelector<Player>> target, mandatory<int> time);
   void bangui(mandatory<Bangui> mode);
 };
