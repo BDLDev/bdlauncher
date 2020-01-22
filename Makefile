@@ -21,7 +21,7 @@ CXXFLAGS+= -fPIC -std=gnu++17 -DLANG=$(LANG) -DBDL_TAG=\"$(BDLTAG)\"
 ifeq (1,$(RELEASE))
 	OBJ_SUFFIX=release
 	CFLAGS+= -s -O3 -Wall -Werror
-	CXXFLAGS+= -s -O3
+	CXXFLAGS+= -s -O3 -Wno-invalid-offsetof
 else
 	OBJ_SUFFIX=debug
 	CFLAGS+= -g -DDEBUG -O0 -Wall -Werror

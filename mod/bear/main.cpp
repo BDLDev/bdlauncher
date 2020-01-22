@@ -19,7 +19,8 @@
 #include <minecraft/json.h>
 #include "base.h"
 #include "../gui/gui.h"
-
+#include"bear.command.h"
+#include <ctime>
 #include <cmath>
 #include <deque>
 #include <dlfcn.h>
@@ -63,39 +64,8 @@ bool isBanned(const string &name) {
     return 0;
   }
 }
-size_t MAX_CHAT_SIZE;
-static_deque<string, 128> banword;
-static int logfd;
-static int logsz;
-static void initlog() {
-  logfd = open("player.log", O_WRONLY | O_APPEND | O_CREAT, S_IRWXU);
-  logsz = lseek(logfd, 0, SEEK_END);
-}
-static void async_log(const char *fmt, ...) {
-  char buf[1024];
-  auto x = time(0);
-  va_list vl;
-  va_start(vl, fmt);
-  auto tim = strftime(buf, 128, "[%Y-%m-%d %H:%M:%S] ", localtime(&x));
-  int s    = vsnprintf(buf + tim, 1024, fmt, vl) + tim;
-  write(1, buf, s);
-  write(logfd, buf, s);
-  va_end(vl);
-}
-
-#include <sys/socket.h>
-#include <arpa/inet.h>
-ssize_t (*rori)(int socket, void *buffer, size_t length, int flags, struct sockaddr *address, socklen_t *address_len);
-static ssize_t
-recvfrom_hook(int socket, void *buffer, size_t length, int flags, struct sockaddr *address, socklen_t *address_len) {
-  int rt = rori(socket, buffer, length, flags, address, address_len);
-  if (rt && ((char *) buffer)[0] == 0x5) {
-    char buf[1024];
-    inet_ntop(AF_INET, &(((sockaddr_in *) address)->sin_addr), buf, *address_len);
-    async_log("[NETWORK] %s send conn\n", buf);
-  }
-  return rt;
-}
+#include "log.hpp"
+#include "network.hpp"
 THook(
     void *, _ZN20ServerNetworkHandler22_onClientAuthenticatedERK17NetworkIdentifierRK11Certificate,
     ServerNetworkHandler *snh, NetworkIdentifier &a, Certificate &b) {
@@ -105,16 +75,50 @@ THook(
   string val;
   auto succ = ban_data.Get(xuid, val);
   if (!succ) { ban_data.Put(xuid, pn); }
-  // do_log("%p",getMC());
-  // do_log("%p",getMC()->getNetworkHandler());
-  // do_log("%p %p",snh,getMC()->getNetEventCallback());
   if (isBanned(pn) || (succ && isBanned(val))) {
     snh->disconnectClient(a, YOU_R_BANNED, false);
     return nullptr;
   }
   return original(snh, a, b);
 }
+
+size_t MAX_CHAT_SIZE;
+static_deque<string, 128> banword;
+template<const int size,const int delta>
+struct timeq{
+  pair<ServerPlayer*,clock_t> pool[size];
+  int ptr=0;
+  bool push(ServerPlayer* sp){
+    auto now=clock();
+    pool[ptr++]={sp,now};
+    if(ptr==size) ptr=0;
+    int cnt=0;
+    clock_t first=LONG_MAX;
+    for(auto& [p,clk]:pool){
+      if(p==sp){
+        if(clk<first) first=clk;
+        cnt++;
+      }
+    }
+    if(cnt<=1) return true;
+    if((cnt-1)*delta>now-first) return false;
+    return true;
+  }
+};
+
+#include"ChatSan.hpp"
 unordered_map<string, time_t> mute_time;
+static bool is_muted(const string& name){
+  auto it = mute_time.find(name);
+  if (it != mute_time.end()) {
+    if (it->second != 0 && time(0) > it->second) {
+      mute_time.erase(it);
+    } else {
+      return true;
+    }
+  }
+  return false;
+}
 static bool hkc(ServerPlayer *b, string &c) {
   if (c.size() > MAX_CHAT_SIZE) {
     sendText(b, "too long chat");
@@ -129,49 +133,44 @@ static bool hkc(ServerPlayer *b, string &c) {
       return 0;
     }
   }
-  auto it = mute_time.find(b->getName());
-  if (it != mute_time.end()) {
-    if (it->second != 0 && time(0) > it->second) {
-      mute_time.erase(it);
-    } else {
-      sendText(b, "You're muted!");
-      return 0;
-    }
+  auto& name=b->getName();
+  if(is_muted(name)){
+    sendText(b,"You're muted");
+    return 0;
   }
-  async_log("[CHAT] %s: %s\n", b->getName().c_str(), c.c_str());
+  async_log("[CHAT] %s: %s\n", name.c_str(), c.c_str());
   return 1;
 }
-static void oncmd_mute(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
-  ARGSZ(2)
-  int to = atoi(a[1]);
-  if (to == -1)
-    mute_time[string(a[0])] = 0; // always
-  else
-    mute_time[string(a[0])] = time(0) + to;
-}
-static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
-  ARGSZ(1)
-  if ((int) b.getPermissionsLevel() > 0) {
-    auto tim = a.size() == 1 ? 0 : (time(0) + atoi(a[1]));
-    ban_data.Put(a[0], string((char *) &tim, 4));
-    auto x = getuser_byname(string(a[0]));
-    if (x) { ban_data.Put(x->getXUID(), x->getName()); }
-    runcmd(string("skick \"") + string(a[0]) + "\" §cYou are banned");
-    outp.success("§b" + string(a[0]) + " has been banned");
+
+
+void ACCommand::mute(mandatory<Mute>,mandatory<CommandSelector<Player>> target,mandatory<int> time_){
+  int to = time_==-1?0:(time(0)+to);
+  auto results = target.results(getOrigin());
+  if (!Command::checkHasTargets(results, getOutput())) return;
+  for (auto &player : results) {
+    mute_time[player.getName()] = to;
+    getOutput().addMessage(player.getName()+" has been muted");
   }
+  getOutput().success();
 }
-static void oncmd2(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
-  ARGSZ(1)
-  if ((int) b.getPermissionsLevel() > 0) {
-    ban_data.Del(a[0]);
-    outp.success("§b" + string(a[0]) + " has been unbanned");
-  }
+void ACCommand::ban(mandatory<Ban>,mandatory<string> target,optional<int> time_) {
+    auto& tg=target;
+    do_log("ban time: %d",time_);
+    auto tim = time_==0 ? 0 : (time(0) + time_);
+    ban_data.Put(target, string((char *) &tim, 4));
+    auto x = getuser_byname(target);
+    if (x) { 
+      ban_data.Put(x->getXUID(), x->getName());
+      forceKickPlayer(*x);
+    }
+    getOutput().success("§b" + target + " has been banned");
 }
-// add custom
+void ACCommand::unban(mandatory<Unban>,mandatory<string> target){
+  ban_data.Del(target);
+  getOutput().success();
+}
 using std::unordered_set;
-// static unordered_set<short> banitems,warnitems;
 static static_deque<short, 64> banitems, warnitems;
-static bool dbg_player;
 static int LOG_CHEST;
 THook(void *, _ZN15ChestBlockActor9startOpenER6Player, BlockActor &ac, Player &pl) {
   if (LOG_CHEST) {
@@ -181,11 +180,6 @@ THook(void *, _ZN15ChestBlockActor9startOpenER6Player, BlockActor &ac, Player &p
   return original(ac, pl);
 }
 static bool handle_u(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos const *dstPos, Block const *a5) {
-  if (dbg_player) { sendText(a0->getPlayer(), "you use id " + std::to_string(a1->getId())); }
-  /*if(LOG_CHEST && a5->getLegacyBlock()->getBlockItemId()==54){
-      async_log("[CHEST] %s open chest pos: %d %d %d\n",a0->getPlayer()->getName().c_str(),a2->x,a2->y,a2->z);
-  }*/
-  // do_log("dbg use %s",a0->getPlayer()->getCarriedItem().toString().c_str());
   if (a0->getPlayer()->getPlayerPermissionLevel() > 1) return 1;
   auto &sn = a0->getPlayer()->getName();
   if (banitems.has(a1->getId())) {
@@ -210,7 +204,7 @@ enum CheatType { FLY, NOCLIP, INV, MOVE };
 static void notifyCheat(const string &name, CheatType x) {
   const char *CName[] = {"FLY", "NOCLIP", "Creative", "Teleport"};
   async_log("[%s] detected for %s\n", CName[x], name.c_str());
-  string kick = string("skick \"") + name + "\" §cYou are banned";
+  string kick = string("ac kick \"") + name + "\" §cYou are banned";
   switch (x) {
   case FLY: runcmd(kick); break;
   case NOCLIP: runcmd(kick); break;
@@ -226,51 +220,6 @@ THook(void *, _ZN5BlockC2EtR7WeakPtrI11BlockLegacyE, Block *a, unsigned short x,
     if (a->isContainerBlock()) leg->addBlockProperty({0x1000000LL});
   }
   return ret;
-}
-
-static unordered_map<STRING_HASH, clock_t> lastchat;
-static int FChatLimit;
-static ServerPlayer *lastchat_fast;
-static clock_t lastchat_fast_c;
-static bool ChatLimit(ServerPlayer *p) {
-  if (!FChatLimit || p->getPlayerPermissionLevel() > 1) return true;
-  if (lastchat_fast == p) {
-    auto delta = clock() - lastchat_fast_c;
-    if (delta <= CLOCKS_PER_SEC / 10) return false;
-  }
-  lastchat_fast   = p;
-  lastchat_fast_c = clock();
-  auto hash       = do_hash(p->getName());
-  auto last       = lastchat.find(hash);
-  if (last != lastchat.end()) {
-    auto old     = last->second;
-    auto now     = clock();
-    last->second = now;
-    if (now - old < CLOCKS_PER_SEC / 10) return false;
-    return true;
-  } else {
-    lastchat.insert({hash, clock()});
-    return true;
-  }
-}
-
-THook(
-    void *, _ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK10TextPacket, ServerNetworkHandler *sh,
-    NetworkIdentifier const &iden, Packet *pk) {
-  ServerPlayer *p = sh->_getServerPlayer(iden, pk->getClientSubId());
-  if (p) {
-    if (ChatLimit(p)) return original(sh, iden, pk);
-  }
-  return nullptr;
-}
-THook(
-    void *, _ZN20ServerNetworkHandler6handleERK17NetworkIdentifierRK20CommandRequestPacket, ServerNetworkHandler *sh,
-    NetworkIdentifier const &iden, Packet *pk) {
-  ServerPlayer *p = sh->_getServerPlayer(iden, pk->getClientSubId());
-  if (p) {
-    if (ChatLimit(p)) return original(sh, iden, pk);
-  }
-  return nullptr;
 }
 
 THook(
@@ -431,141 +380,81 @@ static void _load_config() {
     if (!banword.full()) banword.push_back(i.asString(""));
   MAX_CHAT_SIZE = value["MAX_CHAT_LEN"].asInt(1000);
 }
-static void load_config(argVec &a, CommandOrigin const &b, CommandOutput &outp) { _load_config(); }
-static Shash_t lastn;
-static clock_t lastcl;
-static int fd_count;
-#include <ctime>
-USED static int handle_dest(GameMode *a0, BlockPos const &a1, unsigned char a2) {
+void ACCommand::reload(mandatory<Reload>){ _load_config(); getOutput().success(); }
+
+timeq<6,(int)(CLOCKS_PER_SEC*0.1)> fastdq;
+static bool handle_dest(GameMode *a0, BlockPos const *a1) {
   if (!FDest) return 1;
   auto sp = a0->getPlayer();
   int pl  = sp->getPlayerPermissionLevel();
   if (pl > 1 || sp->isCreative()) { return 1; }
-  auto hash = sp->getNameTagAsHash();
-  int x(a1.x), y(a1.y), z(a1.z);
-  Block &bk = *sp->getBlockSource()->getBlock(a1);
-  int id    = bk.getLegacyBlock()->getBlockItemId();
-  if (id == 7 || id == 416) {
-    notifyCheat(sp->getName(), CheatType::INV);
-    return 0;
-  }
-  if (hash == lastn && clock() - lastcl < CLOCKS_PER_SEC * (10.0 / 1000) /*10ms*/) {
-    lastcl = clock();
-    fd_count++;
-    if (fd_count >= 5) {
-      fd_count = 3;
-      return 0;
-    }
-  } else {
-    lastn    = hash;
-    lastcl   = clock();
-    fd_count = 0;
-  }
+  int x(a1->x), y(a1->y), z(a1->z);
   const Vec3 &fk = a0->getPlayer()->getPos();
-#define abs(x) ((x) < 0 ? -(x) : (x))
+  #define abs(x) ((x) < 0 ? -(x) : (x))
   int dx = fk.x - x;
   int dy = fk.y - y;
   int dz = fk.z - z;
   int d2 = dx * dx + dy * dy + dz * dz;
   if (d2 > 45) { return 0; }
+  if(!fastdq.push(sp)){
+    return 0;
+  }
+  /*Block &bk = *sp->getBlockSource()->getBlock(*a1);
+  int id    = bk.getLegacyBlock()->getBlockItemId();
+  if (id == 7 || id == 416) {
+    notifyCheat(sp->getName(), CheatType::INV);
+    return 0;
+  }*/
   return 1;
 }
-static void toggle_dbg(argVec &a, CommandOrigin const &b, CommandOutput &outp) { dbg_player = !dbg_player; }
-static void kick_cmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
-  ARGSZ(1)
-  if ((int) b.getPermissionsLevel() > 0) {
-    auto x = getuser_byname(a[0]);
-    if (x) {
-      forceKickPlayer(*x);
-      outp.success("§bKicked player");
-    } else {
-      outp.error("Player not found!");
-    }
-  }
+void ACCommand::kick(mandatory<Kick>,mandatory<string> target){
+  auto sp=getplayer_byname2(target);
+  if(!sp) {getOutput().error("cant found");return;}
+    forceKickPlayer(*sp);
+    getOutput().addMessage("Kicked "+sp->getName());
+  getOutput().success();
 }
-static void bangui_cmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
-  gui_ChoosePlayer((ServerPlayer *) b.getEntity(), "ban", "ban", [](ServerPlayer *sp, string_view dst) {
+void ACCommand::bangui(mandatory<Bangui>){
+  auto sp=getSP(getOrigin().getEntity());
+  if(sp){
+    gui_ChoosePlayer(sp, "ban", "ban", [](ServerPlayer *sp, string_view dst) {
     SPBuf sb;
     sb.write("ban \""sv);
     sb.write(dst);
     sb.write("\""sv);
     runcmdAs(sb.get(), sp);
   });
-}
-THook(void *, _ZN5Actor9addEffectERK17MobEffectInstance, Actor &ac, MobEffectInstance *mi) {
-  if (mi->getId() == 14) {
-    auto sp = getSP(ac);
-    if (sp) {
-      if (sp->getPlayerPermissionLevel() <= 1) {
-        async_log("[EFFECT] %s used self-hiding effect\n", sp->getName().c_str());
-      }
-    }
+  getOutput().success();
   }
-  return original(ac, mi);
 }
-static string dumpSP(ServerPlayer &sp) {
-  string ret;
-  auto &x = sp.getSupplies();
-  int sz  = x.getContainerSize((ContainerID) 0ul);
-  for (int i = 0; i < sz; ++i) {
-    auto &item = x.getItem(i, (ContainerID) 0ul);
-    // do_log("%s",item.toString().c_str());
-    ret += item.toString() + " | ";
-  }
-  return ret;
-}
-static string dumpSP_Ender(ServerPlayer &sp) {
-  string ret;
-  auto *x = sp.getEnderChestContainer();
-  if (!x) {
-    do_log("no ender found");
-    return "";
-  }
-  int sz = x->getContainerSize();
-  for (int i = 0; i < sz; ++i) {
-    auto &item = x->getItem(i);
-    // do_log("%s",item.toString().c_str());
-    ret += item.toString() + " | ";
-  }
-  return ret;
-}
-static string dumpall(ServerPlayer *sp) {
-  string ret;
-  ret = dumpSP(*sp);
-  ret += "\n-----starting ender chest dump-----\n";
-  ret += dumpSP_Ender(*sp) + "\n";
-  return ret;
-}
-static void oncmd_invcheck(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
-  ARGSZ(1)
-  auto sp = getSP(getplayer_byname2(a[0]));
-  if (!sp) {
-    outp.error("cant find user");
+#include "hidechk.hpp"
+#include "invchk.hpp"
+static void onJoin(ServerPlayer *sp) {
+  auto& pn=sp->getName();
+  auto xuid=sp->getXUID();
+  string val;
+  auto succ = ban_data.Get(xuid, val);
+  if (!succ) { ban_data.Put(xuid, pn); }
+  if (isBanned(pn) || (succ && isBanned(val))) {
+    forceKickPlayer(*sp);
+    async_log("[BAN] anti-blacklist detected for %s \n",sp->getName().c_str());
     return;
   }
-  outp.addMessage(dumpall(sp));
-}
-static void onJoin(ServerPlayer *sp) {
   auto inv = dumpall(sp);
   int fd   = open(("invdump/" + sp->getName()).c_str(), O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR);
   write(fd, inv.data(), inv.size());
   close(fd);
 }
+
 void mod_init(std::list<string> &modlist) {
   initlog();
-  register_cmd("ban", oncmd, "ban player", 1);
-  register_cmd("unban", oncmd2, "unban player", 1);
-  register_cmd("reload_bear", load_config, "reload Configs for antibear", 1);
-  register_cmd("bear_dbg", toggle_dbg, "toggle item id debug", 1);
-  register_cmd("skick", kick_cmd, "force kick", 1);
-  register_cmd("bangui", bangui_cmd, "gui for ban", 1);
-  register_cmd("invcheck", oncmd_invcheck, "inspect player's inventory", 1);
-  register_cmd("mute", oncmd_mute, "mute player", 1);
+  register_commands();
   mkdir("invdump", S_IRWXU);
   reg_player_join(onJoin);
   reg_useitemon(handle_u);
   reg_player_left(handle_left);
   reg_chat(hkc);
+  reg_destroy(handle_dest);
   _load_config();
   if (getenv("LOGNET")) rori = (typeof(rori))(MyHook(fp(recvfrom), fp(recvfrom_hook)));
   do_log("Loaded " BDL_TAG);

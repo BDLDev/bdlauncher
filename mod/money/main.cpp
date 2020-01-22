@@ -7,7 +7,6 @@
 #include <Loader.h>
 #include <MC.h>
 #include "base.h"
-#include "seral.hpp"
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -32,31 +31,7 @@ BDL_EXPORT void mod_init(std::list<string> &modlist);
 }
 extern void load_helper(std::list<string> &modlist);
 static LDBImpl db("data_v2/money", true, 1048576 * 2); // 2MB Cache
-static void DO_DATA_CONVERT(const char *buf, int sz) {
-  do_log("size %d", sz);
-  DataStream ds;
-  ds.dat = string(buf, sz);
-  int length;
-  ds >> length;
-  for (int i = 0; i < length; ++i) {
-    string key, val;
-    ds >> key >> val;
-    do_log("key %s val %d", key.c_str(), access(val.data(), int, 0));
-    db.Put(key, val);
-  }
-}
-static void load() {
-  //   char *buf;
-  //   int sz;
-  struct stat tmp;
-  if (stat("data/money/money.db", &tmp) != -1) {
-    FileBuffer fb("data/money/money.db");
-    DO_DATA_CONVERT(fb.data, fb.size);
-    do_log("DATA CONVERT DONE;old:data/money/money.db.old");
-    link("data/money/money.db", "data/money/money.db.old");
-    unlink("data/money/money.db");
-  }
-}
+
 int INIT_MONEY;
 void loadcfg() {
   std::ifstream ifs {"config/money.json"};
@@ -211,7 +186,6 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
 #include <iostream>
 void mod_init(std::list<string> &modlist) {
   do_log("loaded! " BDL_TAG "");
-  load();
   loadcfg();
   register_cmd("money", oncmd, "money command");
   register_cmd("reload_money", loadcfg, "reload money cfg", 1);
