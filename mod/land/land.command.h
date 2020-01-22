@@ -6,7 +6,7 @@ using namespace BDL::CustomCommand;
 command_register_function register_commands();
 
 enum class Exit { exit };
-enum class AB { a,b };
+enum class AB { a, b };
 enum class Query { query };
 enum class Buy { buy };
 enum class Sell { sell };

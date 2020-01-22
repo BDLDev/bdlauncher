@@ -143,7 +143,7 @@ static bool hkc(ServerPlayer *b, string &c) {
 }
 
 void ACCommand::mute(mandatory<Mute>, mandatory<CommandSelector<Player>> target, mandatory<int> time_) {
-  int to       = time_ == -1 ? 0 : (time(0) + to);
+  int to       = time_ == -1 ? 0 : (time(0) + time_);
   auto results = target.results(getOrigin());
   if (!Command::checkHasTargets(results, getOutput())) return;
   for (auto &player : results) {
