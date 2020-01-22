@@ -19,7 +19,7 @@
 #include <minecraft/json.h>
 #include "base.h"
 #include "../gui/gui.h"
-#include"bear.command.h"
+#include "bear.command.h"
 #include <ctime>
 #include <cmath>
 #include <deque>
@@ -84,31 +84,31 @@ THook(
 
 size_t MAX_CHAT_SIZE;
 static_deque<string, 128> banword;
-template<const int size,const int delta>
-struct timeq{
-  pair<ServerPlayer*,clock_t> pool[size];
-  int ptr=0;
-  bool push(ServerPlayer* sp){
-    auto now=clock();
-    pool[ptr++]={sp,now};
-    if(ptr==size) ptr=0;
-    int cnt=0;
-    clock_t first=LONG_MAX;
-    for(auto& [p,clk]:pool){
-      if(p==sp){
-        if(clk<first) first=clk;
+template <const int size, const int delta> struct timeq {
+  pair<ServerPlayer *, clock_t> pool[size];
+  int ptr = 0;
+  bool push(ServerPlayer *sp) {
+    auto now    = clock();
+    pool[ptr++] = {sp, now};
+    if (ptr == size) ptr = 0;
+    int cnt       = 0;
+    clock_t first = LONG_MAX;
+    for (auto &[p, clk] : pool) {
+      if (p == sp) {
+        if (clk < first) first = clk;
         cnt++;
       }
     }
-    if(cnt<=1) return true;
-    if((cnt-1)*delta>now-first) return false;
+    if (cnt <= 1) return true;
+    if ((cnt - 1) * delta > now - first) return false;
     return true;
   }
 };
 
-#include"ChatSan.hpp"
+#include "ChatSan.hpp"
+
 unordered_map<string, time_t> mute_time;
-static bool is_muted(const string& name){
+static bool is_muted(const string &name) {
   auto it = mute_time.find(name);
   if (it != mute_time.end()) {
     if (it->second != 0 && time(0) > it->second) {
@@ -133,39 +133,38 @@ static bool hkc(ServerPlayer *b, string &c) {
       return 0;
     }
   }
-  auto& name=b->getName();
-  if(is_muted(name)){
-    sendText(b,"You're muted");
+  auto &name = b->getName();
+  if (is_muted(name)) {
+    sendText(b, "You're muted");
     return 0;
   }
   async_log("[CHAT] %s: %s\n", name.c_str(), c.c_str());
   return 1;
 }
 
-
-void ACCommand::mute(mandatory<Mute>,mandatory<CommandSelector<Player>> target,mandatory<int> time_){
-  int to = time_==-1?0:(time(0)+to);
+void ACCommand::mute(mandatory<Mute>, mandatory<CommandSelector<Player>> target, mandatory<int> time_) {
+  int to       = time_ == -1 ? 0 : (time(0) + to);
   auto results = target.results(getOrigin());
   if (!Command::checkHasTargets(results, getOutput())) return;
   for (auto &player : results) {
     mute_time[player.getName()] = to;
-    getOutput().addMessage(player.getName()+" has been muted");
+    getOutput().addMessage(player.getName() + " has been muted");
   }
   getOutput().success();
 }
-void ACCommand::ban(mandatory<Ban>,mandatory<string> target,optional<int> time_) {
-    auto& tg=target;
-    do_log("ban time: %d",time_);
-    auto tim = time_==0 ? 0 : (time(0) + time_);
-    ban_data.Put(target, string((char *) &tim, 4));
-    auto x = getuser_byname(target);
-    if (x) { 
-      ban_data.Put(x->getXUID(), x->getName());
-      forceKickPlayer(*x);
-    }
-    getOutput().success("§b" + target + " has been banned");
+void ACCommand::ban(mandatory<Ban>, mandatory<string> target, optional<int> time_) {
+  auto &tg = target;
+  do_log("ban time: %d", time_);
+  auto tim = time_ == 0 ? 0 : (time(0) + time_);
+  ban_data.Put(target, string((char *) &tim, 4));
+  auto x = getuser_byname(target);
+  if (x) {
+    ban_data.Put(x->getXUID(), x->getName());
+    forceKickPlayer(*x);
+  }
+  getOutput().success("§b" + target + " has been banned");
 }
-void ACCommand::unban(mandatory<Unban>,mandatory<string> target){
+void ACCommand::unban(mandatory<Unban>, mandatory<string> target) {
   ban_data.Del(target);
   getOutput().success();
 }
@@ -380,9 +379,12 @@ static void _load_config() {
     if (!banword.full()) banword.push_back(i.asString(""));
   MAX_CHAT_SIZE = value["MAX_CHAT_LEN"].asInt(1000);
 }
-void ACCommand::reload(mandatory<Reload>){ _load_config(); getOutput().success(); }
+void ACCommand::reload(mandatory<Reload>) {
+  _load_config();
+  getOutput().success();
+}
 
-timeq<6,(int)(CLOCKS_PER_SEC*0.1)> fastdq;
+timeq<6, (int) (CLOCKS_PER_SEC * 0.1)> fastdq;
 static bool handle_dest(GameMode *a0, BlockPos const *a1) {
   if (!FDest) return 1;
   auto sp = a0->getPlayer();
@@ -390,15 +392,13 @@ static bool handle_dest(GameMode *a0, BlockPos const *a1) {
   if (pl > 1 || sp->isCreative()) { return 1; }
   int x(a1->x), y(a1->y), z(a1->z);
   const Vec3 &fk = a0->getPlayer()->getPos();
-  #define abs(x) ((x) < 0 ? -(x) : (x))
+#define abs(x) ((x) < 0 ? -(x) : (x))
   int dx = fk.x - x;
   int dy = fk.y - y;
   int dz = fk.z - z;
   int d2 = dx * dx + dy * dy + dz * dz;
   if (d2 > 45) { return 0; }
-  if(!fastdq.push(sp)){
-    return 0;
-  }
+  if (!fastdq.push(sp)) { return 0; }
   /*Block &bk = *sp->getBlockSource()->getBlock(*a1);
   int id    = bk.getLegacyBlock()->getBlockItemId();
   if (id == 7 || id == 416) {
@@ -407,37 +407,40 @@ static bool handle_dest(GameMode *a0, BlockPos const *a1) {
   }*/
   return 1;
 }
-void ACCommand::kick(mandatory<Kick>,mandatory<string> target){
-  auto sp=getplayer_byname2(target);
-  if(!sp) {getOutput().error("cant found");return;}
-    forceKickPlayer(*sp);
-    getOutput().addMessage("Kicked "+sp->getName());
+void ACCommand::kick(mandatory<Kick>, mandatory<string> target) {
+  auto sp = getplayer_byname2(target);
+  if (!sp) {
+    getOutput().error("cant found");
+    return;
+  }
+  forceKickPlayer(*sp);
+  getOutput().addMessage("Kicked " + sp->getName());
   getOutput().success();
 }
-void ACCommand::bangui(mandatory<Bangui>){
-  auto sp=getSP(getOrigin().getEntity());
-  if(sp){
+void ACCommand::bangui(mandatory<Bangui>) {
+  auto sp = getSP(getOrigin().getEntity());
+  if (sp) {
     gui_ChoosePlayer(sp, "ban", "ban", [](ServerPlayer *sp, string_view dst) {
-    SPBuf sb;
-    sb.write("ban \""sv);
-    sb.write(dst);
-    sb.write("\""sv);
-    runcmdAs(sb.get(), sp);
-  });
-  getOutput().success();
+      SPBuf sb;
+      sb.write("ban \""sv);
+      sb.write(dst);
+      sb.write("\""sv);
+      runcmdAs(sb.get(), sp);
+    });
+    getOutput().success();
   }
 }
 #include "hidechk.hpp"
 #include "invchk.hpp"
 static void onJoin(ServerPlayer *sp) {
-  auto& pn=sp->getName();
-  auto xuid=sp->getXUID();
+  auto &pn  = sp->getName();
+  auto xuid = sp->getXUID();
   string val;
   auto succ = ban_data.Get(xuid, val);
   if (!succ) { ban_data.Put(xuid, pn); }
   if (isBanned(pn) || (succ && isBanned(val))) {
     forceKickPlayer(*sp);
-    async_log("[BAN] anti-blacklist detected for %s \n",sp->getName().c_str());
+    async_log("[BAN] anti-blacklist detected for %s \n", sp->getName().c_str());
     return;
   }
   auto inv = dumpall(sp);

@@ -27,7 +27,7 @@ static string dumpall(ServerPlayer *sp) {
   ret = dumpSP(*sp);
   ret += "\n-----starting ender chest dump-----\n";
   ret += dumpSP_Ender(*sp) + "\n";
-   return ret;
+  return ret;
 }
 void ACCommand::invchk(mandatory<Invchk>, mandatory<CommandSelector<Player>> target) {
   auto results = target.results(getOrigin());
@@ -35,8 +35,8 @@ void ACCommand::invchk(mandatory<Invchk>, mandatory<CommandSelector<Player>> tar
   for (auto &player : results) {
     auto sp = getSP(player);
     if (!sp) continue;
-    auto dmp=dumpall(sp);
-    getOutput().addMessage("---dump for "+sp->getName()+"---\n"+dmp);
+    auto dmp = dumpall(sp);
+    getOutput().addMessage("---dump for " + sp->getName() + "---\n" + dmp);
   }
   getOutput().success();
 }

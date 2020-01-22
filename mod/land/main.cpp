@@ -66,102 +66,102 @@ void LDCommand::exit(mandatory<Exit> mode) {
   choose_state.erase(sp->getNameTag());
   getOutput().success("§bExit selection mode, please input /land buy");
 }
-void LDCommand::A_(mandatory<A> mode){
+void LDCommand::A_(mandatory<A> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   choose_state[sp->getNameTag()] = 1;
   getOutput().success("§bEnter selection mode, please click on the ground to select point A");
 }
-void LDCommand::B_(mandatory<B> mode){
+void LDCommand::B_(mandatory<B> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   choose_state[sp->getNameTag()] = 2;
   getOutput().success("§bPlease click on the ground to select point B");
 }
-void LDCommand::query(mandatory<Query> mode){
+void LDCommand::query(mandatory<Query> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   auto &pos = sp->getPos();
-    int dim   = sp->getDimensionId();
-    auto lp   = getFastLand(pos.x, pos.z, dim);
-    if (lp) {
-      char buf[1000];
-      snprintf(buf, 1000, "§bThis is %s's land", lp->owner);
-      getOutput().success(buf);
-    } else {
-      getOutput().error("No land here");
-      return;
-    }
+  int dim   = sp->getDimensionId();
+  auto lp   = getFastLand(pos.x, pos.z, dim);
+  if (lp) {
+    char buf[1000];
+    snprintf(buf, 1000, "§bThis is %s's land", lp->owner);
+    getOutput().success(buf);
+  } else {
+    getOutput().error("No land here");
+    return;
+  }
 }
-void LDCommand::buy(mandatory<Buy> mode){
+void LDCommand::buy(mandatory<Buy> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   SPBuf sb;
-  auto op   = sp->getPlayerPermissionLevel() > 1;
-  auto &nm  = sp->getName();
-      auto &hash = nm;
-    int x, z, dx, dz;
-    int dim = sp->getDimensionId();
-    if (startpos.count(hash) + endpos.count(hash) != 2) {
-      getOutput().error("Choose 2 points please.");
-      return;
-    }
-    choose_state.erase(hash);
-    x  = std::min(startpos[hash].x, endpos[hash].x);
-    z  = std::min(startpos[hash].z, endpos[hash].z);
-    dx = std::max(startpos[hash].x, endpos[hash].x);
-    dz = std::max(startpos[hash].z, endpos[hash].z);
-    // step 1 check money
-    int deltax = dx - x + 1, deltaz = dz - z + 1;
-    uint siz = deltax * deltaz;
-    if (deltax >= 4096 || deltaz >= 4096 || siz >= 5000000) {
-      getOutput().error("Too big land");
-      return;
-    }
-    int price = siz * LAND_PRICE;
-    if (price <= 0 || price >= 500000000) {
-      getOutput().error("Too big land");
-      return;
-    }
-    auto mon = get_money(nm);
-    if (mon < price) {
-      getOutput().error("Money not enough");
-      return;
-    }
-    // step 2 check coll
-    for (int i = x; i <= dx; ++i)
-      for (int j = z; j <= dz; ++j) {
-        auto lp = getFastLand(i, j, dim);
-        if (lp) {
-          sb.write("Land collision detected! hint: "sv);
-          sb.write(lp->getOwner());
-          sb.write("'s land"sv);
-          getOutput().error(sb.getstr());
-          return;
-        }
+  auto op    = sp->getPlayerPermissionLevel() > 1;
+  auto &nm   = sp->getName();
+  auto &hash = nm;
+  int x, z, dx, dz;
+  int dim = sp->getDimensionId();
+  if (startpos.count(hash) + endpos.count(hash) != 2) {
+    getOutput().error("Choose 2 points please.");
+    return;
+  }
+  choose_state.erase(hash);
+  x  = std::min(startpos[hash].x, endpos[hash].x);
+  z  = std::min(startpos[hash].z, endpos[hash].z);
+  dx = std::max(startpos[hash].x, endpos[hash].x);
+  dz = std::max(startpos[hash].z, endpos[hash].z);
+  // step 1 check money
+  int deltax = dx - x + 1, deltaz = dz - z + 1;
+  uint siz = deltax * deltaz;
+  if (deltax >= 4096 || deltaz >= 4096 || siz >= 5000000) {
+    getOutput().error("Too big land");
+    return;
+  }
+  int price = siz * LAND_PRICE;
+  if (price <= 0 || price >= 500000000) {
+    getOutput().error("Too big land");
+    return;
+  }
+  auto mon = get_money(nm);
+  if (mon < price) {
+    getOutput().error("Money not enough");
+    return;
+  }
+  // step 2 check coll
+  for (int i = x; i <= dx; ++i)
+    for (int j = z; j <= dz; ++j) {
+      auto lp = getFastLand(i, j, dim);
+      if (lp) {
+        sb.write("Land collision detected! hint: "sv);
+        sb.write(lp->getOwner());
+        sb.write("'s land"sv);
+        getOutput().error(sb.getstr());
+        return;
       }
-    // step 3 add land
-    set_money(nm, mon - price);
-    addLand((x) ^ 0x80000000, (dx) ^ 0x80000000, (z) ^ 0x80000000, (dz) ^ 0x80000000, dim, nm);
-    getOutput().success("§bSuccessful land purchase");
+    }
+  // step 3 add land
+  set_money(nm, mon - price);
+  addLand((x) ^ 0x80000000, (dx) ^ 0x80000000, (z) ^ 0x80000000, (dz) ^ 0x80000000, dim, nm);
+  getOutput().success("§bSuccessful land purchase");
 }
-void LDCommand::sell(mandatory<Sell> mode){
+void LDCommand::sell(mandatory<Sell> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   auto op   = sp->getPlayerPermissionLevel() > 1;
   auto &nm  = sp->getName();
   auto &pos = sp->getPos();
-    int dim   = sp->getDimensionId();
-    auto lp   = getFastLand(pos.x, pos.z, dim);
-    if (lp && (lp->chkOwner(nm) == 2 || op)) {
-      int siz = (lp->dx - lp->x) * (lp->dz - lp->z);
-      add_money(nm, siz * LAND_PRICE2);
-      removeLand(lp);
-      getOutput().success("§bYour land has been sold");
-    } else {
-      getOutput().error("No land here or not your land");
-      return;
-    }
+  int dim   = sp->getDimensionId();
+  auto lp   = getFastLand(pos.x, pos.z, dim);
+  if (lp && (lp->chkOwner(nm) == 2 || op)) {
+    int siz = (lp->dx - lp->x) * (lp->dz - lp->z);
+    add_money(nm, siz * LAND_PRICE2);
+    removeLand(lp);
+    getOutput().success("§bYour land has been sold");
+  } else {
+    getOutput().error("No land here or not your land");
+    return;
+  }
 }
 
 void LDCommand::trust(mandatory<Trust> mode, mandatory<std::string> target) {
