@@ -10,6 +10,7 @@ template <const int sz = 1024> struct SPBuf {
   SPBuf() : ptr(0) {}
   constexpr inline std::string getstr() { return std::string(buf, ptr); }
   constexpr inline std::string_view get() { return {buf, (size_t) ptr}; }
+  constexpr inline operator std::string_view() { return {buf, (size_t) ptr}; }
   void clear() { ptr = 0; }
   constexpr inline void write(std::string_view sv) {
     if (unlikely(sv.size() > sz - ptr)) return;
