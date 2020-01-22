@@ -14,28 +14,16 @@ public:
   operator Exit() const noexcept { return value; }
 };
 
-template <> class BDL::CustomCommand::CommandParameterProxy<A> {
-  A value;
+template <> class BDL::CustomCommand::CommandParameterProxy<AB> {
+  AB value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, A>(); }
+  static auto fetch_tid() { return type_id<CommandRegistry, AB>(); }
   static constexpr auto parser    = &CommandRegistry::fake_parse;
   static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "A";
+  static constexpr auto enum_name = "AB";
 
-  operator A() const noexcept { return value; }
-};
-
-template <> class BDL::CustomCommand::CommandParameterProxy<B> {
-  B value;
-
-public:
-  static auto fetch_tid() { return type_id<CommandRegistry, B>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "B";
-
-  operator B() const noexcept { return value; }
+  operator AB() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Query> {
@@ -203,22 +191,14 @@ struct LDCommand_0 : Command {
 };
 
 struct LDCommand_1 : Command {
-  CommandParameterProxy<A> mode;
+  CommandParameterProxy<AB> mode;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
     LDCommand context{origin, output};
-    context.A_(mode);
+    context.AB_(mode);
   }
 };
 
 struct LDCommand_2 : Command {
-  CommandParameterProxy<B> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.B_(mode);
-  }
-};
-
-struct LDCommand_3 : Command {
   CommandParameterProxy<Query> mode;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
     LDCommand context{origin, output};
@@ -226,7 +206,7 @@ struct LDCommand_3 : Command {
   }
 };
 
-struct LDCommand_4 : Command {
+struct LDCommand_3 : Command {
   CommandParameterProxy<Buy> mode;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
     LDCommand context{origin, output};
@@ -234,7 +214,7 @@ struct LDCommand_4 : Command {
   }
 };
 
-struct LDCommand_5 : Command {
+struct LDCommand_4 : Command {
   CommandParameterProxy<Sell> mode;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
     LDCommand context{origin, output};
@@ -242,7 +222,7 @@ struct LDCommand_5 : Command {
   }
 };
 
-struct LDCommand_6 : Command {
+struct LDCommand_5 : Command {
   CommandParameterProxy<Trust> mode;
   CommandParameterProxy<std::string> target;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
@@ -251,7 +231,7 @@ struct LDCommand_6 : Command {
   }
 };
 
-struct LDCommand_7 : Command {
+struct LDCommand_6 : Command {
   CommandParameterProxy<Untrust> mode;
   CommandParameterProxy<std::string> target;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
@@ -260,7 +240,7 @@ struct LDCommand_7 : Command {
   }
 };
 
-struct LDCommand_8 : Command {
+struct LDCommand_7 : Command {
   CommandParameterProxy<Trustgui> mode;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
     LDCommand context{origin, output};
@@ -268,7 +248,7 @@ struct LDCommand_8 : Command {
   }
 };
 
-struct LDCommand_9 : Command {
+struct LDCommand_8 : Command {
   CommandParameterProxy<Untrustgui> mode;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
     LDCommand context{origin, output};
@@ -276,7 +256,7 @@ struct LDCommand_9 : Command {
   }
 };
 
-struct LDCommand_10 : Command {
+struct LDCommand_9 : Command {
   CommandParameterProxy<Perm> mode;
   CommandParameterProxy<int> perm;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
@@ -285,7 +265,7 @@ struct LDCommand_10 : Command {
   }
 };
 
-struct LDCommand_11 : Command {
+struct LDCommand_10 : Command {
   CommandParameterProxy<Give> mode;
   CommandParameterProxy<CommandSelector<Player>> target;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
@@ -334,12 +314,9 @@ void register_commands() {
     item.addValue("exit", Exit::exit);
   }
   {
-    auto &item = instance.registerEnum<A>();
-    item.addValue("a", A::a);
-  }
-  {
-    auto &item = instance.registerEnum<B>();
-    item.addValue("b", B::b);
+    auto &item = instance.registerEnum<AB>();
+    item.addValue("a", AB::a);
+    item.addValue("b", AB::b);
   }
   {
     auto &item = instance.registerEnum<Query>();
@@ -401,51 +378,47 @@ void register_commands() {
     }
     {
       auto &ovl = cmd.registerOverload<LDCommand_1>();
-      ovl.addParameter<A>("mode", false, offsetof(LDCommand_1, mode));
+      ovl.addParameter<AB>("mode", false, offsetof(LDCommand_1, mode));
     }
     {
       auto &ovl = cmd.registerOverload<LDCommand_2>();
-      ovl.addParameter<B>("mode", false, offsetof(LDCommand_2, mode));
+      ovl.addParameter<Query>("mode", false, offsetof(LDCommand_2, mode));
     }
     {
       auto &ovl = cmd.registerOverload<LDCommand_3>();
-      ovl.addParameter<Query>("mode", false, offsetof(LDCommand_3, mode));
+      ovl.addParameter<Buy>("mode", false, offsetof(LDCommand_3, mode));
     }
     {
       auto &ovl = cmd.registerOverload<LDCommand_4>();
-      ovl.addParameter<Buy>("mode", false, offsetof(LDCommand_4, mode));
+      ovl.addParameter<Sell>("mode", false, offsetof(LDCommand_4, mode));
     }
     {
       auto &ovl = cmd.registerOverload<LDCommand_5>();
-      ovl.addParameter<Sell>("mode", false, offsetof(LDCommand_5, mode));
+      ovl.addParameter<Trust>("mode", false, offsetof(LDCommand_5, mode));
+      ovl.addParameter<std::string>("target", false, offsetof(LDCommand_5, target));
     }
     {
       auto &ovl = cmd.registerOverload<LDCommand_6>();
-      ovl.addParameter<Trust>("mode", false, offsetof(LDCommand_6, mode));
+      ovl.addParameter<Untrust>("mode", false, offsetof(LDCommand_6, mode));
       ovl.addParameter<std::string>("target", false, offsetof(LDCommand_6, target));
     }
     {
       auto &ovl = cmd.registerOverload<LDCommand_7>();
-      ovl.addParameter<Untrust>("mode", false, offsetof(LDCommand_7, mode));
-      ovl.addParameter<std::string>("target", false, offsetof(LDCommand_7, target));
+      ovl.addParameter<Trustgui>("mode", false, offsetof(LDCommand_7, mode));
     }
     {
       auto &ovl = cmd.registerOverload<LDCommand_8>();
-      ovl.addParameter<Trustgui>("mode", false, offsetof(LDCommand_8, mode));
+      ovl.addParameter<Untrustgui>("mode", false, offsetof(LDCommand_8, mode));
     }
     {
       auto &ovl = cmd.registerOverload<LDCommand_9>();
-      ovl.addParameter<Untrustgui>("mode", false, offsetof(LDCommand_9, mode));
+      ovl.addParameter<Perm>("mode", false, offsetof(LDCommand_9, mode));
+      ovl.addParameter<int>("perm", false, offsetof(LDCommand_9, perm));
     }
     {
       auto &ovl = cmd.registerOverload<LDCommand_10>();
-      ovl.addParameter<Perm>("mode", false, offsetof(LDCommand_10, mode));
-      ovl.addParameter<int>("perm", false, offsetof(LDCommand_10, perm));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_11>();
-      ovl.addParameter<Give>("mode", false, offsetof(LDCommand_11, mode));
-      ovl.addParameter<CommandSelector<Player>>("target", false, offsetof(LDCommand_11, target));
+      ovl.addParameter<Give>("mode", false, offsetof(LDCommand_10, mode));
+      ovl.addParameter<CommandSelector<Player>>("target", false, offsetof(LDCommand_10, target));
     }
   }
   {

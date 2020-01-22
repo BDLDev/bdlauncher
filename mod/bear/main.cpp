@@ -153,7 +153,6 @@ void ACCommand::mute(mandatory<Mute>, mandatory<CommandSelector<Player>> target,
   getOutput().success();
 }
 void ACCommand::ban(mandatory<Ban>, mandatory<string> target, optional<int> time_) {
-  auto &tg = target;
   do_log("ban time: %d", time_);
   auto tim = time_ == 0 ? 0 : (time(0) + time_);
   ban_data.Put(target, string((char *) &tim, 4));

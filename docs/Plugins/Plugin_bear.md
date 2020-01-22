@@ -7,13 +7,12 @@ OP commands:
 
 | Command | Description |
 | ------- | ----------- |
-| `/ban [name] [second]` | ban a player |
-| `/unban [name]` | allow a player |
-| `/skick [name]` | kick a player |
-| `/bear_dbg` | debug, tap the ground to display the ID of the handheld item |
-| `/invcheck [name]` | check player's inventory |
-| `/mute [name] [second]` | mute a player <br> When a player enters the server, his backpack information will be saved to the invdump folder. |
-| `/reload_bear` | reload configuration |
+| `/ac ban [name] [second]` | ban a player |
+| `/ac unban [name]` | allow a player |
+| `/ac kick [name]` | kick a player |
+| `/ac invchk [name]` | check player's inventory |
+| `/ac mute [name] [second]` | mute a player <br> When a player enters the server, his backpack information will be saved to the invdump folder. |
+| `/ac reload` | reload configuration |
 
 configuration file: `bear.json`
 
@@ -27,15 +26,14 @@ OP命令:
 
 | 功能 | 指令 |
 | - | - |
-| 封禁玩家 | `/ban [玩家名] [秒](可选)` |
-| 解除玩家的封禁 | `/unban [玩家]` |
-| 强制踢出玩家 | `/skick [玩家]` |
-| 以GUI的方式打开ban | `/bangui` |
-| 打开debug开关，点地显示手里物品id | `/bear_dbg` |
-| 检查玩家的背包 | `/invcheck [玩家]` |
+| 封禁玩家 | `/ac ban [玩家名] [秒](可选)` |
+| 解除玩家的封禁 | `/ac unban [玩家]` |
+| 强制踢出玩家 | `/ac kick [玩家]` |
+| 以GUI的方式打开ban | `/ac bangui` |
+| 检查玩家的背包 | `/ac invchk [玩家]` |
 | 玩家进服自动保存背包到invdump文件夹
-| 禁言玩家 | `/mute 玩家名 秒` |
-| 重载配置 | `/reload_bear` |
+| 禁言玩家 | `/ac mute 玩家名 秒` |
+| 重载配置 | `/ac reload` |
 
 配置文件: `bear.json`
 ```json
