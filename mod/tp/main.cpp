@@ -223,12 +223,12 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
     getOutput().success();
   } break;
   case TPCMD::f: {
-    auto dst=getplayer_byname2(target);
-    if(!dst){
+    auto dst = getplayer_byname2(target);
+    if (!dst) {
       getOutput().error("target not found!");
       return;
     }
-    auto& dnm=dst->getName();
+    auto &dnm = dst->getName();
     if (tpmap.count(dnm)) {
       getOutput().error("A request of your target is pending.");
       return;
@@ -243,12 +243,12 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
     sendTPForm(name, 0, (ServerPlayer *) dst);
   }
   case TPCMD::t: {
-    auto dst=getplayer_byname2(target);
-    if(!dst){
+    auto dst = getplayer_byname2(target);
+    if (!dst) {
       getOutput().error("target not found!");
       return;
     }
-    auto& dnm=dst->getName();
+    auto &dnm = dst->getName();
     if (tpmap.count(dnm)) {
       getOutput().error("A request of your target is pending.");
       return;
@@ -454,7 +454,7 @@ void mod_init(std::list<string> &modlist) {
   load_cfg();
   initTPGUI();
   register_cmd("suicide", oncmd_suic, "kill yourself");
-  //register_cmd("tpa", oncmd, "teleport command");
+  // register_cmd("tpa", oncmd, "teleport command");
   register_cmd("home", oncmd_home, "home command");
   register_cmd("warp", oncmd_warp, "warp command");
   register_cmd("back", oncmd_back, "back to deathpoint");
