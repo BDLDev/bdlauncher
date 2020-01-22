@@ -83,7 +83,7 @@ clean:
 	@rm -rf $(BIN_LAUNCHER) $(DLL_PRELOAD) $(MOD_OUTS)
 
 .PHONY: install
-install: $(addprefix install-,launcher preload modlist $(addprefix mod-,$(MOD_LIST)) $(addprefix config-,$(CFG_FILES)))
+install: $(addprefix install-,launcher preload $(addprefix mod-,$(MOD_LIST)) $(addprefix config-,$(CFG_FILES)))
 	@echo " DONE"
 
 FORMAT_SRCS=$(patsubst ./%,%,$(shell find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|c\|h\)' -and -not -path "./include/*" -and -not -path '*/\.*')) $(shell find include/minecraft -regex '.*\.\(cpp\|hpp\|cc\|cxx\|c\|h\)') $(wildcard include/*.h include/*.hpp)
@@ -121,9 +121,9 @@ $(addprefix install-mod-,$(MOD_LIST)): install-mod-%: build/mods/%.mod
 $(addprefix install-config-,$(CFG_FILES)): install-config-%: config/%.json
 	@$(call install,$<)
 
-.PHONY: install-modlist
-install-modlist: mod.list
-	@$(INSTALL_SH) mod.list "$(DESTDIR)/mods/mod.list"
+#.PHONY: install-modlist
+#install-modlist: mod.list
+#	@$(INSTALL_SH) mod.list "$(DESTDIR)/mods/mod.list"
 
 # Direct Target
 
