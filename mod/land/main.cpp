@@ -66,17 +66,11 @@ void LDCommand::exit(mandatory<Exit> mode) {
   choose_state.erase(sp->getNameTag());
   getOutput().success("§bExit selection mode, please input /land buy");
 }
-void LDCommand::A_(mandatory<A> mode) {
+void LDCommand::AB_(mandatory<AB> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
-  choose_state[sp->getNameTag()] = 1;
-  getOutput().success("§bEnter selection mode, please click on the ground to select point A");
-}
-void LDCommand::B_(mandatory<B> mode) {
-  auto sp = getSP(getOrigin().getEntity());
-  if (!sp) return;
-  choose_state[sp->getNameTag()] = 2;
-  getOutput().success("§bPlease click on the ground to select point B");
+  choose_state[sp->getNameTag()] = (mode==AB::b)+1;
+  getOutput().success("§bEnter selection mode, please click on the ground to select point");
 }
 void LDCommand::query(mandatory<Query> mode) {
   auto sp = getSP(getOrigin().getEntity());
