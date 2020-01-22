@@ -106,9 +106,15 @@ struct TopoDepSolver {
     }
     return rv;
   }
+  struct op{
+    bool
+      operator()(Node *& a,Node *& b){
+        return a->load_prio>b->load_prio;
+      }
+  };
   list<string> topoSort() {
     list<string> rv;
-    priority_queue<Node *> que;
+    priority_queue<Node *,vector<Node *>,op> que;
     for (auto &[mname, i] : nodes) {
       if (i.topo_indeg == 0) que.push(&i);
     }

@@ -7,7 +7,6 @@
 #include <vector>
 #include <Loader.h>
 #include <MC.h>
-#include "seral.hpp"
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -18,6 +17,7 @@
 #include "../gui/gui.h"
 #include <fstream>
 #include <minecraft/json.h>
+#include "tp.command.h"
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:tp\n"
@@ -61,62 +61,7 @@ struct home {
 static list<string> warp_list;
 static unordered_map<string, Vpos> warp;
 static LDBImpl tp_db("data_v2/tp");
-void CONVERT_WARP() {
-  char *buf;
-  int siz;
-  FileBuffer fb("data/tp/wps.db");
-  buf = fb.data;
-  siz = fb.size;
-  DataStream ds;
-  ds.dat = string(buf, siz);
-  int cnt;
-  ds >> cnt;
-  vector<string> warps;
-  for (int i = 0; i < cnt; ++i) {
-    int vposlen;
-    ds >> vposlen;
-    Vpos pos;
-    ds >> pos;
-    DataStream tmpds;
-    tmpds << pos;
-    tp_db.Put("warp_" + pos.name, tmpds.dat);
-    do_log("warp %s found", pos.name.c_str());
-    warps.emplace_back(pos.name);
-  }
-  DataStream tmpds;
-  tmpds << warps;
-  tp_db.Put("warps", tmpds.dat);
-}
-void CONVERT_HOME() {
-  char *buf;
-  int siz;
-  FileBuffer fb("data/tp/tp.db");
-  buf = fb.data;
-  siz = fb.size;
-  int cnt;
-  DataStream ds;
-  ds.dat = string(buf, siz);
-  ds >> cnt;
-  do_log("sz %d", cnt);
-  for (int i = 0; i < cnt; ++i) {
-    string key;
-    home hom;
-    int homelen;
-    ds >> key;
-    ds >> homelen;
-    do_log("key %s len %d", key.c_str(), homelen);
-    int homecnt;
-    ds >> homecnt;
-    hom.cnt = homecnt;
-    for (int j = 0; j < homecnt; ++j) {
-      ds.curpos += 4; // skip sizeof(vpos)
-      ds >> hom.vals[j];
-    }
-    DataStream tmpds;
-    tmpds << hom;
-    tp_db.Put("home_" + key, tmpds.dat);
-  }
-}
+
 void add_warp(int x, int y, int z, int dim, const string &name) {
   warp_list.push_back(name);
   Vpos ps;
@@ -163,16 +108,7 @@ static void putHome(const string &key, home &hm) {
   ds << hm;
   tp_db.Put("home_" + key, ds.dat);
 }
-static void load() {
-  struct stat tmp;
-  if (stat("data/tp/tp.db", &tmp) != -1) {
-    do_log("CONVERTING DATA.");
-    CONVERT_HOME();
-    CONVERT_WARP();
-    link("data/tp/tp.db", "data/tp/tp.db_old");
-    unlink("data/tp/tp.db");
-  }
-}
+
 struct tpreq {
   int dir; // 0=f
   string name;
@@ -205,8 +141,13 @@ static void sendTPChoose(ServerPlayer *sp, int type) { // 0=t
 
 static void sendTPForm(const string &from, int type, ServerPlayer *sp) {
   SPBuf<512> sb;
+  sb.write("§b ");
   sb.write(from);
-  sb.write((type ? " wants to teleport you to his location" : "want to teleport to your location"));
+  sb.write("wants you to teleport to his location,you can enter \"/tpa ac\" to accept or \"/tpa de\" to reject");
+  sendText(sp, sb);
+  sb.clear();
+  sb.write(from);
+  sb.write((type ? "want to teleport to your location" : " wants to teleport you to his location"));
   SharedForm *sf = getForm("TP Request", sb.get());
   sf->addButton("Accept");
   sf->addButton("Refuse");
@@ -223,128 +164,107 @@ static void initTPGUI() {
   TPGUI.cb = [](ServerPlayer *sp, string_view sv, int idx) { sendTPChoose(sp, idx); };
 }
 static unordered_map<string, string> player_target;
-
-static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
+void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
   if (!CanTP) {
-    outp.error("Teleport not enabled on this server!");
+    getOutput().error("Teleport not enabled on this server!");
     return;
   }
-  //   int pl      = (int) b.getPermissionsLevel();
-  string name = b.getName();
-  ARGSZ(1)
-  if (a[0] == "f") {
-    string dnm  = a.size() == 2 ? string(a[1]) : "";
-    Player *dst = NULL;
-    if (dnm != "") dst = getplayer_byname2(dnm);
-    if (dst) dnm = dst->getName();
-    // from
-    if (dst == NULL) {
-      outp.error("Player is offline");
+  auto sp = getSP(getOrigin().getEntity());
+  if (!sp) return;
+  auto &nam = sp->getName();
+  switch (mode) {
+  case TPCMD::ac: {
+    if (tpmap.count(nam) == 0) return;
+    tpreq req = tpmap[nam];
+    tpmap.erase(nam);
+    getOutput().success("§bYou have accepted the send request from the other party");
+    player_target.erase(req.name);
+    auto dst = getplayer_byname(req.name);
+    if (dst) {
+      SPBuf sb;
+      sb.write("§b ");
+      sb.write(nam);
+      sb.write(" accepted the transmission request");
+      sendText(dst, sb);
+      if (req.dir == 0) {
+        // f
+        TeleportA(*sp, dst->getPos(), {dst->getDimensionId()});
+      } else {
+        TeleportA(*dst, sp->getPos(), {sp->getDimensionId()});
+      }
+    }
+  } break;
+  case TPCMD::de: {
+    if (tpmap.count(nam) == 0) return;
+    tpreq req = tpmap[nam];
+    tpmap.erase(nam);
+    getOutput().success("§bYou have rejected the send request");
+    player_target.erase(req.name);
+    auto dst = getplayer_byname(req.name);
+    if (dst) {
+      SPBuf sb;
+      sb.write("§b ");
+      sb.write(nam);
+      sb.write(" rejected the transmission request");
+      sendText(dst, sb);
+    }
+  } break;
+  case TPCMD::cancel: {
+    if (player_target.count(nam)) {
+      auto &nm = player_target[nam];
+      if (tpmap.count(nm) && tpmap[nm].name == nam) {
+        tpmap.erase(nm);
+        getOutput().success("cancelled");
+      }
+    }
+  } break;
+  case TPCMD::gui: {
+    SendTPGUI(sp);
+    getOutput().success();
+  } break;
+  case TPCMD::f: {
+    auto dst=getplayer_byname2(target);
+    if(!dst){
+      getOutput().error("target not found!");
       return;
     }
+    auto& dnm=dst->getName();
     if (tpmap.count(dnm)) {
-      outp.error("A request of your target is pending.");
+      getOutput().error("A request of your target is pending.");
       return;
     }
     if (player_target.count(dnm)) {
-      outp.error("You have already initiated the request");
+      getOutput().error("You have already initiated the request");
       return;
     }
     player_target[name] = dnm;
     tpmap[dnm]          = {0, name, clock()};
-    outp.success("§bYou sent a teleport request to the target player");
-    SPBuf sb;
-    sb.write("§b ");
-    sb.write(name);
-    sb.write("wants you to teleport to his location,you can enter \"/tpa ac\" to accept or \"/tpa de\" to reject");
-    sendText(dst, sb.get());
-    sendTPForm(name, 1, (ServerPlayer *) dst);
+    getOutput().success("§bYou sent a teleport request to the target player");
+    sendTPForm(name, 0, (ServerPlayer *) dst);
   }
-  if (a[0] == "t") {
-    string dnm  = a.size() == 2 ? string(a[1]) : "";
-    Player *dst = NULL;
-    if (dnm != "") dst = getplayer_byname2(dnm);
-    if (dst) dnm = dst->getName();
-    // to
-    if (dst == NULL) {
-      outp.error("Player is offline");
+  case TPCMD::t: {
+    auto dst=getplayer_byname2(target);
+    if(!dst){
+      getOutput().error("target not found!");
       return;
     }
+    auto& dnm=dst->getName();
     if (tpmap.count(dnm)) {
-      outp.error("A request of your target is pending.");
+      getOutput().error("A request of your target is pending.");
       return;
     }
     if (player_target.count(dnm)) {
-      outp.error("You have already initiated the request");
+      getOutput().error("You have already initiated the request");
       return;
     }
     player_target[name] = dnm;
-    tpmap[dnm]          = {1, name, clock()};
-    outp.success("§bYou sent a teleport request to the target player");
-    SPBuf sb;
-    sb.write("§b ");
-    sb.write(name);
-    sb.write("wants to teleport to your location,you can enter \"/tpa ac\" to accept or \"/tpa de\" to reject");
-    sendText(dst, sb.get());
+    tpmap[dnm]          = {0, name, clock()};
+    getOutput().success("§bYou sent a teleport request to the target player");
     sendTPForm(name, 0, (ServerPlayer *) dst);
   }
-  if (a[0] == "cancel") {
-    // cancel req
-    if (player_target.count(name)) {
-      auto &nm = player_target[name];
-      if (tpmap.count(nm) && tpmap[nm].name == name) {
-        tpmap.erase(nm);
-        outp.success("cancelled");
-      }
-    }
-  }
-  if (a[0] == "gui") {
-    auto sp = getSP(b.getEntity());
-    if (sp) {
-      SendTPGUI(sp);
-      outp.success();
-    }
-  }
-  if (a[0] == "ac") {
-    // accept
-    if (tpmap.count(name) == 0) return;
-    tpreq req = tpmap[name];
-    tpmap.erase(name);
-    outp.success("§bYou have accepted the send request from the other party");
-    player_target.erase(req.name);
-    auto dst = getplayer_byname(req.name);
-    if (dst) {
-      SPBuf sb;
-      sb.write("§b ");
-      sb.write(name);
-      sb.write(" accepted the transmission request");
-      sendText(dst, sb.get());
-      if (req.dir == 0) {
-        // f
-        TeleportA(*getplayer_byname(name), dst->getPos(), {dst->getDimensionId()});
-      } else {
-        TeleportA(*dst, b.getWorldPosition(), {b.getEntity()->getDimensionId()});
-      }
-    }
-  }
-  if (a[0] == "de") {
-    // deny
-    if (tpmap.count(name) == 0) return;
-    tpreq req = tpmap[name];
-    tpmap.erase(name);
-    outp.success("§bYou have rejected the send request");
-    player_target.erase(req.name);
-    auto dst = getplayer_byname(req.name);
-    if (dst) {
-      SPBuf sb;
-      sb.write("§b ");
-      sb.write(name);
-      sb.write(" rejected the transmission request");
-      sendText(dst, sb.get());
-    }
+  default: break;
   }
 }
-
 static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   if (!CanHome) {
     outp.error("Home not enabled on this server!");
@@ -491,7 +411,7 @@ static void handle_mobdie(Mob &mb, const ActorDamageSource &) {
 static int TP_TIMEOUT = 30;
 THook(void *, _ZN12ServerPlayer9tickWorldERK4Tick, ServerPlayer *sp, unsigned long const *tk) {
   auto res = original(sp, tk);
-  if (*tk % 20 == 0) {
+  if (*tk % 40 == 0) {
     auto &name = sp->getName();
     auto it    = tpmap.find(name);
     if (it != tpmap.end()) {
@@ -511,15 +431,15 @@ static void load_cfg() {
   std::ifstream ifs{"config/tp.json"};
   Json::Value value;
   Json::Reader reader;
-  if (!reader.parse(ifs, value)){
+  if (!reader.parse(ifs, value)) {
     auto msg = reader.getFormattedErrorMessages();
     do_log("%s", msg.c_str());
     exit(1);
   }
-  CanBack  = value["can_back"].asBool(false);
-  CanHome  = value["can_home"].asBool(false);
-  CanTP    = value["can_tp"].asBool(false);
-  MaxHomes = value["max_homes"].asBool(false);
+  CanBack       = value["can_back"].asBool(false);
+  CanHome       = value["can_home"].asBool(false);
+  CanTP         = value["can_tp"].asBool(false);
+  MaxHomes      = value["max_homes"].asBool(false);
   auto &timeout = value["TP_TIMEOUT"];
   if (timeout.isInt()) {
     TP_TIMEOUT = timeout.asInt(0);
@@ -530,15 +450,15 @@ static void load_cfg() {
 
 void mod_init(std::list<string> &modlist) {
   do_log("loaded! " BDL_TAG "");
-  load();
   load_warps_new();
   load_cfg();
   initTPGUI();
   register_cmd("suicide", oncmd_suic, "kill yourself");
-  register_cmd("tpa", oncmd, "teleport command");
+  //register_cmd("tpa", oncmd, "teleport command");
   register_cmd("home", oncmd_home, "home command");
   register_cmd("warp", oncmd_warp, "warp command");
   register_cmd("back", oncmd_back, "back to deathpoint");
   reg_mobdie(handle_mobdie);
+  register_commands();
   load_helper(modlist);
 }
