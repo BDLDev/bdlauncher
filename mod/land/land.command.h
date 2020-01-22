@@ -6,8 +6,7 @@ using namespace BDL::CustomCommand;
 command_register_function register_commands();
 
 enum class Exit { exit };
-enum class A { a };
-enum class B { b };
+enum class AB { a,b };
 enum class Query { query };
 enum class Buy { buy };
 enum class Sell { sell };
@@ -28,8 +27,7 @@ public:
   LDCommand(CommandOrigin const &origin, CommandOutput &output) noexcept : CustomCommandContext(origin, output) {}
 
   void exit(mandatory<Exit> mode);
-  void A_(mandatory<A> mode);
-  void B_(mandatory<B> mode);
+  void AB_(mandatory<AB> mode);
   void query(mandatory<Query> mode);
   void buy(mandatory<Buy> mode);
   void sell(mandatory<Sell> mode);
