@@ -121,9 +121,9 @@ $(addprefix install-mod-,$(MOD_LIST)): install-mod-%: build/mods/%.mod
 $(addprefix install-config-,$(CFG_FILES)): install-config-%: config/%.json
 	@$(call install,$<)
 
-.PHONY: install-modlist
-install-modlist: mod.list
-	@$(INSTALL_SH) mod.list "$(DESTDIR)/mods/mod.list"
+#.PHONY: install-modlist
+#install-modlist: mod.list
+#	@$(INSTALL_SH) mod.list "$(DESTDIR)/mods/mod.list"
 
 # Direct Target
 
