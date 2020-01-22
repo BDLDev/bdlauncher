@@ -91,7 +91,7 @@ void LDCommand::buy(mandatory<Buy> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   SPBuf sb;
-//  auto op    = sp->getPlayerPermissionLevel() > 1;
+  //  auto op    = sp->getPlayerPermissionLevel() > 1;
   auto &nm   = sp->getName();
   auto &hash = nm;
   int x, z, dx, dz;
