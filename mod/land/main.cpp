@@ -69,7 +69,7 @@ void LDCommand::exit(mandatory<Exit> mode) {
 void LDCommand::AB_(mandatory<AB> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
-  choose_state[sp->getNameTag()] = (mode==AB::b)+1;
+  choose_state[sp->getNameTag()] = (mode == AB::b) + 1;
   getOutput().success("§bEnter selection mode, please click on the ground to select point");
 }
 void LDCommand::query(mandatory<Query> mode) {
@@ -91,7 +91,7 @@ void LDCommand::buy(mandatory<Buy> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   SPBuf sb;
-  auto op    = sp->getPlayerPermissionLevel() > 1;
+//  auto op    = sp->getPlayerPermissionLevel() > 1;
   auto &nm   = sp->getName();
   auto &hash = nm;
   int x, z, dx, dz;
