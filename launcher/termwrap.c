@@ -34,7 +34,10 @@ void handle_line(char *line) {
     printf("\r");
 }
 void write_log(char *data, ssize_t length) {
-  if (logfd) write(logfd, data, length);
+  if (logfd) {
+    ssize_t sz=write(logfd, data, length);
+    if(sz<0) return; //MUST USE RETVAL
+  }
 }
 void init_log(const char *logname) {
   logfd = open(logname, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
