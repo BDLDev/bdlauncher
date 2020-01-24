@@ -118,7 +118,11 @@ bool execute_cmdchain(string_view chain, string_view sp, bool chained) {
   static_deque<string_view> dst;
   split_string(chainxx, dst, ",");
   for (auto &i : dst) {
-    auto res = runcmd(i);
+    char buf[1024];
+    memcpy(buf,i.data(),i.size());
+    auto sz=i.size();
+    for(decltype(sz) j=0;j<sz;++j) if(buf[j]=='$') buf[j]=',';
+    auto res = runcmd({buf,sz});
     if (!res.isSuccess() && chained) return false;
   }
   return true;
@@ -209,10 +213,10 @@ ServerPlayer *getplayer_byname2(string_view name) {
   return rt;
 }
 
-void get_player_names(vector<string> &a) {
+/*void get_player_names(vector<string> &a) {
   auto vc = ServLevel->getUsers();
   for (auto &i : *vc) { a.emplace_back(i->getName()); }
-}
+}*/
 
 THook(
     void *,
