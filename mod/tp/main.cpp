@@ -21,7 +21,7 @@
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:tp\n"
-    "version:20200121\n"
+    "version:20200125\n"
     "author:sysca11\n"
     "depend:base@20200121,command@20200121,gui@20200121\n";
 
@@ -143,7 +143,8 @@ static void sendTPForm(const string &from, int type, ServerPlayer *sp) {
   SPBuf<512> sb;
   sb.write("§b ");
   sb.write(from);
-  sb.write(" wants you to teleport to his location,you can enter \"/tpa ac\" to accept or \"/tpa de\" to reject");
+  sb.write((type ? " wants to teleport to your location" : " wants to teleport you to his location"));
+  sb.write(",you can enter \"/tpa ac\" to accept or \"/tpa de\" to reject");
   sendText(sp, sb);
   sb.clear();
   sb.write(from);
@@ -175,7 +176,7 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
   switch (mode) {
   case TPCMD::ac: {
     if (tpmap.count(nam) == 0) return;
-    tpreq& req = tpmap[nam];
+    tpreq &req = tpmap[nam];
     getOutput().success("§bYou have accepted the send request from the other party");
     player_target.erase(req.name);
     auto dst = getplayer_byname(req.name);
@@ -196,7 +197,7 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
   } break;
   case TPCMD::de: {
     if (tpmap.count(nam) == 0) return;
-    tpreq& req = tpmap[nam];
+    tpreq &req = tpmap[nam];
     getOutput().success("§bYou have rejected the send request");
     player_target.erase(req.name);
     auto dst = getplayer_byname(req.name);
@@ -238,9 +239,10 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
       return;
     }
     player_target[nam] = dnm;
-    tpmap[dnm]          = {0, nam, clock()};
+    tpmap[dnm]         = {0, nam, clock()};
     getOutput().success("§bYou sent a teleport request to the target player");
     sendTPForm(nam, 0, (ServerPlayer *) dst);
+    return;
   }
   case TPCMD::t: {
     auto dst = getplayer_byname2(target);
@@ -258,9 +260,10 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
       return;
     }
     player_target[nam] = dnm;
-    tpmap[dnm]          = {0, nam, clock()};
+    tpmap[dnm]         = {1, nam, clock()};
     getOutput().success("§bYou sent a teleport request to the target player");
-    sendTPForm(nam, 0, (ServerPlayer *) dst);
+    sendTPForm(nam, 1, (ServerPlayer *) dst);
+    return;
   }
   default: break;
   }

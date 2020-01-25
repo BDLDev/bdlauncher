@@ -5,7 +5,7 @@ using namespace BDL::CustomCommand;
 
 class TestCommand : public CustomCommandContext {
 public:
-  static constexpr auto cmd_name        = "test";
+  static constexpr auto cmd_name    = "test";
   static constexpr auto description = "test command";
   static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
@@ -16,7 +16,7 @@ public:
 
 class Test2Command : public CustomCommandContext {
 public:
-  static constexpr auto cmd_name        = "test2";
+  static constexpr auto cmd_name    = "test2";
   static constexpr auto description = "test command2";
   static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
@@ -38,7 +38,7 @@ public:
 
 class Test3Command : public CustomCommandContext {
 public:
-  static constexpr auto cmd_name        = "test3";
+  static constexpr auto cmd_name    = "test3";
   static constexpr auto description = "test command3";
   static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
@@ -50,7 +50,7 @@ public:
 
 class TestSelectorCommand : public CustomCommandContext {
 public:
-  static constexpr auto cmd_name        = "test-select";
+  static constexpr auto cmd_name    = "test-select";
   static constexpr auto description = "Test selector";
   static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
@@ -67,7 +67,7 @@ public:
 class TestJsonCommand : public CustomCommandContext {
 public:
   inline static alias_list aliases  = {"json"};
-  static constexpr auto cmd_name        = "test-json";
+  static constexpr auto cmd_name    = "test-json";
   static constexpr auto description = "Test json";
   static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
