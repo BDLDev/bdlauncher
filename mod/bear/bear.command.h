@@ -16,7 +16,7 @@ enum class Bangui { bangui };
 struct ACCommand : CustomCommandContext {
 public:
   inline static alias_list aliases  = {"bear"};
-  static constexpr auto name        = "ac";
+  static constexpr auto cmd_name        = "ac";
   static constexpr auto description = "AntiCheat functions";
   static constexpr auto permission  = CommandPermissionLevel::OP;
 

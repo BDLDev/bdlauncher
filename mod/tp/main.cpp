@@ -143,11 +143,11 @@ static void sendTPForm(const string &from, int type, ServerPlayer *sp) {
   SPBuf<512> sb;
   sb.write("§b ");
   sb.write(from);
-  sb.write("wants you to teleport to his location,you can enter \"/tpa ac\" to accept or \"/tpa de\" to reject");
+  sb.write(" wants you to teleport to his location,you can enter \"/tpa ac\" to accept or \"/tpa de\" to reject");
   sendText(sp, sb);
   sb.clear();
   sb.write(from);
-  sb.write((type ? "want to teleport to your location" : " wants to teleport you to his location"));
+  sb.write((type ? " want to teleport to your location" : " wants to teleport you to his location"));
   SharedForm *sf = getForm("TP Request", sb.get());
   sf->addButton("Accept");
   sf->addButton("Refuse");
@@ -175,8 +175,7 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
   switch (mode) {
   case TPCMD::ac: {
     if (tpmap.count(nam) == 0) return;
-    tpreq req = tpmap[nam];
-    tpmap.erase(nam);
+    tpreq& req = tpmap[nam];
     getOutput().success("§bYou have accepted the send request from the other party");
     player_target.erase(req.name);
     auto dst = getplayer_byname(req.name);
@@ -193,11 +192,11 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
         TeleportA(*dst, sp->getPos(), {sp->getDimensionId()});
       }
     }
+    tpmap.erase(nam);
   } break;
   case TPCMD::de: {
     if (tpmap.count(nam) == 0) return;
-    tpreq req = tpmap[nam];
-    tpmap.erase(nam);
+    tpreq& req = tpmap[nam];
     getOutput().success("§bYou have rejected the send request");
     player_target.erase(req.name);
     auto dst = getplayer_byname(req.name);
@@ -208,6 +207,7 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
       sb.write(" rejected the transmission request");
       sendText(dst, sb);
     }
+    tpmap.erase(nam);
   } break;
   case TPCMD::cancel: {
     if (player_target.count(nam)) {
@@ -237,10 +237,10 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
       getOutput().error("You have already initiated the request");
       return;
     }
-    player_target[name] = dnm;
-    tpmap[dnm]          = {0, name, clock()};
+    player_target[nam] = dnm;
+    tpmap[dnm]          = {0, nam, clock()};
     getOutput().success("§bYou sent a teleport request to the target player");
-    sendTPForm(name, 0, (ServerPlayer *) dst);
+    sendTPForm(nam, 0, (ServerPlayer *) dst);
   }
   case TPCMD::t: {
     auto dst = getplayer_byname2(target);
@@ -257,10 +257,10 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
       getOutput().error("You have already initiated the request");
       return;
     }
-    player_target[name] = dnm;
-    tpmap[dnm]          = {0, name, clock()};
+    player_target[nam] = dnm;
+    tpmap[dnm]          = {0, nam, clock()};
     getOutput().success("§bYou sent a teleport request to the target player");
-    sendTPForm(name, 0, (ServerPlayer *) dst);
+    sendTPForm(nam, 0, (ServerPlayer *) dst);
   }
   default: break;
   }
