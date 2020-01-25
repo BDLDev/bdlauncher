@@ -20,7 +20,7 @@ enum class Give { give };
 struct LDCommand : CustomCommandContext {
 public:
   inline static alias_list aliases  = {"ld"};
-  static constexpr auto name        = "land";
+  static constexpr auto cmd_name        = "land";
   static constexpr auto description = "Land functions";
   static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 
@@ -47,7 +47,7 @@ enum class Reload { reload };
 struct LDOCommand : CustomCommandContext {
 public:
   // inline static alias_list aliases  = {"ld"};
-  static constexpr auto name        = "land_op";
+  static constexpr auto cmd_name        = "land_op";
   static constexpr auto description = "Land functions";
   static constexpr auto permission  = CommandPermissionLevel::OP;
 

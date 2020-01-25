@@ -13,7 +13,7 @@ enum class Unpin { unpin };
 struct BossbarCommand : CustomCommandContext {
 public:
   inline static alias_list aliases  = {"bb"};
-  static constexpr auto name        = "bossbar";
+  static constexpr auto cmd_name        = "bossbar";
   static constexpr auto description = "Bossbar operation";
   static constexpr auto permission  = CommandPermissionLevel::OP;
 

@@ -5,7 +5,7 @@ using namespace BDL::CustomCommand;
 
 class TransferCommand : public CustomCommandContext {
 public:
-  static constexpr auto name        = "transfer";
+  static constexpr auto cmd_name        = "transfer";
   static constexpr auto description = "Transfer you to server";
   static constexpr auto permission  = CommandPermissionLevel::NORMAL;
 

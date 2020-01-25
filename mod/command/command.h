@@ -344,7 +344,7 @@ template <typename T> using has_aliases_t = decltype(T::aliases);
 template <typename T> using has_aliases   = is_detected<has_aliases_t, T>;
 
 template <typename Desc> void CustomCommandRegistry::CommandApplication<Desc>::apply(::CommandRegistry *registry) {
-  std::string name = Desc::name;
+  std::string name = Desc::cmd_name;
   do_log("register command %s", name.c_str());
   registry->registerCommand(name, Desc::description, Desc::permission, (::CommandFlag) 0, (::CommandFlag) 0);
   auto signature = registry->findCommand(name);

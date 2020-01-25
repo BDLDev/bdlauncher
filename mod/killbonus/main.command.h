@@ -10,7 +10,7 @@ enum class KillbonusMode { Reload, Debug };
 class CommandKillbonus : public CustomCommandContext {
 public:
   inline static alias_list aliases  = {"kbonus"};
-  static constexpr auto name        = "killbonus";
+  static constexpr auto cmd_name        = "killbonus";
   static constexpr auto description = "Kill bonus operation";
   static constexpr auto permission  = CommandPermissionLevel::OP;
 
