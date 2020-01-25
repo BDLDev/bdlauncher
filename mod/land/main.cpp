@@ -422,6 +422,7 @@ static bool handle_popitem(ServerPlayer &sp, BlockPos &bpos) {
   }
 }
 
+#ifdef LAND_TIP_CRASH
 static unordered_map<string, string> lastland;
 static unordered_set<string> flying;
 THook(void *, _ZN12ServerPlayer9tickWorldERK4Tick, ServerPlayer *sp, unsigned long const *tk) {
@@ -458,7 +459,7 @@ THook(void *, _ZN12ServerPlayer9tickWorldERK4Tick, ServerPlayer *sp, unsigned lo
   }
   return original(sp, tk);
 }
-
+#endif
 void mod_init(std::list<string> &modlist) {
   do_log("loaded! " BDL_TAG "");
   loadcfg();
