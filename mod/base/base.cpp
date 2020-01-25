@@ -119,10 +119,11 @@ bool execute_cmdchain(string_view chain, string_view sp, bool chained) {
   split_string(chainxx, dst, ",");
   for (auto &i : dst) {
     char buf[1024];
-    memcpy(buf,i.data(),i.size());
-    auto sz=i.size();
-    for(decltype(sz) j=0;j<sz;++j) if(buf[j]=='$') buf[j]=',';
-    auto res = runcmd({buf,sz});
+    memcpy(buf, i.data(), i.size());
+    auto sz = i.size();
+    for (decltype(sz) j = 0; j < sz; ++j)
+      if (buf[j] == '$') buf[j] = ',';
+    auto res = runcmd({buf, sz});
     if (!res.isSuccess() && chained) return false;
   }
   return true;

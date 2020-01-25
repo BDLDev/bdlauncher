@@ -35,8 +35,8 @@ void handle_line(char *line) {
 }
 void write_log(char *data, ssize_t length) {
   if (logfd) {
-    ssize_t sz=write(logfd, data, length);
-    if(sz<0) return; //MUST USE RETVAL
+    ssize_t sz = write(logfd, data, length);
+    if (sz < 0) return; // MUST USE RETVAL
   }
 }
 void init_log(const char *logname) {
