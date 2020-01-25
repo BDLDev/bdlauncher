@@ -25,7 +25,7 @@ ifeq (1,$(RELEASE))
 else
 	OBJ_SUFFIX=debug
 	CFLAGS+= -g -DDEBUG -O0 -Wall -Werror
-	CXXFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined -Wall -Werror -Wno-invalid-offsetof -Wno-unknown-warning-option
+	CXXFLAGS+= -g -DDEBUG -O0 -fsanitize=undefined -Wall -Werror -Wno-invalid-offsetof -Wno-unknown-warning-option -Wno-parentheses
 	LDFLAGS+= -fsanitize=undefined
 endif
 
