@@ -442,10 +442,10 @@ static void load_cfg() {
   CanBack       = value["can_back"].asBool(false);
   CanHome       = value["can_home"].asBool(false);
   CanTP         = value["can_tp"].asBool(false);
-  MaxHomes      = value["max_homes"].asBool(false);
+  MaxHomes      = value["max_homes"].asInt(5);
   auto &timeout = value["TP_TIMEOUT"];
   if (timeout.isInt()) {
-    TP_TIMEOUT = timeout.asInt(0);
+    TP_TIMEOUT = timeout.asInt(30);
   } else {
     do_log("NO TP_TIMEOUT FOUND!USE 30s AS DEFAULT!!!");
   }

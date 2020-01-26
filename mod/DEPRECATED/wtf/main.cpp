@@ -1,11 +1,17 @@
 #include <Loader.h>
 #include <MC.h>
 #include "base.h"
-#include "cmdhelper.h"
+
 extern "C" {
 BDL_EXPORT void mod_init(std::list<string> &modlist);
 }
 extern void load_helper(std::list<string> &modlist);
+const char meta[] __attribute__((used, section("meta"))) =
+    "name:wtf\n"
+    "version:20200125\n"
+    "author:sysca11\n"
+    "depend:base@20200121\n";
+
 typedef signed long __int64;
 typedef unsigned long _QWORD;
 typedef unsigned int _DWORD;
@@ -109,6 +115,10 @@ THook(__int64, _ZN4Core6Random13_genRandInt32Ev, void *thi) {
   return (v4 << 15) & 0xEFC60000 ^ v4 ^ (((v4 << 15) & 0xEFC60000 ^ v4) >> 18);
 }
 void mod_init(std::list<string> &modlist) {
+  if (!getenv("EXP_OPTI")) {
+    printf("[ERR] Delete wtf.mod please or add EXP_OPTI to environment if you KNOW what you're doing.\n");
+    exit(0);
+  }
   do_log("loaded! V2019-12-14");
   load_helper(modlist);
 }
