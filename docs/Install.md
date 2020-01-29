@@ -9,7 +9,7 @@
 | readline | N/A | `apt install libreadline-dev` | `pacman -S readline --needed` |
 | python | 3.7+ | `apt install python3 python3-pip` | `pacman -S python python-pip --needed` |
 | ply[pip] | N/A | `pip3 install --user ply` | `pip install --user ply` |
-
+| clang | 9.0.1 | `apt install clang-format` | `pacman -S clang --needed` |
 # Install it to BDS
 
 If you do not have a bedrock server, please download it from the [official website](https://www.minecraft.net/download/server/bedrock/) first
