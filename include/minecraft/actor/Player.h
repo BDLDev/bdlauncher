@@ -7,6 +7,8 @@ class ItemStack;
 class ActorDamageSource;
 struct Certificate;
 struct ExtendedCertificate;
+class Block;
+
 class Player : public Mob {
 public:
   virtual ~Player() override;

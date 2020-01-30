@@ -5,6 +5,7 @@
 #include "../money/money.h"
 #include <fstream>
 #include <list>
+#include <sys/stat.h>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:chestshop\n"
