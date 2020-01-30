@@ -12,7 +12,7 @@ class Packet {
   unsigned char getClientSubId() const;
 };
 
-class MyPkt : Packet {
+class MyPkt : public Packet {
   public:
   void **vtbl;
   char filler[256];
