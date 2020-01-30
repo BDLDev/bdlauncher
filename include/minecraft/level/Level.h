@@ -50,6 +50,12 @@ public:
   // ~ level-helper ~ //
   std::vector<std::unique_ptr<Actor>> &getActorVector() const ABITAG(level_helper);
   void forEachActor(std::function<bool(Dimension &, ActorUniqueID, Actor *)>) ABITAG(level_helper);
+  void setTime(int);
+  int getTime() const;
+  void* getPacketSender() const;
 };
 
-class ServerLevel : public Level {};
+class ServerLevel : public Level {
+  bool allPlayersSleeping() const;
+  void stopWeather();
+};

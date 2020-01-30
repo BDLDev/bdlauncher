@@ -1,7 +1,5 @@
 #pragma once
 
-#include "MC.h"
-
 #ifdef __INTELLISENSE__
 #  define MOD_NAME "intelisense"
 #  define BDL_TAG "intelisense"

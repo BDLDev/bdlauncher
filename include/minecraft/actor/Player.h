@@ -38,6 +38,7 @@ public:
 
 class ServerPlayer : public Player {
 public:
+  void stopSleepInBed(bool, bool);
   void sendNetworkPacket(Packet &) const;
   void disconnect(void);
   void sendInventory(bool);

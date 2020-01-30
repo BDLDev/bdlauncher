@@ -133,3 +133,8 @@ struct Vec3 {
     return (x - a.x) * (x - a.x) + (y - a.y) * (y - a.y) * 0.01 + (z - a.z) * (z - a.z);
   }
 };
+
+struct ActorUniqueID {
+  unsigned long id;
+  ActorUniqueID() { id = -1; }
+};
