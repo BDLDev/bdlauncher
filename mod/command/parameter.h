@@ -7,7 +7,8 @@
 #include <minecraft/commands/CommandSelector.h>
 #include <minecraft/commands/CommandPosition.h>
 #include <minecraft/json.h>
-#include <minecraft/block/Block.h>
+//#include <minecraft/block/Block.h>
+class Block;
 
 namespace BDL::CustomCommand {
 

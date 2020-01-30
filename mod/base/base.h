@@ -26,6 +26,10 @@ class Vec3;
 // class AutomaticID<Dimension,int>;
 class Dimension;
 struct MCRESULT;
+class GameMode;
+class ItemActor;
+class ActorDamageSource;
+class Mob;
 
 enum TextType : char { RAW = 0, POPUP = 3, JUKEBOX_POPUP = 4, TIP = 5 };
 
