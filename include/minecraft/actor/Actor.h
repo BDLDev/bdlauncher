@@ -3,7 +3,7 @@
 #include "../core/types.h"
 
 #include <global.h>
-
+#include <cstdint>
 #include <memory>
 
 class EntityContext;
@@ -34,7 +34,7 @@ public:
   TickingArea *getTickingArea();
   bool save(CompoundTag &);
   int getEntityTypeId() const;
-  u64 pickUpItem(ItemActor &);
+  uint64_t pickUpItem(ItemActor &);
   void kill();
   void changeDimension(AutomaticID<Dimension, int>, bool);
   int getDimensionId() const;

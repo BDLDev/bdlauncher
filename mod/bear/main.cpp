@@ -39,6 +39,7 @@
 #include <minecraft/actor/MobEffectInstance.h>
 #include <minecraft/item/ItemStack.h>
 #include <minecraft/net/NetworkIdentifier.h>
+#include <minecraft/Packet/MyPkt.h>
 
 #include "cmdhelper.h"
 #include "base.h"

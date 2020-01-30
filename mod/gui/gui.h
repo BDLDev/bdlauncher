@@ -1,6 +1,9 @@
 #pragma once
+#include <string_view>
 #include <functional>
 #include <vector>
+#include "../base/stkbuf.h"
+#include <minecraft/actor/Player.h>
 using std::string;
 using std::vector;
 constexpr string_view button_json = "{\"type\":\"form\",\"title\":\"";

@@ -12,6 +12,7 @@ struct ExtendedCertificate;
 class Block;
 class FillingContainer;
 class InventoryTransactionManager;
+class AbilitiesIndex;
 
 class Player : public Mob {
 public:
@@ -32,7 +33,9 @@ public:
   
   std::string getName() { return ExtendedCertificate::getIdentityName(getCertificate()); }
   bool canUseAbility(AbilitiesIndex) const;
-  PlayerInventoryProxy *getSupplies() const;
+  // TODO fix
+  /*PlayerInventoryProxy *getSupplies() const;*/
+  PlayerInventoryProxy &getSupplies() const;
   ItemStack &getCarriedItem() const;
   void setCarriedItem(ItemStack const &);
   void add(ItemStack &);
@@ -41,7 +44,8 @@ public:
   void setBedRespawnPosition(BlockPos const &);
   void setName(std::string const &);
   bool startCrafting(BlockPos const &, bool); //_ZN6Player13startCraftingERK8BlockPosb //broken!
-/*int getCommandPermissionLevel() const;*/
+  // TODO fix
+  /*int getCommandPermissionLevel() const;*/
   unsigned char getPlayerPermissionLevel() const;
   unsigned char getCommandPermissionLevel() const;
   float getDestroySpeed(Block const &) const;
