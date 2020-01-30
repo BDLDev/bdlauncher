@@ -36,7 +36,7 @@
 #include <minecraft/actor/Player.h>
 #include <minecraft/actor/PlayerInventoryProxy.h>
 #include <minecraft/core/getSP.h>
-#include <minecraft/actor/MobEffectInstance>
+#include <minecraft/actor/MobEffectInstance.h>
 #include <minecraft/item/ItemStack.h>
 #include <minecraft/net/NetworkIdentifier.h>
 
