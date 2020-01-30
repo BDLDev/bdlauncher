@@ -2,12 +2,16 @@
 
 #include "Mob.h"
 #include "minecraft/net/Connection.h"
+#include <string>
+
 class Packet;
 class ItemStack;
 class ActorDamageSource;
 struct Certificate;
 struct ExtendedCertificate;
 class Block;
+class FillingContainer;
+class InventoryTransactionManager;
 
 class Player : public Mob {
 public:
@@ -19,6 +23,13 @@ public:
         std::string const&(*fn)(Player*)=(typeof(fn))(ptr);
         return fn(this);
   }*/
+  bool isPlayerInitialized() const;
+  std::string getRealNameTag() const { return ExtendedCertificate::getIdentityName(getCertificate()); }
+  unsigned char getClientSubId() const;
+  FillingContainer *getEnderChestContainer();
+  InventoryTransactionManager *getTransactionManager();
+  void updateInventoryTransactions();
+  
   std::string getName() { return ExtendedCertificate::getIdentityName(getCertificate()); }
   bool canUseAbility(AbilitiesIndex) const;
   PlayerInventoryProxy *getSupplies() const;
@@ -30,6 +41,7 @@ public:
   void setBedRespawnPosition(BlockPos const &);
   void setName(std::string const &);
   bool startCrafting(BlockPos const &, bool); //_ZN6Player13startCraftingERK8BlockPosb //broken!
+/*int getCommandPermissionLevel() const;*/
   unsigned char getPlayerPermissionLevel() const;
   unsigned char getCommandPermissionLevel() const;
   float getDestroySpeed(Block const &) const;
@@ -42,6 +54,6 @@ class ServerPlayer : public Player {
 public:
   void stopSleepInBed(bool, bool);
   void sendNetworkPacket(Packet &) const;
-  void disconnect(void);
   void sendInventory(bool);
+  void disconnect();
 };

@@ -15,4 +15,8 @@ public:
   std::vector<ItemStack const *> getSlots() const;
   void setItem(int, ItemStack const &, ContainerID);
   bool removeResource(ItemStack const &);
+  
+  ItemStack &getItem(int, ContainerID) const;
+  int getContainerSize(ContainerID) const;
+  void clearSlot(int, ContainerID);
 };

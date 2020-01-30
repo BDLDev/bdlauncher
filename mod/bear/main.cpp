@@ -22,11 +22,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <bdlexport.h>
 #include "../gui/gui.h"
 #include <Loader.h>
 #include <global.h>
 #include <minecraft/json.h>
 #include <minecraft/core/GameMode.h>
+#include <minecraft/core/Minecraft.h>
 #include <minecraft/block/BlockPos.h>
 #include <minecraft/block/Block.h>
 #include <minecraft/actor/InventorySource.h>
@@ -34,6 +36,9 @@
 #include <minecraft/actor/Player.h>
 #include <minecraft/actor/PlayerInventoryProxy.h>
 #include <minecraft/core/getSP.h>
+#include <minecraft/actor/MobEffectInstance>
+#include <minecraft/item/ItemStack.h>
+#include <minecraft/net/NetworkIdentifier.h>
 
 #include "cmdhelper.h"
 #include "base.h"

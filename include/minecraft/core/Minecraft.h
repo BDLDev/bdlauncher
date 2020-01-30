@@ -30,6 +30,9 @@ class NetworkIdentifier;
 class ServerPlayer;
 class ServerNetworkHandler {
 public:
+  ServerPlayer *_getServerPlayer(NetworkIdentifier const &, unsigned char);
+  void onSubclientLogoff(NetworkIdentifier const &, unsigned char const &);
+
   void disconnectClient(
       NetworkIdentifier const &, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &,
       bool); // def false?
