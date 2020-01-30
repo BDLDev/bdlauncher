@@ -56,7 +56,7 @@ void load() {
     do_log("FastMath enabled");
   }
   // 1.13.1 26581604 1.13.2 26587812 1.14 0x9287ed8 0x78d6840
-  RedStoneMUL = value["RedStoneMUL"].asInt(0);
+  /*RedStoneMUL = value["RedStoneMUL"].asInt(0);
   float *pp   = (float *) (((uintptr_t) dlsym(NULL, "_ZN10LevelChunk4tickER11BlockSourceRK4Tick")) + 0x19b1698);
   int newSpawnDist = value["pVal"].asInt(0);
   int hit          = -114514;
@@ -79,7 +79,7 @@ void load() {
   mprotect(
       (void *) ROUND_PAGE_DOWN((ulong) patch), (ROUND_PAGE_UP((ulong) patch) - ROUND_PAGE_DOWN((ulong) patch)),
       PROT_WRITE | PROT_READ | PROT_EXEC);
-  *pp = newSpawnDist;
+  *pp = newSpawnDist;*/
 }
 /*
 typedef unsigned long __int64;
@@ -194,6 +194,6 @@ THook(__int64,_ZN4Core6Random13_genRandInt32Ev,void *thi)
 
 void mod_init(std::list<string> &modlist) {
   load();
-  do_log("loaded! V2019-12-19");
+  do_log("loaded! V2019-12-30");
   load_helper(modlist);
 }
