@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include <MC.h>
+//#include <MC.h>
 #include <global.h>
 
 static INLINE char get_log_level(int level) {

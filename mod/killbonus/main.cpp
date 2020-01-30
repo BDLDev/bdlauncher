@@ -1,5 +1,5 @@
 #include <Loader.h>
-#include <MC.h>
+//#include <MC.h>
 #include "cmdhelper.h"
 #include <minecraft/json.h>
 #include <fstream>

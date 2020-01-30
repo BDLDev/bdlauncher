@@ -5,7 +5,7 @@
 #include "cmdhelper.h"
 #include <vector>
 #include <Loader.h>
-#include <MC.h>
+//#include <MC.h>
 #include "base.h"
 #include <sys/stat.h>
 #include <unistd.h>

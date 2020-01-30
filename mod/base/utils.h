@@ -1,6 +1,6 @@
 #pragma once
 
-#include <MC.h>
+//#include <MC.h>
 
 BDL_EXPORT ItemStack *createItemStack_static(short id, short aux, unsigned char amo, ItemStack *stk);
 BDL_EXPORT ItemStack *createItemStack(short id, short aux, unsigned char amo);
