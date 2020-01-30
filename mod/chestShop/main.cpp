@@ -7,7 +7,10 @@
 #include <list>
 #include <sys/stat.h>
 #include <minecraft/block/BlockActor.h>
+#include <minecraft/block/BlockPos.h>
 #include <minecraft/core/GameMode.h>
+#include <minecraft/actor/InventorySource.h>
+#include <minecraft/actor/InventoryAction.h>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:chestshop\n"
@@ -274,7 +277,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
 static bool handle_u(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos const *dstPos, Block const *a5) {
   auto nm          = a0->getPlayer()->getName();
   auto it          = ply_price.find(nm);
-  ServerPlayer *sp = a0->getPlayer();
+  ServerPlayer *sp = dynamic_cast<ServerPlayer*>(a0->getPlayer());
   if (it == ply_price.end()) return 1;
   int state = it->second;
   if (state == -114514) {
