@@ -30,6 +30,7 @@ extern "C" {
 BDL_EXPORT void mod_init(std::list<string> &modlist);
 }
 extern void load_helper(std::list<string> &modlist);
+#define access(ptr, type, off) (*((type *) (((uintptr_t) ptr) + off)))
 static LDBImpl db("data_v2/money", true, 1048576 * 2); // 2MB Cache
 
 int INIT_MONEY;

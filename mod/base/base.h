@@ -14,6 +14,7 @@
 #include "dbimpl.h"
 #include "utils.h"
 #include <minecraft/actor/Player.h>
+#include <minecraft/core/types.h>
 
 using namespace std::literals;
 using std::function;

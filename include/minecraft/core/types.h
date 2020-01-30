@@ -24,6 +24,25 @@ struct MCRESULT {
   bool isSuccess() const;
 };
 */
+enum class MCCATEGORY : char {};
+class MCRESULT {
+public:
+  bool success;        // 0
+  MCCATEGORY category; // 1
+  unsigned short code; // 2
+
+  static bool isSuccess(int);
+
+  MCRESULT(bool, MCCATEGORY, unsigned short);
+  MCRESULT(int);
+
+  bool operator==(MCRESULT const &) const;
+  bool operator!=(MCRESULT const &) const;
+
+  int getFullCode() const;
+  bool isSuccess() const;
+};
+
 enum class CommandPermissionLevel : unsigned char { NORMAL, OP, TERMINAL };
 enum class CommandOutputType : char {};
 
