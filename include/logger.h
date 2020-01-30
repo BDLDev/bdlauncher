@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef
+#  define BDL_EXPORT __attribute__((visibility("default")))
+#endif
+
 #ifdef __INTELLISENSE__
 #  define MOD_NAME "intelisense"
 #  define BDL_TAG "intelisense"
