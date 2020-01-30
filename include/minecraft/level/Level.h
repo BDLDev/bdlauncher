@@ -20,6 +20,8 @@ class Player;
 class BlockPalette;
 class MapItemSavedData;
 class ItemStack;
+class ServerPlayer;
+
 class BlockSourceListener {
 public:
   virtual ~BlockSourceListener();
@@ -53,6 +55,7 @@ public:
   void setTime(int);
   int getTime() const;
   void* getPacketSender() const;
+  std::vector<std::unique_ptr<ServerPlayer>> *getUsers();
 };
 
 class ServerLevel : public Level {

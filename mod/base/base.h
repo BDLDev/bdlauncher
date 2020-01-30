@@ -13,6 +13,7 @@
 #include "cmdreg.h"
 #include "dbimpl.h"
 #include "utils.h"
+#include <minecraft/actor/Player.h>
 
 using namespace std::literals;
 using std::function;
@@ -20,7 +21,6 @@ using std::string;
 using std::string_view;
 using std::vector;
 
-class Player;
 class Actor;
 class Vec3;
 // class AutomaticID<Dimension,int>;

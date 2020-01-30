@@ -1,6 +1,10 @@
 
 #include <functional>
 
+extern "C" {
+void _ZN6PacketC2Ev(void *);
+}
+
 class BinaryStream;
 
 class Packet {

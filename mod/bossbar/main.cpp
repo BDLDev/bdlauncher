@@ -14,7 +14,9 @@
 #include <fcntl.h>
 #include <minecraft/actor/Player.h>
 #include <minecraft/packet/MyPkt.h>
+#include <minecraft/packet/BinaryStream.h>
 #include <minecraft/core/getSP.h>
+#include <minecraft/level/Level.h>
 using std::string;
 using std::unordered_map;
 class LevelChunk;
