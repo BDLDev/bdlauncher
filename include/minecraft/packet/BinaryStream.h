@@ -1,5 +1,6 @@
 #include <string>
 #include <minecraft/core/types.h>
+#include "gsl/string_span"
 
 class BinaryStream {
 public:
@@ -40,4 +41,5 @@ public:
     writeFloat(vc.y);
     writeFloat(vc.z);
   }
+  void writeString(gsl::basic_string_span<char const, -1l>);
 };
