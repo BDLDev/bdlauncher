@@ -1,5 +1,6 @@
 #pragma once
 #include "cmdhelper.h"
+#include <bdlexport.h>
 #include <string>
 #include <unordered_map>
 //#include <MC.h>

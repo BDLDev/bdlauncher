@@ -1,8 +1,6 @@
 #pragma once
 
-#ifndef BDL_EXPORT
-#  define BDL_EXPORT __attribute__((visibility("default")))
-#endif
+#include "bdlexport.h"
 
 #ifdef __INTELLISENSE__
 #  define MOD_NAME "intelisense"

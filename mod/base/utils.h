@@ -1,6 +1,12 @@
 #pragma once
-
 //#include <MC.h>
+#include <string>
+#include <bdlexport.h>
+class ItemStack;
+class ServerPlayer;
+struct ActorUniqueID;
+class BlockSource;
+class Vec3;
 
 BDL_EXPORT ItemStack *createItemStack_static(short id, short aux, unsigned char amo, ItemStack *stk);
 BDL_EXPORT ItemStack *createItemStack(short id, short aux, unsigned char amo);
