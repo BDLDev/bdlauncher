@@ -194,6 +194,6 @@ THook(__int64,_ZN4Core6Random13_genRandInt32Ev,void *thi)
 
 void mod_init(std::list<string> &modlist) {
   load();
-  do_log("loaded! V2019-12-19");
+  do_log("loaded! V2019-12-30");
   load_helper(modlist);
 }
