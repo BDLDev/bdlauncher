@@ -1,3 +1,4 @@
+
 static ServerPlayer *last_hide_sp;
 THook(void *, _ZN5Actor9addEffectERK17MobEffectInstance, Actor &ac, MobEffectInstance *mi) {
   if (mi->getId() == 14) {

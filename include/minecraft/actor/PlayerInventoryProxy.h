@@ -3,7 +3,7 @@
 #include <vector>
 
 class ItemStack;
-enum class ContainerID;
+enum class ContainerID : unsigned long { DEFAULT = 0 };
 
 class PlayerInventoryProxy {
 public:

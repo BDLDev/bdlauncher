@@ -1,25 +1,17 @@
-
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <global.h>
 #include <cstdio>
 #include <list>
 #include <forward_list>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include "cmdhelper.h"
 #include <vector>
-#include <Loader.h>
 //#include <MC.h>
 #include <unistd.h>
 #include <cstdarg>
 #include <fstream>
-#include <minecraft/json.h>
-#include "base.h"
-#include "../gui/gui.h"
-#include "bear.command.h"
 #include <ctime>
 #include <cmath>
 #include <deque>
@@ -30,7 +22,27 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "../gui/gui.h"
+#include <Loader.h>
+#include <global.h>
+#include <minecraft/json.h>
+#include <minecraft/core/GameMode.h>
+#include <minecraft/block/BlockPos.h>
+#include <minecraft/block/Block.h>
+#include <minecraft/actor/InventorySource.h>
+#include <minecraft/actor/InventoryAction.h>
+#include <minecraft/actor/Player.h>
+#include <minecraft/actor/PlayerInventoryProxy.h>
+#include <minecraft/core/getSP.h>
+
+#include "cmdhelper.h"
+#include "base.h"
+#include "bear.command.h"
 #include "lang.h"
+#include "log.hpp"
+#include "network.hpp"
+#include "ChatSan.hpp"
+
 using std::string;
 using std::unordered_map;
 using std::unordered_set;
@@ -64,8 +76,7 @@ bool isBanned(const string &name) {
     return 0;
   }
 }
-#include "log.hpp"
-#include "network.hpp"
+
 THook(
     void *, _ZN20ServerNetworkHandler22_onClientAuthenticatedERK17NetworkIdentifierRK11Certificate,
     ServerNetworkHandler *snh, NetworkIdentifier &a, Certificate &b) {
@@ -105,7 +116,7 @@ template <const int size, const int delta> struct timeq {
   }
 };
 
-#include "ChatSan.hpp"
+
 
 unordered_map<string, time_t> mute_time;
 static bool is_muted(const string &name) {
