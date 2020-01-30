@@ -1,6 +1,7 @@
 #include <string>
 
-struct InventorySource {
+class InventorySource {
+public:
   char filler[12];
   int getType() const;
   int getFlags() const;

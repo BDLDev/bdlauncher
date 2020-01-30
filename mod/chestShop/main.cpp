@@ -11,6 +11,7 @@
 #include <minecraft/core/GameMode.h>
 #include <minecraft/actor/InventorySource.h>
 #include <minecraft/actor/InventoryAction.h>
+#include <minecraft/item/ItemStack.h>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:chestshop\n"
