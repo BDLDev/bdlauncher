@@ -132,7 +132,7 @@ static bool hkc(ServerPlayer *b, string &c) {
       return 0;
     }
   }
-  auto &name = b->getName();
+  auto &name = b->getNameTag();
   if (is_muted(name)) {
     sendText(b, "You're muted");
     return 0;
