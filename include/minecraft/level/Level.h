@@ -58,6 +58,11 @@ public:
   int getTime() const;
   void* getPacketSender() const;
   std::vector<std::unique_ptr<ServerPlayer>> *getUsers();
+
+  void* save();
+  ServerPlayer *getPlayer(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &) const;
+  int getUserCount() const;
+  int getTickedMobCountPrevious() const;
 };
 
 class ServerLevel : public Level {

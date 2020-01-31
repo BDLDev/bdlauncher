@@ -32,6 +32,7 @@ using std::vector;
 #include <minecraft/net/NetworkIdentifier.h>
 #include <minecraft/net/LoopbackPacketSender.h>
 #include <minecraft/packet/MyPkt.h>
+#include <minecraft/packet/BinaryStream.h>
 #include <minecraft/level/Level.h>
 
 #include "base.h"
