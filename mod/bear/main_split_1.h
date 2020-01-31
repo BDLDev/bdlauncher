@@ -1,5 +1,7 @@
+#include <utility>
+
  template <const int size, const int delta> struct timeq {
-  pair<ServerPlayer *, clock_t> pool[size];
+  std::pair<ServerPlayer *, clock_t> pool[size];
   int ptr = 0;
   bool push(ServerPlayer *sp) {
     auto now    = clock();
