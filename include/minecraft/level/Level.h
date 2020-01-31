@@ -50,7 +50,7 @@ public:
   BlockPalette *getGlobalBlockPalette() const;
   LevelStorage *getLevelStorage();
   MapItemSavedData& getMapSavedData(ActorUniqueID);
-  MapItemSavedData& getMapSavedData(std::unique_ptr<CompoundTag, std::default_delete<CompoundTag> > const&)
+  MapItemSavedData& getMapSavedData(std::unique_ptr<CompoundTag, std::default_delete<CompoundTag> > const&);
   // ~ level-helper ~ //
   std::vector<std::unique_ptr<Actor>> &getActorVector() const ABITAG(level_helper);
   void forEachActor(std::function<bool(Dimension &, ActorUniqueID, Actor *)>) ABITAG(level_helper);

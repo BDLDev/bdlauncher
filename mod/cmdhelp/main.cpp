@@ -6,6 +6,11 @@
 #include <cstdarg>
 #include "../gui/gui.h"
 #include <queue>
+#include <minecraft/core/do_hash.h>
+#include <minecraft/core/getSP.h>
+#include <minecraft/core/GameMode.h>
+#include <minecraft/item/ItemStack.h>
+typedef unsigned long STRING_HASH;
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:cmdhelp\n"

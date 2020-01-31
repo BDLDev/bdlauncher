@@ -55,7 +55,7 @@ public:
   virtual ~Actor();
 
   const std::string &getNameTag() const;
-//  Shash_t getNameTagAsHash() { return do_hash(getNameTag()); } // fix it
+  uint64_t getNameTagAsHash() const; // fix it
   Vec3 const &getPos() const;
   std::vector<MobEffect> &getAllEffects() const;
   BlockSource &getRegion() const;
