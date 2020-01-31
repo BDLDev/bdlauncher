@@ -2,8 +2,8 @@
 
 #include <string_view>
 #include <cstring>
-#include "stl.hpp"
 #include <functional>
+#include "stl.hpp"
 
 template <const int sz = 1024> struct SPBuf {
   char buf[sz];

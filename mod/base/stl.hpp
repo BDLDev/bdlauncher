@@ -3,8 +3,8 @@
 #define likely(cond) __glibc_likely(!!(cond))
 #include <string_view>
 #include <string>
-#include <logger.h>
 #include <list>
+#include <logger.h>
 using std::string;
 using std::string_view;
 template <typename T, const int S = 96, const int SZ_MAX = sizeof(T) * S> struct static_deque {
