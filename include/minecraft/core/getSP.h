@@ -1,3 +1,4 @@
+#pragma once
 #include <memory>
 #include "vtSP.h"
 #define access(ptr, type, off) (*((type *) (((uintptr_t) ptr) + off)))

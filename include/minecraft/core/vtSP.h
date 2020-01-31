@@ -1,3 +1,4 @@
+#pragma once
 extern "C" {
 void _ZTV12ServerPlayer(void); // dummy
 }

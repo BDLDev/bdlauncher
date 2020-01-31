@@ -1,4 +1,4 @@
-
+#pragma once
 class Vec3;
 
 class BlockPos {
