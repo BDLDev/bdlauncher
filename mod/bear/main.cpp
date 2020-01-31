@@ -43,6 +43,7 @@
 #include <minecraft/packet/MyPkt.h>
 #include <cmdhelper.h>
 
+#include "main_split_1.h"
 #include "../base/base.h"
 #include "bear.command.h"
 #include "lang.h"
@@ -104,28 +105,6 @@ THook(
 
 size_t MAX_CHAT_SIZE;
 static_deque<string, 128> banword;
-template <const int size, const int delta> struct timeq {
-  pair<ServerPlayer *, clock_t> pool[size];
-  int ptr = 0;
-  bool push(ServerPlayer *sp) {
-    auto now    = clock();
-    pool[ptr++] = {sp, now};
-    if (ptr == size) ptr = 0;
-    int cnt       = 0;
-    clock_t first = LONG_MAX;
-    for (auto &[p, clk] : pool) {
-      if (p == sp) {
-        if (clk < first) first = clk;
-        cnt++;
-      }
-    }
-    if (cnt <= 1) return true;
-    if ((cnt - 1) * delta > now - first) return false;
-    return true;
-  }
-};
-
-
 
 unordered_map<string, time_t> mute_time;
 static bool is_muted(const string &name) {
