@@ -62,7 +62,7 @@ public:
   Dimension &getDimension() const;
   long getRuntimeID() const;
   void setNameTag(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &);
-  void setScoreTag(string const &);
+  void setScoreTag(std::string const &);
   Mob *getOwner() const;
   ServerPlayer *getPlayerOwner() const;
   int getOwnerEntityType();

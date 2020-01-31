@@ -146,8 +146,8 @@ void ACCommand::mute(mandatory<Mute>, mandatory<CommandSelector<Player>> target,
   auto results = target.results(getOrigin());
   if (!Command::checkHasTargets(results, getOutput())) return;
   for (auto &player : results) {
-    mute_time[player.getName()] = to;
-    getOutput().addMessage(player.getName() + " has been muted");
+    mute_time[player.getNameTag()] = to;
+    getOutput().addMessage(player.getNameTag() + " has been muted");
   }
   getOutput().success();
 }
@@ -157,7 +157,7 @@ void ACCommand::ban(mandatory<Ban>, mandatory<string> target, optional<int> time
   ban_data.Put(target, string((char *) &tim, 4));
   auto x = getuser_byname(target);
   if (x) {
-    ban_data.Put(x->getXUID(), x->getName());
+    ban_data.Put(x->getXUID(), x->getNameTag());
     forceKickPlayer(*x);
   }
   getOutput().success("§b" + target + " has been banned");
@@ -172,13 +172,13 @@ static int LOG_CHEST;
 THook(void *, _ZN15ChestBlockActor9startOpenER6Player, BlockActor &ac, Player &pl) {
   if (LOG_CHEST) {
     auto &pos = ac.getPosition();
-    async_log("[CHEST] %s open chest pos: %d %d %d\n", pl.getName().c_str(), pos.x, pos.y, pos.z);
+    async_log("[CHEST] %s open chest pos: %d %d %d\n", pl.getNameTag().c_str(), pos.x, pos.y, pos.z);
   }
   return original(ac, pl);
 }
 static bool handle_u(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos const *dstPos, Block const *a5) {
   if (a0->getPlayer()->getPlayerPermissionLevel() > 1) return 1;
-  auto &sn = a0->getPlayer()->getName();
+  auto &sn = a0->getPlayer()->getNameTag();
   if (banitems.has(a1->getId())) {
     async_log(
         "[ITEM] %s tries to use prohibited items(banned) %s pos: %d %d %d\n", sn.c_str(), a1->toString().c_str(), a2->x,
@@ -194,7 +194,7 @@ static bool handle_u(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos c
   }
   return 1;
 }
-static void handle_left(ServerPlayer *a1) { async_log("[LEFT] %s left game\n", a1->getName().c_str()); }
+static void handle_left(ServerPlayer *a1) { async_log("[LEFT] %s left game\n", a1->getNameTag().c_str()); }
 
 static int FPushBlock, FExpOrb, FDest;
 enum CheatType { FLY, NOCLIP, INV, MOVE };
@@ -310,7 +310,7 @@ struct VirtInv{
 // unordered_map<string,IHash> lastitem;
 THook(unsigned long, _ZNK20InventoryTransaction11executeFullER6Playerb, void *_thi, Player &player, bool b) {
   if (player.getPlayerPermissionLevel() > 1) return original(_thi, player, b);
-  const string &name = player.getName();
+  const string &name = player.getNameTag();
   auto &a            = *((unordered_map<InventorySource, vector<InventoryAction>> *) _thi);
   for (auto &i : a) {
     for (auto &j : i.second) {
@@ -400,7 +400,7 @@ static bool handle_dest(GameMode *a0, BlockPos const *a1) {
   /*Block &bk = *sp->getBlockSource()->getBlock(*a1);
   int id    = bk.getLegacyBlock()->getBlockItemId();
   if (id == 7 || id == 416) {
-    notifyCheat(sp->getName(), CheatType::INV);
+    notifyCheat(sp->getNameTag(), CheatType::INV);
     return 0;
   }*/
   return 1;
@@ -412,7 +412,7 @@ void ACCommand::kick(mandatory<Kick>, mandatory<string> target) {
     return;
   }
   forceKickPlayer(*sp);
-  getOutput().addMessage("Kicked " + sp->getName());
+  getOutput().addMessage("Kicked " + sp->getNameTag());
   getOutput().success();
 }
 void ACCommand::bangui(mandatory<Bangui>) {
@@ -430,18 +430,18 @@ void ACCommand::bangui(mandatory<Bangui>) {
 }
 
 static void onJoin(ServerPlayer *sp) {
-  auto &pn  = sp->getName();
+  auto &pn  = sp->getNameTag();
   auto xuid = sp->getXUID();
   string val;
   auto succ = ban_data.Get(xuid, val);
   if (!succ) { ban_data.Put(xuid, pn); }
   if (isBanned(pn) || (succ && isBanned(val))) {
     forceKickPlayer(*sp);
-    async_log("[BAN] anti-blacklist detected for %s \n", sp->getName().c_str());
+    async_log("[BAN] anti-blacklist detected for %s \n", sp->getNameTag().c_str());
     return;
   }
   auto inv = dumpall(sp);
-  int fd   = open(("invdump/" + sp->getName()).c_str(), O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR);
+  int fd   = open(("invdump/" + sp->getNameTag()).c_str(), O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR);
   write(fd, inv.data(), inv.size());
   close(fd);
 }
