@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <string>
+
 /*
 enum class MCCATEGORY : char {};
 typedef uint64_t u64;
@@ -156,4 +157,8 @@ struct Vec3 {
 struct ActorUniqueID {
   unsigned long id;
   ActorUniqueID() { id = -1; }
+};
+
+struct SynchedActorData {
+  template <typename T> void set(unsigned short, T const &);
 };
