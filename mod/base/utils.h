@@ -1,6 +1,6 @@
 #pragma once
 //#include <MC.h>
-#include <cstring>
+#include <string>
 #include <bdlexport.h>
 class ItemStack;
 class ServerPlayer;

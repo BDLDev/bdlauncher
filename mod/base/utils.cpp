@@ -8,6 +8,8 @@
 #include <minecraft/core/types.h>
 #include <minecraft/actor/Player.h>
 #include <minecraft/actor/ActorDefinitionIdentifier.h>
+#include <minecraft/actor/InventoryTransactionManager.h>
+#include <minecraft/actor/PlayerInventoryProxy.h>
 #include <minecraft/item/Item.h>
 #include <minecraft/item/ItemStack.h>
 #include <minecraft/item/ItemRegistry.h>

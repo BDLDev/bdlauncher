@@ -6,6 +6,8 @@
 
 class Item;
 class ItemInstance;
+class BlockLegacy;
+class RecipeIngredient;
 
 extern "C" {
 void _ZN9ItemStackD0Ev(void *);
@@ -18,9 +20,12 @@ public:
 
 
   ItemStack();
+  ItemStack(BlockLegacy const&, int);
+  ItemStack(RecipeIngredient const&);
   ItemStack(ItemStack const &);
   ItemStack(ItemInstance const &);
-  ItemStack(const Item &, int amo);
+  ItemStack(Item const &);
+  ItemStack(Item const&, int);
   ItemStack &operator=(ItemStack const &);
   // void clone(ItemStack const &);
   std::vector<std::string> getCustomLore() const;
