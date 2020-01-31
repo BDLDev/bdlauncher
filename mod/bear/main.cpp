@@ -30,6 +30,7 @@
 #include <minecraft/core/GameMode.h>
 #include <minecraft/core/Minecraft.h>
 #include <minecraft/block/BlockPos.h>
+#include <minecraft/block/BlockActor.h>
 #include <minecraft/block/Block.h>
 #include <minecraft/actor/InventorySource.h>
 #include <minecraft/actor/InventoryAction.h>
