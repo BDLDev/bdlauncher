@@ -214,8 +214,8 @@ static void notifyCheat(const string &name, CheatType x) {
 THook(void *, _ZN5BlockC2EtR7WeakPtrI11BlockLegacyE, Block *a, unsigned short x, void *c) {
   auto ret = original(a, x, c);
   if (FPushBlock) {
-    auto *leg = a->getLegacyBlock();
-    if (a->isContainerBlock()) leg->addBlockProperty({0x1000000LL});
+    auto *leg = a->getLegacyBlock();BlockProperty t;t.x=0x1000000LL;
+    if (a->isContainerBlock()) leg->addBlockProperty(t);
   }
   return ret;
 }
