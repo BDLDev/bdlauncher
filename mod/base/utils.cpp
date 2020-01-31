@@ -10,6 +10,7 @@
 #include <minecraft/actor/ActorDefinitionIdentifier.h>
 #include <minecraft/actor/InventoryTransactionManager.h>
 #include <minecraft/actor/PlayerInventoryProxy.h>
+#include <minecraft/commands/CommandUtils.h>
 #include <minecraft/item/Item.h>
 #include <minecraft/item/ItemStack.h>
 #include <minecraft/item/ItemRegistry.h>
