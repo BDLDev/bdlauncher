@@ -34,6 +34,10 @@ using std::vector;
 #include <minecraft/packet/MyPkt.h>
 #include <minecraft/level/Level.h>
 
+#ifndef access
+#define access(ptr, type, off) (*((type *) (((uintptr_t) ptr) + off)))
+#endif
+
 #include "base.h"
 #include "hook.h"
 

@@ -7,6 +7,10 @@
 #include "../core/vtSP.h"
 #include "global.h"
 
+#ifndef access
+#define access(ptr, type, off) (*((type *) (((uintptr_t) ptr) + off)))
+#endif
+
 class EntityContext;
 class SimpleContainer;
 class ActorDefinitionDescriptor;
