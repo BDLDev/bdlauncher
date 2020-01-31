@@ -5,10 +5,9 @@
 #include <cassert>
 #include <minecraft/actor/Player.h>
 #include "../base/stkbuf.hpp"
-using std::string;
-using std::vector;
-constexpr string_view button_json = "{\"type\":\"form\",\"title\":\"";
-constexpr string_view input_json  = "{\"type\":\"custom_form\",\"title\":\""; // content
+
+constexpr std::string_view button_json = "{\"type\":\"form\",\"title\":\"";
+constexpr std::string_view input_json  = "{\"type\":\"custom_form\",\"title\":\""; // content
 struct SharedForm {
   bool needfree;
   bool isInput;
@@ -16,8 +15,8 @@ struct SharedForm {
   unsigned char labcnt;
   int fid;
   SPBuf<2048> buf;
-  string_view labels[128];
-  function<void(ServerPlayer *, string_view, int)> cb;
+  std::string_view labels[128];
+  std::function<void(ServerPlayer *, string_view, int)> cb;
   SharedForm(string_view title, string_view cont, bool nedfree = true, bool isInp = false) {
     needfree    = nedfree;
     isInput     = isInp;

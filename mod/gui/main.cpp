@@ -19,6 +19,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "gui.h"
+#include <minecraft/packet/MyPkt.h>
 using std::string;
 using std::unordered_map;
 
