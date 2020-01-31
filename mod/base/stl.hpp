@@ -2,6 +2,8 @@
 #define unlikely(cond) __glibc_unlikely(!!(cond))
 #define likely(cond) __glibc_likely(!!(cond))
 #include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <string_view>
 #include <string>
 #include <cstring>
