@@ -10,14 +10,8 @@ class GameMode {
 public:
   void* vtbl;
   ServerPlayer *player;
-  
-  ServerPlayer *getPlayer() { return player; }
-  u64 attack(Actor &);
-  u64 buildBlock(BlockPos const &, unsigned char);
-  u64 destroyBlock(BlockPos const &, unsigned char);
-  u64 useItem(ItemStack &);
-  u64 useItemOn(ItemStack &, BlockPos const &, unsigned char, Vec3 const &, Block const *);
 
+  inline ServerPlayer *getPlayer() { return player; }
   //MakeAccessor(getPlayer, Player *, 8);
   uint64_t attack(Actor &);
   uint64_t buildBlock(BlockPos const &, unsigned char);
