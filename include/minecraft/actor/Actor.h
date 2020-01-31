@@ -27,7 +27,7 @@ class ItemStack;
 class MobEffect;
 class Mob;
 class ServerPlayer;
-class ArmorSlot;
+enum class ArmorSlot;
 
 class Actor {
 public:

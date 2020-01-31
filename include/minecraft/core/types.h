@@ -163,4 +163,4 @@ struct SynchedActorData {
   template <typename T> void set(unsigned short, T const &);
 };
 
-enum ArmorSlot : int { UNK = 0 };
+enum class ArmorSlot : int { UNK = 0 };
