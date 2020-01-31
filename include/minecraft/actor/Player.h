@@ -12,7 +12,7 @@ struct ExtendedCertificate;
 class Block;
 class FillingContainer;
 class InventoryTransactionManager;
-class AbilitiesIndex;
+enum class AbilitiesIndex;
 
 class Player : public Mob {
 public:
