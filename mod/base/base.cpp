@@ -1,6 +1,6 @@
 #define BASE
-#include "cmdhelper.h"
-#include "myhook.h"
+#include <cmdhelper.h>
+#include <myhook.h>
 #include <Loader.h>
 //#include <MC.h>
 #include <vector>
@@ -9,13 +9,33 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <tuple>
+#include <list>
+#include <vector>
 using std::list;
 using std::tuple;
 using std::vector;
-#include "base.h"
-#include "hook.h"
 #include <sstream>
 #include <logger.h>
+#include <string>
+
+#include <minecraft/actor/Actor.h>
+#include <minecraft/actor/Mob.h>
+#include <minecraft/actor/ItemActor.h>
+#include <minecraft/actor/Player.h>
+#include <minecraft/actor/ActorDamageSource.h>
+#include <minecraft/core/GameMode.h>
+#include <minecraft/block/BlockPos.h>
+#include <minecraft/item/ItemStack.h>
+#include <minecraft/block/Block.h>
+#include <minecraft/core/types.h>
+#include <minecraft/core/Minecraft.h>
+#include <minecraft/net/NetworkIdentifier.h>
+#include <minecraft/net/LoopbackPacketSender.h>
+#include <minecraft/packet/MyPkt.h>
+#include <minecraft/level/Level.h>
+
+#include "base.h"
+#include "hook.h"
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:base\n"
