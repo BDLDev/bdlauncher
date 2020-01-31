@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 #include "minecraft/core/types.h"
 #include "gsl/string_span"
 
