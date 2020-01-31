@@ -1,5 +1,5 @@
 #pragma once
-#include <global.h>
+#include "global.h"
 #include <cstdint>
 class Actor;
 class ItemStack;

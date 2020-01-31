@@ -19,7 +19,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "gui.h"
+#include <minecraft/core/types.h>
+#include <minecraft/level/Level.h>
 #include <minecraft/packet/MyPkt.h>
+#include <minecraft/packet/BinaryStream.h>
 using std::string;
 using std::unordered_map;
 

@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
-#include "../../RakNet/PluginInterface2.h"
-#include "../../RakNet/peerinterface.h"
-#include "../../RakNet/types.h"
-#include "../../RakNet/peer.h"
+#include "RakNet/PluginInterface2.h"
+#include "RakNet/peerinterface.h"
+#include "RakNet/types.h"
+#include "RakNet/peer.h"
 ;
 class EntityRegistry;
 

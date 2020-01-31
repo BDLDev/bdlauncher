@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <minecraft/core/types.h>
+#include "minecraft/core/types.h"
 #include "gsl/string_span"
 
 class BinaryStream {
