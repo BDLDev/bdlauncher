@@ -1,6 +1,10 @@
 
 #include <functional>
 
+#ifndef fp
+#  define fp(a) ((void *) (a))
+#endif
+
 extern "C" {
 void _ZN6PacketC2Ev(void *);
 }

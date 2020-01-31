@@ -38,6 +38,7 @@
 #include <minecraft/core/getSP.h>
 #include <minecraft/actor/MobEffectInstance.h>
 #include <minecraft/item/ItemStack.h>
+#include <minecraft/item/FillingContainer.h>
 #include <minecraft/net/NetworkIdentifier.h>
 #include <minecraft/packet/MyPkt.h>
 #include <cmdhelper.h>
@@ -48,6 +49,8 @@
 #include "log.hpp"
 #include "network.hpp"
 #include "ChatSan.hpp"
+#include "hidechk.hpp"
+#include "invchk.hpp"
 
 using std::string;
 using std::unordered_map;
@@ -446,8 +449,7 @@ void ACCommand::bangui(mandatory<Bangui>) {
     getOutput().success();
   }
 }
-#include "hidechk.hpp"
-#include "invchk.hpp"
+
 static void onJoin(ServerPlayer *sp) {
   auto &pn  = sp->getName();
   auto xuid = sp->getXUID();
