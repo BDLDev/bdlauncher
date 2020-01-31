@@ -47,7 +47,7 @@ public:
 enum class CommandPermissionLevel : unsigned char { NORMAL, OP, TERMINAL };
 enum class CommandOutputType : char {};
 
-struct Vec3;
+class Vec3;
 
 struct BlockPos;
 class Actor;
@@ -141,7 +141,8 @@ struct RelativeFloat {
   float getValue(float) const;
 };
 
-struct Vec3 {
+class Vec3 {
+public:
   float x, y, z;
   Vec3(){};
   Vec3(float x, float y, float z) : x(x), y(y), z(z) {}

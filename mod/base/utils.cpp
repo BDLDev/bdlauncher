@@ -2,8 +2,15 @@
 #include <global.h>
 #include <logger.h>
 //#include <MC.h>
-#include <string>
+#include <cstring>
+#include <cassert>
 #include "utils.h"
+#include <minecraft/core/types.h>
+#include <minecraft/actor/Player.h>
+#include <minecraft/actor/ActorDefinitionIdentifier.h>
+#include <minecraft/item/Item.h>
+#include <minecraft/item/ItemStack.h>
+#include <minecraft/item/ItemRegistry.h>
 
 using std::string;
 
