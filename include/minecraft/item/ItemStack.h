@@ -6,16 +6,17 @@
 
 class Item;
 class ItemInstance;
-/*
+
 extern "C" {
 void _ZN9ItemStackD0Ev(void *);
 void _ZN9ItemStackD2Ev(void *);
 }
-*/
+
 class ItemStack : public ItemStackBase{
+public:
   char filler[136];
 
-public:
+
   ItemStack();
   ItemStack(ItemStack const &);
   ItemStack(ItemInstance const &);
@@ -27,12 +28,12 @@ public:
   void setCustomLore(std::vector<std::string> const &);
   //  operator bool(void) const;
   //~ItemStack();
-  inline ~ItemStack() { asm("call _ZN9ItemStackD2Ev"); };
+  inline ~ItemStack() { _ZN9ItemStackD2Ev(this); }
   short getId() const;
   float getDestroySpeed(Block const &) const;
   std::string toString() const;
   bool operator!=(ItemStack const &) const;
   bool isOffhandItem() const;
 
-  //inline void defunct_cfree() { _ZN9ItemStackD0Ev(this); }
+  inline void defunct_cfree() { _ZN9ItemStackD0Ev(this); }
 };
