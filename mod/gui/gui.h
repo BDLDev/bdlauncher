@@ -2,7 +2,7 @@
 #include <string_view>
 #include <functional>
 #include <vector>
-#include "../base/stkbuf.h"
+#include "../base/stkbuf.hpp"
 #include <minecraft/actor/Player.h>
 using std::string;
 using std::vector;
