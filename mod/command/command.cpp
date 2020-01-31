@@ -1,5 +1,7 @@
 #include "command.h"
 #include <Loader.h>
+#include <list>
+#include <cstring>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:command\n"
