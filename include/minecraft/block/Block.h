@@ -7,6 +7,7 @@
 
 class Block;
 class BlockProperty {
+public:
   unsigned long x;
 };
 
