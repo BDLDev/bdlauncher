@@ -1,14 +1,13 @@
 #pragma once
-
-#include "../core/types.h"
-
-#include <global.h>
 #include <cstdint>
 #include <cstring>
 #include <memory>
 #include <vector>
+#include "../core/types.h"
+#include "../core/vtSP.h"
+#include "global.h"
 
-#ifndef
+#ifndef access
 #define access(ptr, type, off) (*((type *) (((uintptr_t) ptr) + off)))
 #endif
 
