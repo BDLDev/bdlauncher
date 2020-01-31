@@ -20,7 +20,11 @@
 #include <fcntl.h>
 #include "gui.h"
 #include <minecraft/core/types.h>
+#include <minecraft/core/getSP.h>
+#include <minecraft/core/Minecraft.h>
 #include <minecraft/level/Level.h>
+#include <minecraft/item/ItemStack.h>
+#include <minecraft/net/NetworkIdentifier.h>
 #include <minecraft/packet/MyPkt.h>
 #include <minecraft/packet/BinaryStream.h>
 using std::string;
