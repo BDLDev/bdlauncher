@@ -34,7 +34,7 @@ public:
   void reserve(unsigned long);
   void writeBool(bool);
   void writeByte(unsigned char);
-  void writeStr(string_view sv) {
+  void writeStr(std::string_view sv) {
     writeUnsignedVarInt(sv.size());
     write(sv.data(), sv.size());
   }
