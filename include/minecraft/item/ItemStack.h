@@ -2,10 +2,17 @@
 
 #include <string>
 #include <vector>
+#include "ItemStackBase.h"
+
 class Item;
 class ItemInstance;
 
-class ItemStack {
+extern "C" {
+void _ZN9ItemStackD0Ev(void *);
+void _ZN9ItemStackD2Ev(void *);
+}
+
+class ItemStack : public ItemStackBase{
   char filler[136];
 
 public:
@@ -26,4 +33,8 @@ public:
   std::string toString() const;
   bool operator!=(ItemStack const &) const;
   bool isOffhandItem() const;
+
+  ItemStack(ItemStack const &);
+  inline void defunct_cfree() { _ZN9ItemStackD0Ev(this); }
+  inline ~ItemStack() { _ZN9ItemStackD2Ev(this); }
 };
