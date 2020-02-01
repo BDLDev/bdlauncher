@@ -21,6 +21,13 @@
 #include "../gui/gui.h"
 #include "data.hpp"
 #include "land.command.h"
+#include <minecraft/core/getSP.h>
+#include <minecraft/core/GameMode.h>
+#include <minecraft/block/BlockPos.h>
+#include <minecraft/actor/ActorDamageSource.h>
+#include <minecraft/level/Level.h>
+#include <minecraft/item/ItemStack.h>
+
 const char meta[] __attribute__((used, section("meta"))) =
     "name:land\n"
     "version:20200121\n"
@@ -168,7 +175,7 @@ void LDCommand::trust(mandatory<Trust> mode, mandatory<std::string> target) {
   auto lp   = getFastLand(pos.x, pos.z, dim);
   if (lp && (lp->chkOwner(nm) == 2 || op)) {
     SPBuf sb;
-    DataLand dl{*lp};
+    DataLand dl(*lp);
     dl.addOwner(target);
     updLand(dl);
     sb.write("§bMake ");
