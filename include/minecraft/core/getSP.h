@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "vtSP.h"
+#include "access.h"
 
 //typedef void *UNK_64;
 class ServerPlayer;

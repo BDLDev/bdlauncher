@@ -2,10 +2,7 @@
 #include <unordered_map>
 #include "base.h"
 #include <sys/cdefs.h>
-
-#ifndef access
-#define access(ptr, type, off) (*((type *) (((uintptr_t) ptr) + off)))
-#endif
+#include <minecraft/core/access.h>
 
 using std::list;
 using std::swap;

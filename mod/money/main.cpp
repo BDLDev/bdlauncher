@@ -17,10 +17,7 @@
 #include <fstream>
 #include "../gui/gui.h"
 #include "lang.h"
-
-#ifndef access
-#define access(ptr, type, off) (*((type *) (((uintptr_t) ptr) + off)))
-#endif
+#include <minecraft/core/access.h>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:money\n"

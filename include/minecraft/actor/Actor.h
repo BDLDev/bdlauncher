@@ -5,6 +5,7 @@
 #include <vector>
 #include "../core/types.h"
 #include "../core/vtSP.h"
+#include "../core/access.h"
 #include "global.h"
 
 class EntityContext;

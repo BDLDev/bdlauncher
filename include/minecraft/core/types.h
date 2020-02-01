@@ -5,12 +5,6 @@
 #include <cstdlib>
 #include <string>
 
-#include <unistd.h>
-// fix 
-#ifndef access
-#define access(ptr, type, off) (*((type *) (((uintptr_t) ptr) + off)))
-#endif
-
 /*
 enum class MCCATEGORY : char {};
 typedef uint64_t u64;
