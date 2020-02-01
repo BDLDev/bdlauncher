@@ -22,7 +22,7 @@ public:
   std::unique_ptr<CompoundTag, std::default_delete<CompoundTag>> &getUserData() const;
   void setStackSize(unsigned char);
   void setCustomLore(std::vector<std::string> const&);
-  std::vector<std::string>& getCustomLore() const
+  std::vector<std::string>& getCustomLore() const;
   void setCustomName(std::string const &);
   bool operator!=(ItemStackBase const&) const;
   bool operator==(ItemStackBase const&) const;

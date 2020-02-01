@@ -12,7 +12,7 @@ class RecipeIngredient;
 extern "C" {
 void _ZN9ItemStackD0Ev(void *);
 void _ZN9ItemStackD2Ev(void *);
-}
+};
 
 class ItemStack : public ItemStackBase{
 public:
