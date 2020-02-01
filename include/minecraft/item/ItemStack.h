@@ -28,17 +28,11 @@ public:
   ItemStack(Item const&, int);
   ItemStack &operator=(ItemStack const &);
   // void clone(ItemStack const &);
-  std::vector<std::string> getCustomLore() const;
-  bool isNull() const;
-  void setCustomLore(std::vector<std::string> const &);
   //  operator bool(void) const;
   //~ItemStack();
   inline ~ItemStack() { _ZN9ItemStackD2Ev(this); }
-  short getId() const;
   float getDestroySpeed(Block const &) const;
-  std::string toString() const;
-  bool operator!=(ItemStack const &) const;
-  bool isOffhandItem() const;
+  bool operator=(ItemStack const&);
 
   inline void defunct_cfree() { _ZN9ItemStackD0Ev(this); }
 };
