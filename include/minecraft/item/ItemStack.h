@@ -26,7 +26,7 @@ public:
   ItemStack(ItemInstance const &);
   ItemStack(Item const &);
   ItemStack(Item const&, int);
-  ItemStack &operator=(ItemStack const &);
+  ItemStack operator=(ItemStack const&);
   // void clone(ItemStack const &);
   //  operator bool(void) const;
   //~ItemStack();
