@@ -1,11 +1,16 @@
+#include <fstream>
+
+#include <minecraft/core/getSP.h>
+#include <minecraft/level/Level.h>
+#include <minecraft/actor/Player.h>
+#include <minecraft/actor/ActorDamageSource.h>
 #include <Loader.h>
 //#include <MC.h>
-#include "cmdhelper.h"
+#include <cmdhelper.h>
 #include <minecraft/json.h>
-#include <fstream>
+
 #include "base.h"
 #include "../money/money.h"
-#include <fstream>
 #include "main.command.h"
 
 const char meta[] __attribute__((used, section("meta"))) =
