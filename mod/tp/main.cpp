@@ -128,7 +128,7 @@ static void oncmd_suic(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
 }
 
 static void sendTPChoose(ServerPlayer *sp, int type) { // 0=t
-  string name = sp->getName();
+//  string name = sp->getNameTag();
   gui_ChoosePlayer(sp, "Select target player", "Send teleport request", [type](ServerPlayer *xx, string_view dest) {
     SPBuf<512> sb;
     sb.write("tpa "sv);
@@ -176,7 +176,7 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
   }
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
-  auto &nam = sp->getName();
+  auto &nam = sp->getNameTag();
   switch (mode) {
   case TPCMD::ac: {
     if (tpmap.count(nam) == 0) return;
@@ -233,7 +233,7 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
       getOutput().error("target not found!");
       return;
     }
-    auto &dnm = dst->getName();
+    auto &dnm = dst->getNameTag();
     if (tpmap.count(dnm)) {
       getOutput().error("A request of your target is pending.");
       return;
@@ -254,7 +254,7 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
       getOutput().error("target not found!");
       return;
     }
-    auto &dnm = dst->getName();
+    auto &dnm = dst->getNameTag();
     if (tpmap.count(dnm)) {
       getOutput().error("A request of your target is pending.");
       return;
@@ -278,7 +278,7 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     return;
   }
   //   int pl            = (int) b.getPermissionsLevel();
-  string name       = b.getName();
+  string name       = b.getNameTag();
   string_view homen = a.size() == 2 ? string(a[1]) : "hape";
   Vec3 pos          = b.getWorldPosition();
   ARGSZ(1)
@@ -341,7 +341,7 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
 static void oncmd_warp(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   int pl = (int) b.getPermissionsLevel();
   // do_log("pl %d",pl);
-  string name = b.getName();
+  string name = b.getNameTag();
   Vec3 pos    = b.getWorldPosition();
   ARGSZ(1)
   if (a[0] == "add") {
@@ -397,7 +397,7 @@ static void oncmd_back(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   }
   ServerPlayer *sp = (ServerPlayer *) b.getEntity();
   if (!sp) return;
-  auto it = deathpoint.find(sp->getName());
+  auto it = deathpoint.find(sp->getNameTag());
   if (it == deathpoint.end()) {
     outp.error("Can't find deathpoint");
     return;
@@ -412,14 +412,14 @@ static void handle_mobdie(Mob &mb, const ActorDamageSource &) {
   if (sp) {
     ServerPlayer *sp = (ServerPlayer *) &mb;
     sendText(sp, "§bYou can use /back to return last deathpoint");
-    deathpoint[sp->getName()] = {sp->getPos(), sp->getDimensionId()};
+    deathpoint[sp->getNameTag()] = {sp->getPos(), sp->getDimensionId()};
   }
 }
 static int TP_TIMEOUT = 30;
 THook(void *, _ZN12ServerPlayer9tickWorldERK4Tick, ServerPlayer *sp, unsigned long const *tk) {
   auto res = original(sp, tk);
   if (*tk % 40 == 0) {
-    auto &name = sp->getName();
+    auto &name = sp->getNameTag();
     auto it    = tpmap.find(name);
     if (it != tpmap.end()) {
       if (it->second.reqtime + CLOCKS_PER_SEC * TP_TIMEOUT <= clock()) {
