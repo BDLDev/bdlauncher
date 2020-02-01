@@ -21,6 +21,6 @@ public:
   bool isNull() const;
   std::unique_ptr<CompoundTag, std::default_delete<CompoundTag>> &getUserData() const;
   void setStackSize(unsigned char);
-  void setCustomLore(std::vector<string> const &);
+  void setCustomLore(std::vector<std::string> const &);
   void setCustomName(std::string const &);
 };

@@ -9,6 +9,10 @@
 #include <memory>
 #include <vector>
 
+namespace mce {
+struct UUID;
+};
+
 class LevelStorage;
 class BlockSource;
 class Block;
