@@ -1,5 +1,7 @@
 #pragma once
 
+class ActorUniqueID;
+
 class ActorDamageSource {
 public:
   virtual void destruct1()                 = 0;
