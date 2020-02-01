@@ -1,6 +1,7 @@
 #include <fstream>
 
 #include <minecraft/core/getSP.h>
+#include <minecraft/core/types.h>
 #include <minecraft/level/Level.h>
 #include <minecraft/actor/Player.h>
 #include <minecraft/actor/ActorDamageSource.h>

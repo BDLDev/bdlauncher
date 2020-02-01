@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include "vtSP.h"
-#define access(ptr, type, off) (*((type *) (((uintptr_t) ptr) + off)))
 
 //typedef void *UNK_64;
 class ServerPlayer;
