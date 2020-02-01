@@ -24,6 +24,7 @@ public:
         std::string const&(*fn)(Player*)=(typeof(fn))(ptr);
         return fn(this);
   }*/
+  void stopSleepInBed(bool, bool);
   bool isPlayerInitialized() const;
   std::string getRealNameTag() const { return ExtendedCertificate::getIdentityName(getCertificate()); }
   unsigned char getClientSubId() const;
