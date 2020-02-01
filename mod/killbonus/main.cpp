@@ -62,7 +62,7 @@ static void handle_die(Mob &a, ActorDamageSource const &b) {
       if (it != bonus_mp.end()) {
         auto mi = it->second.first, mx = it->second.second;
         auto addm = rand() % (mx + 1 - mi) + mi;
-        add_money(sp->getName(), addm);
+        add_money(sp->getNameTag(), addm);
         sendText(sp, "you get $" + std::to_string(addm) + " by killing");
       }
     }

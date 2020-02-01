@@ -217,7 +217,7 @@ ServerPlayer *getplayer_byname2(string_view name) {
   ServerPlayer *rt = NULL;
   auto vc          = ServLevel->getUsers();
   for (auto &tg : *vc) {
-    string bf = tg->getName();
+    string bf = tg->getNameTag();
     int sz    = std::min(bf.size(), name.size());
     int eq    = 1;
     for (int i = 0; i < sz; ++i) {
@@ -287,7 +287,7 @@ NetworkIdentifier *getPlayerNeti(ServerPlayer &sp) { return (NetworkIdentifier *
 ServerPlayer *getuser_byname(string_view a) {
   auto vc = ServLevel->getUsers();
   for (auto &i : *vc) {
-    if (i->getName() == a) return i.get();
+    if (i->getNameTag() == a) return i.get();
   }
   return nullptr;
 }

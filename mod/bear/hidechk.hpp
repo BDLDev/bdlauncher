@@ -6,7 +6,7 @@ THook(void *, _ZN5Actor9addEffectERK17MobEffectInstance, Actor &ac, MobEffectIns
     if (sp) {
       if (sp->getPlayerPermissionLevel() <= 1) {
         if (sp != last_hide_sp) {
-          async_log("[EFFECT] %s used self-hiding effect\n", sp->getName().c_str());
+          async_log("[EFFECT] %s used self-hiding effect\n", sp->getNameTag().c_str());
           last_hide_sp = sp;
         }
       }

@@ -52,7 +52,7 @@ struct CMDForm {
   void init(string_view content, string_view title) {
     sf = new SharedForm(title, content, false);
     for (auto &i : ordered_cmds) { sf->addButton(i.first); }
-    sf->cb = [this](ServerPlayer *sp, string_view, int idx) { ordered_cmds[idx].second.execute(sp->getName()); };
+    sf->cb = [this](ServerPlayer *sp, string_view, int idx) { ordered_cmds[idx].second.execute(sp->getNameTag()); };
   }
 };
 static unordered_map<STRING_HASH, CMDForm> forms;
@@ -86,7 +86,7 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
 }
 static void join(ServerPlayer *sp) {
   string val;
-  if (db.Get(sp->getName(), val)) { broadcastText(val); }
+  if (db.Get(sp->getNameTag(), val)) { broadcastText(val); }
   joinHook.execute(sp->getNameTag(), false);
 }
 static void tick(int tk) {
