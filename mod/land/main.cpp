@@ -27,6 +27,7 @@
 #include <minecraft/actor/ActorDamageSource.h>
 #include <minecraft/level/Level.h>
 #include <minecraft/item/ItemStack.h>
+#include <minecraft/actor/Player.h>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:land\n"
