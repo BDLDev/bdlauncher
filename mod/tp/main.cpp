@@ -278,7 +278,7 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     return;
   }
   //   int pl            = (int) b.getPermissionsLevel();
-  string name       = b.getNameTag();
+  string name       = b.getName();
   string_view homen = a.size() == 2 ? string(a[1]) : "hape";
   Vec3 pos          = b.getWorldPosition();
   ARGSZ(1)
@@ -341,7 +341,7 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
 static void oncmd_warp(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   int pl = (int) b.getPermissionsLevel();
   // do_log("pl %d",pl);
-  string name = b.getNameTag();
+  string name = b.getName();
   Vec3 pos    = b.getWorldPosition();
   ARGSZ(1)
   if (a[0] == "add") {
