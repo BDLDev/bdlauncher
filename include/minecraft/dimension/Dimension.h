@@ -6,6 +6,7 @@
 #include <functional>
 
 class Player;
+class Weather;
 
 class Dimension {
 public:

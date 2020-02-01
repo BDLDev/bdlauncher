@@ -10,7 +10,7 @@ public:
   char filler[312];
 
   BinaryStream();
-  BinaryStream(string &, bool);
+  BinaryStream(std::string &, bool);
   void writeFloat(float);
   void writeDouble(double);
   void writeStream(BinaryStream &);
