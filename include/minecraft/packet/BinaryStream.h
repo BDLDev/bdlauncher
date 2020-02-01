@@ -21,7 +21,7 @@ public:
   void writeSignedInt64(long);
   void writeSignedShort(short);
   void writeUnsignedInt(unsigned int);
-  string getAndReleaseData();
+  std::string getAndReleaseData();
   void writeUnsignedChar(unsigned char);
   void writeUnsignedInt64(unsigned long);
   void writeUnsignedShort(unsigned short);
