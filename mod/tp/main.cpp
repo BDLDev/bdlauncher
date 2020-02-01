@@ -3,20 +3,24 @@
 #include <forward_list>
 #include <string>
 #include <unordered_map>
-#include "cmdhelper.h"
 #include <vector>
-#include <Loader.h>
-//#include <MC.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include "base.h"
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include "../gui/gui.h"
 #include <fstream>
+
 #include <minecraft/json.h>
+#include <cmdhelper.h>
+#include <Loader.h>
+//#include <MC.h>
+#include <minecraft/core/getSP.h>
+#include <minecraft/actor/Player.h>
+
+#include "base.h"
+#include "../gui/gui.h"
+
 #include "tp.command.h"
 
 const char meta[] __attribute__((used, section("meta"))) =
