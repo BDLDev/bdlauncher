@@ -32,7 +32,6 @@ public:
   //~ItemStack();
   inline ~ItemStack() { _ZN9ItemStackD2Ev(this); }
   float getDestroySpeed(Block const &) const;
-  bool operator=(ItemStack const&);
 
   inline void defunct_cfree() { _ZN9ItemStackD0Ev(this); }
 };
