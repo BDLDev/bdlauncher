@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bdlexport.h"
+
 #ifdef __INTELLISENSE__
 #  define MOD_NAME "intelisense"
 #  define BDL_TAG "intelisense"

@@ -1,10 +1,12 @@
 #include "myhook.h"
+#include <list>
 #include <Loader.h>
-#include <MC.h>
+//#include <MC.h>
 #include <fstream>
 #include <global.h>
 #include <logger.h>
 #include <minecraft/json.h>
+#include <bdlexport.h>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:opti\n"

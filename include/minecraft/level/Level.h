@@ -1,6 +1,6 @@
 #pragma once
 
-#include <global.h>
+#include "global.h"
 #include "../core/types.h"
 
 #include <cstddef>
@@ -8,6 +8,10 @@
 #include <functional>
 #include <memory>
 #include <vector>
+
+namespace mce {
+struct UUID;
+};
 
 class LevelStorage;
 class BlockSource;
@@ -20,6 +24,9 @@ class Player;
 class BlockPalette;
 class MapItemSavedData;
 class ItemStack;
+class ServerPlayer;
+class CompoundTag;
+
 class BlockSourceListener {
 public:
   virtual ~BlockSourceListener();
@@ -46,13 +53,20 @@ public:
   void forEachPlayer(std::function<bool(Player &)>);
   BlockPalette *getGlobalBlockPalette() const;
   LevelStorage *getLevelStorage();
-  MapItemSavedData &getMapSavedData(ItemStack const &);
+  MapItemSavedData& getMapSavedData(ActorUniqueID);
+  MapItemSavedData& getMapSavedData(std::unique_ptr<CompoundTag, std::default_delete<CompoundTag> > const&);
   // ~ level-helper ~ //
   std::vector<std::unique_ptr<Actor>> &getActorVector() const ABITAG(level_helper);
   void forEachActor(std::function<bool(Dimension &, ActorUniqueID, Actor *)>) ABITAG(level_helper);
   void setTime(int);
   int getTime() const;
   void* getPacketSender() const;
+  std::vector<std::unique_ptr<ServerPlayer>> *getUsers();
+
+  void* save();
+  ServerPlayer *getPlayer(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &) const;
+  int getUserCount() const;
+  int getTickedMobCountPrevious() const;
 };
 
 class ServerLevel : public Level {

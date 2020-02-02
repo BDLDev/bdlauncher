@@ -9,9 +9,7 @@ class CompoundTag;
 class DataLoadHelper;
 class BlockSource;
 class Packet;
-struct BlockPos {
-  int x, int y, int z;
-};
+class BlockPos;
 class Actor;
 class UIProfanityContext;
 class Container;
@@ -49,4 +47,5 @@ public:
   virtual bool getOwningPiston(BlockSource &);
   virtual Container *getContainer();
   virtual void getDeletionDelayTimeSeconds();
+  BlockPos &getPosition() const;
 };
