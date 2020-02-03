@@ -151,4 +151,4 @@ bool isRaining() const;
 
 operator=(LevelData&&);
 
-}
+};
