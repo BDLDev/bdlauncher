@@ -87,7 +87,7 @@ bool isLightning() const;
 std::string& getLevelName() const;
 float getRainLevel() const;
 int getLightningTime() const;
-float getLightningLevel() const
+float getLightningLevel() const;
 /*
 0000000007cb4160 T LevelData::getGameRules() const
 0000000007cb4400 T LevelData::getGenerator() const

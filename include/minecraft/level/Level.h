@@ -70,10 +70,10 @@ public:
   ServerPlayer *getPlayer(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &) const;
   int getUserCount() const;
   int getTickedMobCountPrevious() const;
-  Random getRandom() const;
+  Random* getRandom() const;
   LevelData* getLevelData();
-  broadcastLevelEvent(LevelEvent, CompoundTag const&, Player*);
-  broadcastLevelEvent(LevelEvent, Vec3 const&, int, Player*);
+  void* broadcastLevelEvent(LevelEvent, CompoundTag const&, Player*);
+  void* broadcastLevelEvent(LevelEvent, Vec3 const&, int, Player*);
 };
 
 class ServerLevel : public Level {
