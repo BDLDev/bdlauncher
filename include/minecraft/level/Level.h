@@ -1,7 +1,7 @@
 #pragma once
 
 #include "global.h"
-#include "../core/types.h"
+#include "minecraft/core/types.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -28,7 +28,6 @@ class ItemStack;
 class ServerPlayer;
 class CompoundTag;
 class Random;
-typedef int LevelEvent;
 
 class BlockSourceListener {
 public:
@@ -72,8 +71,8 @@ public:
   int getTickedMobCountPrevious() const;
   Random* getRandom() const;
   LevelData* getLevelData();
-  void* broadcastLevelEvent(LevelEvent, CompoundTag const&, Player*);
-  void* broadcastLevelEvent(LevelEvent, Vec3 const&, int, Player*);
+  void broadcastLevelEvent(LevelEvent, CompoundTag const&, Player*);
+  void broadcastLevelEvent(LevelEvent, Vec3 const&, int, Player*);
 };
 
 class ServerLevel : public Level {

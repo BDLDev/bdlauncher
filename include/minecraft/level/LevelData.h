@@ -149,6 +149,6 @@ int getTime() const;
 CompoundTag createTag() const;
 bool isRaining() const;
 
-operator=(LevelData&&);
+//operator=(LevelData&&);
 
 };
