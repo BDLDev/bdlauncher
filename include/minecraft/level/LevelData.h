@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "minecraft/json.h"
-#include "AdventureSettings.h"
 #include "minecraft/block/BlockPos.h"
 
 class CompoundTag;

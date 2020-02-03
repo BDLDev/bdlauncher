@@ -26,6 +26,7 @@ class MapItemSavedData;
 class ItemStack;
 class ServerPlayer;
 class CompoundTag;
+class Random;
 
 class BlockSourceListener {
 public:
@@ -67,6 +68,7 @@ public:
   ServerPlayer *getPlayer(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &) const;
   int getUserCount() const;
   int getTickedMobCountPrevious() const;
+  Random getRandom() const;
 };
 
 class ServerLevel : public Level {
