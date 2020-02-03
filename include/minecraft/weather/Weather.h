@@ -1,6 +1,7 @@
 #pragma once
 
 class Dimension;
+class LevelData;
 
 class Weather{
 public:
@@ -19,4 +20,5 @@ float getRainLevel(float) const;
 int getSkyFlashTime() const;
 float getLightningLevel(float) const;
 bool isRaining() const;
+void _notifyWeatherChangedEvent(LevelData const&) const;
 };

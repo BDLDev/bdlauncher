@@ -14,6 +14,7 @@ struct UUID;
 };
 
 class LevelStorage;
+class LevelData;
 class BlockSource;
 class Block;
 class ActorBlockSyncMessage;
@@ -27,6 +28,7 @@ class ItemStack;
 class ServerPlayer;
 class CompoundTag;
 class Random;
+typedef int LevelEvent;
 
 class BlockSourceListener {
 public:
@@ -69,6 +71,9 @@ public:
   int getUserCount() const;
   int getTickedMobCountPrevious() const;
   Random getRandom() const;
+  LevelData* getLevelData();
+  broadcastLevelEvent(LevelEvent, CompoundTag const&, Player*);
+  broadcastLevelEvent(LevelEvent, Vec3 const&, int, Player*);
 };
 
 class ServerLevel : public Level {
