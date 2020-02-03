@@ -22,7 +22,7 @@ void setRainTime(int);
 void setSpawnPos(BlockPos const&);
 GameRules* getGameRules();;
 //void setGenerator(GeneratorType);
-void setLevelName(std::sring const&);
+void setLevelName(std::string const&);
 void setRainLevel(float);
 void setSpawnMobs(bool);
 void incrementTick();
