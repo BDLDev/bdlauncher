@@ -86,6 +86,30 @@ public:
   operator Bangui() const noexcept { return value; }
 };
 
+template <> class BDL::CustomCommand::CommandParameterProxy<Kickall> {
+  Kickall value;
+
+public:
+  static auto fetch_tid() { return type_id<CommandRegistry, Kickall>(); }
+  static constexpr auto parser    = &CommandRegistry::fake_parse;
+  static constexpr auto type      = CommandParameterDataType::NORMAL;
+  static constexpr auto enum_name = "Kickall";
+
+  operator Kickall() const noexcept { return value; }
+};
+
+template <> class BDL::CustomCommand::CommandParameterProxy<Crashme> {
+  Crashme value;
+
+public:
+  static auto fetch_tid() { return type_id<CommandRegistry, Crashme>(); }
+  static constexpr auto parser    = &CommandRegistry::fake_parse;
+  static constexpr auto type      = CommandParameterDataType::NORMAL;
+  static constexpr auto enum_name = "Crashme";
+
+  operator Crashme() const noexcept { return value; }
+};
+
 struct ACCommand_0 : Command {
   CommandParameterProxy<Ban> mode;
   CommandParameterProxy<std::string> target;
@@ -123,6 +147,22 @@ struct ACCommand_3 : Command {
 };
 
 struct ACCommand_4 : Command {
+  CommandParameterProxy<Kickall> mode;
+  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+    ACCommand context{origin, output};
+    context.kickall(mode);
+  }
+};
+
+struct ACCommand_5 : Command {
+  CommandParameterProxy<Crashme> mode;
+  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+    ACCommand context{origin, output};
+    context.crashme(mode);
+  }
+};
+
+struct ACCommand_6 : Command {
   CommandParameterProxy<Kick> mode;
   CommandParameterProxy<std::string> target;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
@@ -131,7 +171,7 @@ struct ACCommand_4 : Command {
   }
 };
 
-struct ACCommand_5 : Command {
+struct ACCommand_7 : Command {
   CommandParameterProxy<Mute> mode;
   CommandParameterProxy<CommandSelector<Player>> target;
   CommandParameterProxy<int> time;
@@ -141,7 +181,7 @@ struct ACCommand_5 : Command {
   }
 };
 
-struct ACCommand_6 : Command {
+struct ACCommand_8 : Command {
   CommandParameterProxy<Bangui> mode;
   virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
     ACCommand context{origin, output};
@@ -180,6 +220,14 @@ void register_commands() {
     item.addValue("bangui", Bangui::bangui);
   }
   {
+    auto &item = instance.registerEnum<Kickall>();
+    item.addValue("kickall", Kickall::kickall);
+  }
+  {
+    auto &item = instance.registerEnum<Crashme>();
+    item.addValue("crashme", Crashme::crashme);
+  }
+  {
     auto &cmd = instance.registerCommand<ACCommand>();
     {
       auto &ovl = cmd.registerOverload<ACCommand_0>();
@@ -203,18 +251,26 @@ void register_commands() {
     }
     {
       auto &ovl = cmd.registerOverload<ACCommand_4>();
-      ovl.addParameter<Kick>("mode", false, offsetof(ACCommand_4, mode));
-      ovl.addParameter<std::string>("target", false, offsetof(ACCommand_4, target));
+      ovl.addParameter<Kickall>("mode", false, offsetof(ACCommand_4, mode));
     }
     {
       auto &ovl = cmd.registerOverload<ACCommand_5>();
-      ovl.addParameter<Mute>("mode", false, offsetof(ACCommand_5, mode));
-      ovl.addParameter<CommandSelector<Player>>("target", false, offsetof(ACCommand_5, target));
-      ovl.addParameter<int>("time", false, offsetof(ACCommand_5, time));
+      ovl.addParameter<Crashme>("mode", false, offsetof(ACCommand_5, mode));
     }
     {
       auto &ovl = cmd.registerOverload<ACCommand_6>();
-      ovl.addParameter<Bangui>("mode", false, offsetof(ACCommand_6, mode));
+      ovl.addParameter<Kick>("mode", false, offsetof(ACCommand_6, mode));
+      ovl.addParameter<std::string>("target", false, offsetof(ACCommand_6, target));
+    }
+    {
+      auto &ovl = cmd.registerOverload<ACCommand_7>();
+      ovl.addParameter<Mute>("mode", false, offsetof(ACCommand_7, mode));
+      ovl.addParameter<CommandSelector<Player>>("target", false, offsetof(ACCommand_7, target));
+      ovl.addParameter<int>("time", false, offsetof(ACCommand_7, time));
+    }
+    {
+      auto &ovl = cmd.registerOverload<ACCommand_8>();
+      ovl.addParameter<Bangui>("mode", false, offsetof(ACCommand_8, mode));
     }
   }
 }

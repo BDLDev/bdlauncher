@@ -27,6 +27,7 @@
 #include <minecraft/net/NetworkIdentifier.h>
 #include <minecraft/packet/MyPkt.h>
 #include <minecraft/packet/BinaryStream.h>
+#include "PlayerMap.h"
 using std::string;
 using std::unordered_map;
 
@@ -46,14 +47,22 @@ extern void load_helper(std::list<string> &modlist);
 
 using std::unordered_map;
 using std::vector;
-unordered_map<int, SharedForm *> id_forms;
-//AllocPool<SharedForm> FormMem;
+//unordered_map<int, SharedForm *> id_forms;
+// AllocPool<SharedForm> FormMem;
 SharedForm *getForm(string_view title, string_view cont, bool isInp) {
   return new SharedForm(title, cont, true, isInp); // need free
 }
 static void relForm(SharedForm *sf) {
-  if (sf->needfree) { delete sf;/*FormMem.release(sf);*/ }
+  if (sf->needfree) { delete sf; /*FormMem.release(sf);*/ }
 }
+struct FormWrap{
+  SharedForm* sf;
+  ~FormWrap(){
+    //printf("def\n");
+    relForm(sf);
+  }
+};
+PlayerMap<FormWrap> player_mp;
 struct GUIPK {
   MyPkt *pk;
   string_view fm;
@@ -73,14 +82,13 @@ struct GUIPK {
 static inline void sendStr(ServerPlayer &sp, string_view fm, int id) { gGUIPK.send(sp, fm, id); }
 static int autoid;
 BDL_EXPORT void sendForm(ServerPlayer &sp, SharedForm *fm) {
-  if (id_forms.size() > 128) {
-    for (auto &i : id_forms) { delete i.second; }
-    id_forms.clear();
-    do_log("Warning!Form Spam Detected!Clearing Form datas.Last Player %s", sp.getNameTag().c_str());
-  }
   auto x           = fm->serial();
   fm->fid          = ++autoid;
-  id_forms[autoid] = fm;
+  if(player_mp.dat.count(&sp)){
+    player_mp.defe(&sp);
+  }
+  player_mp[sp].sf=fm;
+  //printf("%s\n",string(x).c_str());
   sendStr(sp, x, autoid);
 }
 THook(
@@ -89,11 +97,18 @@ THook(
   ServerPlayer *p = sh->_getServerPlayer(iden, pk->getClientSubId());
   if (p) {
     int id  = access(pk, int, 36);
-    auto it = id_forms.find(id);
-    if (it != id_forms.end()) {
-      it->second->process(p, access(pk, string, 40));
-      relForm(it->second);
-      id_forms.erase(it);
+    auto it = player_mp.dat.find(p);
+    if (it != player_mp.dat.end()) {
+      auto form=it->second.sf;
+      if(id==form->fid){
+        auto oldfre=form->needfree;
+        form->needfree=false;
+        player_mp.dat.erase(p); //WHY USE THIS SHIT HACK? A FORM CAN BE OPENED IN ANOTHER ONE
+        //printf("recv %d %d\n",id,form->fid);
+        form->process(p, access(pk, string, 40));
+        form->needfree=oldfre;
+        relForm(form);
+      }
     }
   }
   return nullptr;
