@@ -25,7 +25,7 @@
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:tp\n"
-    "version:20200125\n"
+    "version:20200204\n"
     "author:sysca11\n"
     "depend:base@20200121,command@20200121,gui@20200121\n";
 
@@ -52,14 +52,13 @@ struct Vpos {
 };
 struct home {
   int cnt = 0;
-  Vpos vals[10];
+  vector<Vpos> vals;
   void packto(DataStream &ds) const {
-    ds << cnt;
-    for (int i = 0; i < cnt; ++i) { ds << vals[i]; }
+    ds << vals;
   }
   void unpack(DataStream &ds) {
-    ds >> cnt;
-    for (int i = 0; i < cnt; ++i) { ds >> vals[i]; }
+    ds >> vals;
+    cnt=vals.size();
   }
 };
 static list<string> warp_list;
@@ -279,7 +278,7 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   }
   //   int pl            = (int) b.getPermissionsLevel();
   string name       = b.getName();
-  string_view homen = a.size() == 2 ? string(a[1]) : "hape";
+  string homen = a.size() == 2 ? string(a[1]) : "hape";
   Vec3 pos          = b.getWorldPosition();
   ARGSZ(1)
   if (a[0] == "add") {
@@ -288,20 +287,16 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
       outp.error("Can't add more homes");
       return;
     }
-    myh.vals[myh.cnt] = Vpos(pos.x, pos.y, pos.z, b.getEntity()->getDimensionId(), string(homen));
+    myh.vals.push_back(Vpos(pos.x, pos.y, pos.z, b.getEntity()->getDimensionId(), homen));
     myh.cnt++;
     putHome(name, myh);
     outp.success("§bSuccessfully added a home");
   }
   if (a[0] == "del") {
     home &myh = getHome(name);
-    home tmpn;
-    tmpn     = myh;
-    tmpn.cnt = 0;
-    for (int i = 0; i < myh.cnt; ++i) {
-      if (myh.vals[i].name != homen) { tmpn.vals[tmpn.cnt++] = myh.vals[i]; }
+    for (auto i=myh.vals.begin();i!=myh.vals.end();++i) {
+      if (i->name == homen) { myh.vals.erase(i); break;}
     }
-    myh = tmpn;
     putHome(name, myh);
     outp.success("§bHome has been deleted");
   }
@@ -316,8 +311,8 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   }
   if (a[0] == "ls") {
     home &myh = getHome(name);
-    sendText((Player *) b.getEntity(), "§b====Home list====");
-    for (int i = 0; i < myh.cnt; ++i) { sendText((Player *) b.getEntity(), myh.vals[i].name); }
+    outp.addMessage("§b====Home list====");
+    for (int i = 0; i < myh.cnt; ++i) outp.addMessage(myh.vals[i].name); 
     outp.success("§b============");
   }
   if (a[0] == "gui") {
