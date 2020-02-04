@@ -1,14 +1,19 @@
 #pragma once
 
-#include <global.h>
+#include "global.h"
 #include "../core/NBT.h"
 #include <memory>
 #include <string>
 
 class Block;
+class BlockProperty {
+public:
+  unsigned long x;
+};
 
 class BlockLegacy {
 public:
+  void addBlockProperty(BlockProperty);
   std::string const &getRawNameId() const;
   Block const *getDefaultState() const;
   short getBlockItemId() const;

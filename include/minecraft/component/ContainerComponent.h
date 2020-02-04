@@ -9,7 +9,7 @@ class BlockSource;
 class ItemStack;
 class ItemActor;
 class Player;
-struct Vec3;
+class Vec3;
 enum class ContainerType;
 
 class ContainerComponent {

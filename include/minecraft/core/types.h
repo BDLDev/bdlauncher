@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <string>
+
 /*
 enum class MCCATEGORY : char {};
 typedef uint64_t u64;
@@ -24,10 +25,29 @@ struct MCRESULT {
   bool isSuccess() const;
 };
 */
+enum class MCCATEGORY : char {};
+class MCRESULT {
+public:
+  bool success;        // 0
+  MCCATEGORY category; // 1
+  unsigned short code; // 2
+
+  static bool isSuccess(int);
+
+  MCRESULT(bool, MCCATEGORY, unsigned short);
+  MCRESULT(int);
+
+  bool operator==(MCRESULT const &) const;
+  bool operator!=(MCRESULT const &) const;
+
+  int getFullCode() const;
+  bool isSuccess() const;
+};
+
 enum class CommandPermissionLevel : unsigned char { NORMAL, OP, TERMINAL };
 enum class CommandOutputType : char {};
 
-struct Vec3;
+class Vec3;
 
 struct BlockPos;
 class Actor;
@@ -121,7 +141,8 @@ struct RelativeFloat {
   float getValue(float) const;
 };
 
-struct Vec3 {
+class Vec3 {
+public:
   float x, y, z;
   Vec3(){};
   Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
@@ -133,3 +154,16 @@ struct Vec3 {
     return (x - a.x) * (x - a.x) + (y - a.y) * (y - a.y) * 0.01 + (z - a.z) * (z - a.z);
   }
 };
+
+struct ActorUniqueID {
+  unsigned long id;
+  ActorUniqueID() { id = -1; }
+};
+
+struct SynchedActorData {
+  template <typename T> void set(unsigned short, T const &);
+};
+
+enum class ArmorSlot : int { UNK = 0 };
+
+enum class LevelEvent : unsigned int {};

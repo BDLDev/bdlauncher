@@ -10,7 +10,7 @@
 
 class Level;
 class Dimension;
-enum struct AbilitiesIndex : int;
+enum class AbilitiesIndex : int;
 enum class OriginType : char {
   Player           = 0,
   Block            = 1,

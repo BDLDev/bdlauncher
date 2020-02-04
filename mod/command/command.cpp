@@ -1,5 +1,7 @@
 #include "command.h"
 #include <Loader.h>
+#include <list>
+#include <cstring>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:command\n"
@@ -23,7 +25,7 @@ THook(void *, _ZN9XPCommand5setupER15CommandRegistry, CommandRegistry &thi) {
 
 } // namespace BDL::CustomCommand
 
-extern void load_helper(std::list<string> &modlist);
+extern void load_helper(std::list<std::string> &modlist);
 extern "C" {
-BDL_EXPORT void mod_init(std::list<string> &modlist) { load_helper(modlist); }
+BDL_EXPORT void mod_init(std::list<std::string> &modlist) { load_helper(modlist); }
 }

@@ -5,7 +5,7 @@
 #include "cmdhelper.h"
 #include <vector>
 #include <Loader.h>
-#include <MC.h>
+//#include <MC.h>
 #include "base.h"
 #include <sys/stat.h>
 #include <unistd.h>
@@ -17,6 +17,7 @@
 #include <fstream>
 #include "../gui/gui.h"
 #include "lang.h"
+#include <minecraft/core/access.h>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:money\n"

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../core/types.h"
-
 #include <functional>
 #include <memory>
+#include <string>
 
 class CommandContext;
 class CommandOutputSender;
@@ -11,6 +11,11 @@ class CommandOrigin;
 class CommandRegistry;
 class CommandOutput;
 class Packet;
+
+class MinecraftCommands {
+public:
+  MCRESULT requestCommandExecution(std::unique_ptr<CommandOrigin>, std::string const &, int, bool) const;
+};
 /*
 class MinecraftCommands {
 public:

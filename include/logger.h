@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MC.h"
+#include "bdlexport.h"
 
 #ifdef __INTELLISENSE__
 #  define MOD_NAME "intelisense"

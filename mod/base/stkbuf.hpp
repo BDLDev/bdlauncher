@@ -1,7 +1,8 @@
 #pragma once
 
 #include <string_view>
-#include <string>
+#include <cstring>
+#include <functional>
 #include "stl.hpp"
 
 template <const int sz = 1024> struct SPBuf {
