@@ -30,7 +30,7 @@
 
 #include "data.hpp"
 #include "land.command.h"
-
+#include "PlayerMap.h"
 const char meta[] __attribute__((used, section("meta"))) =
     "name:land\n"
     "version:20200121\n"
@@ -52,8 +52,8 @@ struct LPOS {
   int x, z;
 };
 static std::unordered_map<string, LPOS> startpos, endpos;
-static unordered_map<string, int> choose_state;
-
+//static unordered_map<string, int> choose_state;
+static PlayerMap<int> choose_state;
 int LAND_PRICE, LAND_PRICE2;
 static bool land_tip = true;
 static void loadcfg() {
@@ -73,13 +73,13 @@ static void loadcfg() {
 void LDCommand::exit(mandatory<Exit> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
-  choose_state.erase(sp->getNameTag());
+  choose_state.defe(sp);
   getOutput().success("§bExit selection mode, please input /land buy");
 }
 void LDCommand::AB_(mandatory<AB> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
-  choose_state[sp->getNameTag()] = (mode == AB::b) + 1;
+  choose_state[sp] = (mode == AB::b) + 1;
   getOutput().success("§bEnter selection mode, please click on the ground to select point");
 }
 void LDCommand::query(mandatory<Query> mode) {
@@ -110,7 +110,7 @@ void LDCommand::buy(mandatory<Buy> mode) {
     getOutput().error("Choose 2 points please.");
     return;
   }
-  choose_state.erase(hash);
+  choose_state.defe(sp);
   x  = std::min(startpos[hash].x, endpos[hash].x);
   z  = std::min(startpos[hash].z, endpos[hash].z);
   dx = std::max(startpos[hash].x, endpos[hash].x);
@@ -386,12 +386,12 @@ static bool handle_inter(GameMode *a0, Actor &a1) {
 static bool handle_useion(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos const *dstPos, Block const *a5) {
   ServerPlayer *sp = a0->getPlayer();
   auto &hash       = sp->getNameTag();
-  if (choose_state[hash] != 0) {
-    if (choose_state[hash] == 1) {
+  if (choose_state[sp] != 0) {
+    if (choose_state[sp] == 1) {
       startpos[hash] = {a2->x, a2->z};
       sendText(sp, "§bPoint A selected");
     }
-    if (choose_state[hash] == 2) {
+    if (choose_state[sp] == 2) {
       endpos[hash] = {a2->x, a2->z};
       char buf[1000];
       auto siz = (abs(startpos[hash].x - endpos[hash].x) + 1) * (abs(startpos[hash].z - endpos[hash].z) + 1);
