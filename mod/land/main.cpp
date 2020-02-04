@@ -52,7 +52,7 @@ struct LPOS {
   int x, z;
 };
 static std::unordered_map<string, LPOS> startpos, endpos;
-//static unordered_map<string, int> choose_state;
+// static unordered_map<string, int> choose_state;
 static PlayerMap<int> choose_state;
 int LAND_PRICE, LAND_PRICE2;
 static bool land_tip = true;

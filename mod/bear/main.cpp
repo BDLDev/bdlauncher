@@ -50,7 +50,7 @@
 #include "bear.command.h"
 #include "lang.h"
 
-static bool NOFMCBUG,NOPLAYERTPA;
+static bool NOFMCBUG, NOPLAYERTPA;
 
 #include "log.hpp"
 #include "network.hpp"
@@ -145,17 +145,13 @@ static bool hkc(ServerPlayer *b, string &c) {
   async_log("[CHAT] %s: %s\n", name.c_str(), c.c_str());
   return 1;
 }
-extern "C"{
-  void _ZN14ServerInstance14onLevelCorruptEv(void*);
+extern "C" {
+void _ZN14ServerInstance14onLevelCorruptEv(void *);
 }
-void ACCommand::crashme(mandatory<Crashme>){
-  _ZN14ServerInstance14onLevelCorruptEv(nullptr);
-}
-void ACCommand::kickall(mandatory<Kickall>){
-  auto x=getSrvLevel()->getUsers();
-  for(auto& i:*x){
-    runcmd("kick \""+i->getNameTag()+"\"");
-  }
+void ACCommand::crashme(mandatory<Crashme>) { _ZN14ServerInstance14onLevelCorruptEv(nullptr); }
+void ACCommand::kickall(mandatory<Kickall>) {
+  auto x = getSrvLevel()->getUsers();
+  for (auto &i : *x) { runcmd("kick \"" + i->getNameTag() + "\""); }
   getOutput().success("done");
 }
 void ACCommand::mute(mandatory<Mute>, mandatory<CommandSelector<Player>> target, mandatory<int> time_) {
@@ -389,8 +385,8 @@ static void _load_config() {
     do_log("%s", msg.c_str());
     exit(1);
   }
-  NOFMCBUG   = value["NOFMCBUG"].asBool(false);
-  NOPLAYERTPA   = value["NOPLAYERTPA"].asBool(false);
+  NOFMCBUG    = value["NOFMCBUG"].asBool(false);
+  NOPLAYERTPA = value["NOPLAYERTPA"].asBool(false);
   FPushBlock = value["FPushChest"].asBool(false);
   FExpOrb    = value["FSpwanExp"].asBool(false);
   FDest      = value["FDestroyCheck"].asBool(false);
