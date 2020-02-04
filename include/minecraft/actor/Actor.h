@@ -21,6 +21,7 @@ class Dimension;
 class ItemActor;
 class ItemStack;
 class MobEffect;
+class MobEffectInstance;
 class Mob;
 class ServerPlayer;
 enum class ArmorSlot;
@@ -74,4 +75,7 @@ public:
   void setCarriedItem(ItemStack const &);
   void setAutonomous(bool);
   inline SynchedActorData *getDATA() { return (SynchedActorData *) (((uintptr_t) this) + 0x130); }
+  bool hasEffect(MobEffect const &) const;
+  const MobEffectInstance *getEffect(MobEffect const &) const;
+  const std::string &getScoreTag() const;
 };

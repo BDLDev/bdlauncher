@@ -1,4 +1,10 @@
 #pragma once
 struct MobEffectInstance {
-  unsigned int getId() const;
+    int getId() const;
+    int getAmplifier() const;
+    std::string getDisplayName() const;
+    int getDuration() const;
+    int getLingerDuration() const;
+    int getSplashDuration() const;
+    int getDescriptionId() const;
 };

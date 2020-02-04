@@ -53,6 +53,7 @@ public:
   bool isCreative(void) const;
   Certificate &getCertificate() const;
   std::string getXUID() const { return ExtendedCertificate::getXuid(getCertificate()); }
+  bool canDestroy(Block const &) const;
 };
 
 class ServerPlayer : public Player {

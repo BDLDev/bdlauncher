@@ -26,4 +26,5 @@ public:
   void setCustomName(std::string const &);
   bool operator!=(ItemStackBase const&) const;
   bool operator==(ItemStackBase const&) const;
+  bool isDamageableItem() const;
 };
