@@ -13,7 +13,7 @@ enum class Kick { kick };
 enum class Mute { mute };
 enum class Bangui { bangui };
 enum class Kickall { kickall };
-enum class Crashme {crashme};
+enum class Crashme { crashme };
 struct ACCommand : CustomCommandContext {
 public:
   inline static alias_list aliases  = {"bear"};
