@@ -11,7 +11,7 @@ THook(
     NetworkIdentifier const &iden, Packet *pk) {
   ServerPlayer *p = sh->_getServerPlayer(iden, pk->getClientSubId());
   if (p) {
-    if (ChatLimit(p)) return original(sh, iden, pk);
+    if (ChatLimit(p)) return original(sh, iden, pk); else sendText(p,"Chat too fast");
   }
   return nullptr;
 }
@@ -21,12 +21,12 @@ THook(
   ServerPlayer *p = sh->_getServerPlayer(iden, pk->getClientSubId());
   if (p) {
     // 0x28
-
     if (ChatLimit(p)) {
       string &sv = access(pk, string, 0x28);
+      if(NOPLAYERTPA && sv.substr(0,4)=="/tpa") return nullptr;
       async_log("[CMD] %s:%s\n", p->getNameTag().c_str(), sv.c_str());
       return original(sh, iden, pk);
-    }
+    }  else sendText(p,"Chat too fast");
   }
   return nullptr;
 }

@@ -20,7 +20,7 @@
 
 #include "base.h"
 #include "../gui/gui.h"
-
+#include "PlayerMap.h"
 #include "tp.command.h"
 
 const char meta[] __attribute__((used, section("meta"))) =
@@ -45,25 +45,33 @@ struct Vpos {
   int x, y, z, dim;
   string name;
   Vpos() {}
-  Vpos(int a, int b, int c, int d, string e) { x = a, y = b, z = c, dim = d, name = e; }
+  Vpos(int a, int b, int c, int d, string_view e) { x = a, y = b, z = c, dim = d, name = e; }
   void packto(DataStream &ds) const { ds << x << y << z << dim << name; }
   void unpack(DataStream &ds) { ds >> x >> y >> z >> dim >> name; }
   void tele(Actor &ply) const { TeleportA(ply, {(float) x, (float) y, (float) z}, {dim}); }
 };
-struct home {
-  int cnt = 0;
-  vector<Vpos> vals;
-  void packto(DataStream &ds) const {
-    ds << vals;
-  }
-  void unpack(DataStream &ds) {
-    ds >> vals;
-    cnt=vals.size();
-  }
-};
 static list<string> warp_list;
 static unordered_map<string, Vpos> warp;
 static LDBImpl tp_db("data_v2/tp");
+struct home {
+  int cnt = 0;
+  vector<Vpos> vals;
+  void packto(DataStream &ds) const { ds << vals; }
+  void unpack(DataStream &ds) {
+    ds >> vals;
+    cnt = vals.size();
+  }
+  home(ServerPlayer& sp){
+    DataStream ds;
+    if(tp_db.Get("home_" + sp.getName(), ds.dat)) { ds >> *this; }
+  }
+  void save(ServerPlayer& sp){
+    DataStream ds;
+    ds << *this;
+    tp_db.Put("home_" + sp.getName(), ds.dat);
+  }
+};
+
 
 void add_warp(int x, int y, int z, int dim, const string &name) {
   warp_list.push_back(name);
@@ -95,6 +103,7 @@ void load_warps_new() {
     tmpds >> warp[i];
   }
 }
+/*
 static unordered_map<string, home> home_cache;
 static home &getHome(const string &key) {
   auto it = home_cache.find(key);
@@ -110,8 +119,8 @@ static void putHome(const string &key, home &hm) {
   DataStream ds;
   ds << hm;
   tp_db.Put("home_" + key, ds.dat);
-}
-
+}*/
+PlayerMap<home> ply_homes;
 struct tpreq {
   int dir; // 0=f
   string name;
@@ -130,6 +139,7 @@ static void sendTPChoose(ServerPlayer *sp, int type) { // 0=t
 //  string name = sp->getNameTag();
   gui_ChoosePlayer(sp, "Select target player", "Send teleport request", [type](ServerPlayer *xx, string_view dest) {
     SPBuf<512> sb;
+    printf("sss\n");
     sb.write("tpa "sv);
     if (type == 0)
       sb.write("t");
@@ -277,46 +287,56 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     return;
   }
   //   int pl            = (int) b.getPermissionsLevel();
-  string name       = b.getName();
-  string homen = a.size() == 2 ? string(a[1]) : "hape";
+  //string name       = b.getName();
+  ServerPlayer* sp=getSP(b.getEntity());
+  if(!sp){
+    outp.error("this is a command for players");
+    return;
+  }
   Vec3 pos          = b.getWorldPosition();
   ARGSZ(1)
   if (a[0] == "add") {
-    home &myh = getHome(name);
+    ARGSZ(2)
+    home &myh = ply_homes[sp];
     if (myh.cnt >= MaxHomes) {
       outp.error("Can't add more homes");
       return;
     }
-    myh.vals.push_back(Vpos(pos.x, pos.y, pos.z, b.getEntity()->getDimensionId(), homen));
+    myh.vals.push_back(Vpos(pos.x, pos.y, pos.z, b.getEntity()->getDimensionId(), a[1]));
     myh.cnt++;
-    putHome(name, myh);
+    myh.save(*sp);
     outp.success("§bSuccessfully added a home");
   }
   if (a[0] == "del") {
-    home &myh = getHome(name);
-    for (auto i=myh.vals.begin();i!=myh.vals.end();++i) {
-      if (i->name == homen) { myh.vals.erase(i); break;}
+    ARGSZ(2)
+    home &myh = ply_homes[sp];
+    for (auto i = myh.vals.begin(); i != myh.vals.end(); ++i) {
+      if (i->name == a[1]) {
+        myh.vals.erase(i);
+        break;
+      }
     }
-    putHome(name, myh);
+    myh.save(*sp);
     outp.success("§bHome has been deleted");
   }
   if (a[0] == "go") {
-    home &myh = getHome(name);
+    ARGSZ(2)
+    home &myh = ply_homes[sp];
     for (int i = 0; i < myh.cnt; ++i) {
-      if (myh.vals[i].name == homen) {
+      if (myh.vals[i].name == a[1]) {
         myh.vals[i].tele(*b.getEntity());
         outp.success("§bTeleported you to home");
       }
     }
   }
   if (a[0] == "ls") {
-    home &myh = getHome(name);
+    home &myh = ply_homes[sp];
     outp.addMessage("§b====Home list====");
-    for (int i = 0; i < myh.cnt; ++i) outp.addMessage(myh.vals[i].name); 
+    for (int i = 0; i < myh.cnt; ++i) outp.addMessage(myh.vals[i].name);
     outp.success("§b============");
   }
   if (a[0] == "gui") {
-    home &myh = getHome(name);
+    home &myh = ply_homes[sp];
     auto sf   = getForm("Home", "Please choose a home");
     for (int i = 0; i < myh.cnt; ++i) {
       auto &hname = myh.vals[i].name;

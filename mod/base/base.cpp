@@ -17,7 +17,7 @@ using std::vector;
 #include <sstream>
 #include <logger.h>
 #include <string>
-
+#include<minecraft/core/getSP.h>
 #include <minecraft/actor/Actor.h>
 #include <minecraft/actor/Mob.h>
 #include <minecraft/actor/ItemActor.h>
@@ -51,6 +51,27 @@ BDL_EXPORT void mod_init(list<string> &modlist);
 BDL_EXPORT Minecraft *MC;
 BDL_EXPORT Level *ServLevel;
 }
+
+THook(void*,_ZN14ServerInstance14onLevelCorruptEv,void* x){
+    printf("LEVEL CORRUPT DETECTED!!!\n");
+    string payload;
+    auto vc          = ServLevel->getUsers();
+    for (auto &p : *vc) {
+        auto sp=getSP(p.get());
+        if(sp){
+          payload+=sp->getNameTag()+" ->("+std::to_string(sp->getPos().x)+" , "+std::to_string(sp->getPos().z)+") dim "+std::to_string(sp->getDimensionId())+"\n";
+        }
+    }
+    printf("%s\n",payload.c_str());
+    char buf[1024];
+    auto TIM = time(0);
+    strftime(buf, 1024, "Crash-%Y-%m-%d_%H_%M_%S.txt", localtime(&TIM));
+    FILE* fp=fopen(buf,"w");
+    fwrite(payload.data(),payload.size(),1,fp);
+    fclose(fp);
+    return original(x);
+}
+
 
 static ServerNetworkHandler *MCSNH;
 static LoopbackPacketSender *MCPKTSEND;
@@ -331,6 +352,16 @@ BDL_EXPORT MCRESULT runcmdAs(string_view a, Player *sp) {
   access(ori_ptr, Level *, 32)       = ServLevel;
   return _ZNK17MinecraftCommands23requestCommandExecutionESt10unique_ptrI13CommandOriginSt14default_deleteIS1_EERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEib(
       MCCMD, &ori_ptr, string(a), 4, 1);
+}
+static vector<pair<void(*)(void*,ServerPlayer*),void*>> SPD2EvHooks;
+BDL_EXPORT void regSPD2EvHooks(pair<void(*)(void*,ServerPlayer*),void*> x){
+  SPD2EvHooks.push_back(x);
+}
+THook(void*,_ZN12ServerPlayerD2Ev,ServerPlayer* thi){
+  for(auto& i:SPD2EvHooks){
+    i.first(i.second,thi);
+  }
+  return original(thi);
 }
 static void dummy__() {}
 void mod_init(list<string> &modlist) {

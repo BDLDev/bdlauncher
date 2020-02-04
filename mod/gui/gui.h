@@ -14,16 +14,14 @@ struct SharedForm {
   bool needfree;
   bool isInput;
   bool hasSerialed;
-  unsigned char labcnt;
   int fid;
   SPBuf<2048> buf;
-  std::string_view labels[128];
+  vector<string_view> labels;
   std::function<void(ServerPlayer *, string_view, int)> cb;
   SharedForm(string_view title, string_view cont, bool nedfree = true, bool isInp = false) {
     needfree    = nedfree;
     isInput     = isInp;
     hasSerialed = false;
-    labcnt      = 0;
     if (isInput) {
       buf.write(input_json);
       buf.write(title);
@@ -43,7 +41,7 @@ struct SharedForm {
       cb(sp, d.substr(2, d.size() - 5), 0);
     else {
       auto idx = atoi(d);
-      if (idx >= 0 && idx < labcnt) cb(sp, labels[idx], idx);
+      if (idx >= 0 && idx < (int)labels.size()) cb(sp, labels[idx], idx);
     }
   }
   void addInput(string_view text) {
@@ -56,8 +54,7 @@ struct SharedForm {
     assert(!isInput);
     if (buf.buf[buf.ptr - 1] == '}') { buf.write(split_p1); }
     buf.write("{\"text\":\"");
-    assert(labcnt < 128);
-    labels[labcnt++] = {buf.buf + buf.ptr, text.size()};
+    labels.emplace_back(buf.buf + buf.ptr, text.size());
     buf.write(text);
     buf.write("\"}");
   }

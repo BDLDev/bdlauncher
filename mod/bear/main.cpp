@@ -29,6 +29,7 @@
 #include <minecraft/json.h>
 #include <minecraft/core/GameMode.h>
 #include <minecraft/core/Minecraft.h>
+#include <minecraft/level/Level.h>
 #include <minecraft/block/BlockPos.h>
 #include <minecraft/block/BlockActor.h>
 #include <minecraft/block/Block.h>
@@ -48,6 +49,9 @@
 #include "../base/base.h"
 #include "bear.command.h"
 #include "lang.h"
+
+static bool NOFMCBUG,NOPLAYERTPA;
+
 #include "log.hpp"
 #include "network.hpp"
 #include "ChatSan.hpp"
@@ -103,7 +107,7 @@ THook(
   }
   return original(snh, a, b);
 }
-static bool NOFMCBUG;
+
 size_t MAX_CHAT_SIZE;
 static_deque<string, 128> banword;
 
@@ -141,7 +145,19 @@ static bool hkc(ServerPlayer *b, string &c) {
   async_log("[CHAT] %s: %s\n", name.c_str(), c.c_str());
   return 1;
 }
-
+extern "C"{
+  void _ZN14ServerInstance14onLevelCorruptEv(void*);
+}
+void ACCommand::crashme(mandatory<Crashme>){
+  _ZN14ServerInstance14onLevelCorruptEv(nullptr);
+}
+void ACCommand::kickall(mandatory<Kickall>){
+  auto x=getSrvLevel()->getUsers();
+  for(auto& i:*x){
+    runcmd("kick \""+i->getNameTag()+"\"");
+  }
+  getOutput().success("done");
+}
 void ACCommand::mute(mandatory<Mute>, mandatory<CommandSelector<Player>> target, mandatory<int> time_) {
   int to       = time_ == -1 ? 0 : (time(0) + time_);
   auto results = target.results(getOrigin());
@@ -211,11 +227,13 @@ static void notifyCheat(const string &name, CheatType x) {
   }
 }
 
-THook(void*,_ZNK14FertilizerItem8dispenseER11BlockSourceR9ContaineriRK4Vec3h,void* thi,BlockSource& a, Container& b, int c, Vec3 const& d, unsigned char e){
-  if(NOFMCBUG)
-  return original(thi,a,b,c,d,e);
-  else 
-  return nullptr;
+THook(
+    void *, _ZNK14FertilizerItem8dispenseER11BlockSourceR9ContaineriRK4Vec3h, void *thi, BlockSource &a, Container &b,
+    int c, Vec3 const &d, unsigned char e) {
+  if (NOFMCBUG)
+    return original(thi, a, b, c, d, e);
+  else
+    return nullptr;
 }
 THook(void *, _ZN5BlockC2EtR7WeakPtrI11BlockLegacyE, Block *a, unsigned short x, void *c) {
   auto ret = original(a, x, c);
@@ -371,7 +389,8 @@ static void _load_config() {
     do_log("%s", msg.c_str());
     exit(1);
   }
-  NOFMCBUG = value["NOFMCBUG"].asBool(false);
+  NOFMCBUG   = value["NOFMCBUG"].asBool(false);
+  NOPLAYERTPA   = value["NOPLAYERTPA"].asBool(false);
   FPushBlock = value["FPushChest"].asBool(false);
   FExpOrb    = value["FSpwanExp"].asBool(false);
   FDest      = value["FDestroyCheck"].asBool(false);

@@ -71,7 +71,7 @@ BDL_EXPORT void base_sendPkt(ServerPlayer *sp, Packet &pk);
 
 BDL_EXPORT void forceKickPlayer(ServerPlayer &sp);
 
-//template
+// template
 
 #define ARGSZ(b)                                                                                                       \
   if (a.size() < b) {                                                                                                  \
