@@ -6,7 +6,7 @@
 #include "cmdhelper.h"
 #include <vector>
 #include <Loader.h>
-#include <MC.h>
+//#include <MC.h>
 #include <unistd.h>
 #include <cstdarg>
 
@@ -19,6 +19,14 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "gui.h"
+#include <minecraft/core/types.h>
+#include <minecraft/core/getSP.h>
+#include <minecraft/core/Minecraft.h>
+#include <minecraft/level/Level.h>
+#include <minecraft/item/ItemStack.h>
+#include <minecraft/net/NetworkIdentifier.h>
+#include <minecraft/packet/MyPkt.h>
+#include <minecraft/packet/BinaryStream.h>
 using std::string;
 using std::unordered_map;
 
@@ -69,7 +77,7 @@ BDL_EXPORT void sendForm(ServerPlayer &sp, SharedForm *fm) {
   if (id_forms.size() > 128) {
     for (auto &i : id_forms) { delete i.second; }
     id_forms.clear();
-    do_log("Warning!Form Spam Detected!Clearing Form datas.Last Player %s", sp.getName().c_str());
+    do_log("Warning!Form Spam Detected!Clearing Form datas.Last Player %s", sp.getNameTag().c_str());
   }
   auto x           = fm->serial();
   fm->fid          = ++autoid;
@@ -97,7 +105,7 @@ void gui_ChoosePlayer(
   auto fm = getForm(title, text, false);
   fm->cb  = [cb](ServerPlayer *sp, string_view sv, int x) { cb(sp, sv); };
   auto vc = getSrvLevel()->getUsers();
-  for (auto &i : *vc) { fm->addButton(i->getName()); }
+  for (auto &i : *vc) { fm->addButton(i->getNameTag()); }
   sendForm(*sp, fm);
 }
 void cm(argVec &a, CommandOrigin const &b, CommandOutput &c) {

@@ -1,10 +1,12 @@
 #include "myhook.h"
+#include <list>
 #include <Loader.h>
-#include <MC.h>
+//#include <MC.h>
 #include <fstream>
 #include <global.h>
 #include <logger.h>
 #include <minecraft/json.h>
+#include <bdlexport.h>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:opti\n"
@@ -194,6 +196,6 @@ THook(__int64,_ZN4Core6Random13_genRandInt32Ev,void *thi)
 
 void mod_init(std::list<string> &modlist) {
   load();
-  do_log("loaded! V2019-12-19");
+  do_log("loaded! V2019-12-30");
   load_helper(modlist);
 }

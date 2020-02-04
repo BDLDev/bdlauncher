@@ -1,10 +1,17 @@
 #include <Loader.h>
-#include <MC.h>
+//#include <MC.h>
 #include "base.h"
 #include <minecraft/json.h>
 #include "../money/money.h"
 #include <fstream>
 #include <list>
+#include <sys/stat.h>
+#include <minecraft/block/BlockActor.h>
+#include <minecraft/block/BlockPos.h>
+#include <minecraft/core/GameMode.h>
+#include <minecraft/actor/InventorySource.h>
+#include <minecraft/actor/InventoryAction.h>
+#include <minecraft/item/ItemStack.h>
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:chestshop\n"
@@ -121,8 +128,8 @@ THook(void *, _ZN15ChestBlockActor8stopOpenER6Player, BlockActor &ac, Player &pl
   auto &pos  = ac.getPosition();
   Chest *gch = fetchChest(pos.x, pos.y, pos.z);
   if (gch) {
-    sessions.erase(pl.getName());
-    last_sess.emplace(pl.getName(), gch);
+    sessions.erase(pl.getNameTag());
+    last_sess.emplace(pl.getNameTag(), gch);
   }
   return original(ac, pl);
 }
@@ -130,11 +137,11 @@ THook(void *, _ZN15ChestBlockActor9startOpenER6Player, BlockActor &ac, Player &p
   auto &pos = ac.getPosition();
   // do_log("start pos %d %d %d",pos.x,pos.y,pos.z);
   Chest *gch = fetchChest(pos.x, pos.y, pos.z);
-  if (gch) { sessions.emplace(pl.getName(), gch); }
+  if (gch) { sessions.emplace(pl.getNameTag(), gch); }
   return original(ac, pl);
 }
 THook(unsigned long, _ZNK20InventoryTransaction11executeFullER6Playerb, void *_thi, Player &player, bool b) {
-  const string &name = player.getName();
+  const string &name = player.getNameTag();
   auto it            = sessions.find(name);
   if (it == sessions.end()) return original(_thi, player, b);
   auto chest  = it->second;
@@ -269,9 +276,9 @@ static void oncmd(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   }
 }
 static bool handle_u(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos const *dstPos, Block const *a5) {
-  auto nm          = a0->getPlayer()->getName();
+  auto nm          = a0->getPlayer()->getNameTag();
   auto it          = ply_price.find(nm);
-  ServerPlayer *sp = a0->getPlayer();
+  ServerPlayer *sp = dynamic_cast<ServerPlayer*>(a0->getPlayer());
   if (it == ply_price.end()) return 1;
   int state = it->second;
   if (state == -114514) {

@@ -3,24 +3,34 @@
 #include <forward_list>
 #include <string>
 #include <unordered_map>
-#include "cmdhelper.h"
 #include <vector>
-#include <Loader.h>
-#include <MC.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include "../money/money.h"
-#include "base.h"
 #include <cmath>
 #include <deque>
 #include <dlfcn.h>
 #include <tuple>
-#include <minecraft/json.h>
 #include <fstream>
+
+#include <minecraft/core/getSP.h>
+#include <minecraft/core/GameMode.h>
+#include <minecraft/block/BlockPos.h>
+#include <minecraft/actor/ActorDamageSource.h>
+#include <minecraft/level/Level.h>
+#include <minecraft/item/ItemStack.h>
+#include <minecraft/actor/Player.h>
+#include <minecraft/json.h>
+#include <Loader.h>
+#include <cmdhelper.h>
+//#include <MC.h>
+
 #include "../gui/gui.h"
+#include "base.h"
+#include "../money/money.h"
+
 #include "data.hpp"
 #include "land.command.h"
+
 const char meta[] __attribute__((used, section("meta"))) =
     "name:land\n"
     "version:20200121\n"
@@ -92,7 +102,7 @@ void LDCommand::buy(mandatory<Buy> mode) {
   if (!sp) return;
   SPBuf sb;
   //  auto op    = sp->getPlayerPermissionLevel() > 1;
-  auto &nm   = sp->getName();
+  auto &nm   = sp->getNameTag();
   auto &hash = nm;
   int x, z, dx, dz;
   int dim = sp->getDimensionId();
@@ -143,7 +153,7 @@ void LDCommand::sell(mandatory<Sell> mode) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   auto op   = sp->getPlayerPermissionLevel() > 1;
-  auto &nm  = sp->getName();
+  auto &nm  = sp->getNameTag();
   auto &pos = sp->getPos();
   int dim   = sp->getDimensionId();
   auto lp   = getFastLand(pos.x, pos.z, dim);
@@ -162,13 +172,13 @@ void LDCommand::trust(mandatory<Trust> mode, mandatory<std::string> target) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   auto op   = sp->getPlayerPermissionLevel() > 1;
-  auto &nm  = sp->getName();
+  auto &nm  = sp->getNameTag();
   auto &pos = sp->getPos();
   int dim   = sp->getDimensionId();
   auto lp   = getFastLand(pos.x, pos.z, dim);
   if (lp && (lp->chkOwner(nm) == 2 || op)) {
     SPBuf sb;
-    DataLand dl{*lp};
+    DataLand dl(*lp);
     dl.addOwner(target);
     updLand(dl);
     sb.write("§bMake ");
@@ -184,7 +194,7 @@ void LDCommand::untrust(mandatory<Untrust> mode, mandatory<std::string> target) 
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   auto op   = sp->getPlayerPermissionLevel() > 1;
-  auto &nm  = sp->getName();
+  auto &nm  = sp->getNameTag();
   auto &pos = sp->getPos();
   int dim   = sp->getDimensionId();
   auto lp   = getFastLand(pos.x, pos.z, dim);
@@ -206,7 +216,7 @@ void LDCommand::perm(mandatory<Perm> mode, mandatory<int> perm) {
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
   auto op   = sp->getPlayerPermissionLevel() > 1;
-  auto &nm  = sp->getName();
+  auto &nm  = sp->getNameTag();
   auto &pos = sp->getPos();
   int dim   = sp->getDimensionId();
   auto lp   = getFastLand(pos.x, pos.z, dim);
@@ -234,13 +244,13 @@ void LDCommand::give(mandatory<Give>, mandatory<CommandSelector<Player>> target)
     auto &pos = sp->getPos();
     int dim   = sp->getDimensionId();
     auto lp   = getFastLand(pos.x, pos.z, dim);
-    if (lp && (lp->chkOwner(sp->getName()) == 2 || sp->getPlayerPermissionLevel() > 1)) {
+    if (lp && (lp->chkOwner(sp->getNameTag()) == 2 || sp->getPlayerPermissionLevel() > 1)) {
       DataLand dl{*lp};
-      dl.addOwner(dst->getName(), true);
-      dl.delOwner(sp->getName());
+      dl.addOwner(dst->getNameTag(), true);
+      dl.delOwner(sp->getNameTag());
       updLand(dl);
-      sendText(dst, "You get a land from " + sp->getName());
-      getOutput().success("§bSuccessfully give your territory to " + dst->getName());
+      sendText(dst, "You get a land from " + sp->getNameTag());
+      getOutput().success("§bSuccessfully give your territory to " + dst->getNameTag());
     } else {
       getOutput().error("No land here or not your land");
       return;
@@ -268,7 +278,7 @@ void LDCommand::untrustgui(mandatory<Untrustgui>) {
     auto &pos = sp->getPos();
     int dim   = sp->getDimensionId();
     auto lp   = getFastLand(pos.x, pos.z, dim);
-    if (lp && (lp->chkOwner(sp->getName()) == 2 || sp->getPlayerPermissionLevel() > 1)) {
+    if (lp && (lp->chkOwner(sp->getNameTag()) == 2 || sp->getPlayerPermissionLevel() > 1)) {
       SharedForm *sf = getForm("Untrust a player", "Untrust a player");
       DataLand dl{*lp};
       static_deque<string_view> owners;
@@ -335,7 +345,7 @@ static bool handle_dest(GameMode *a0, BlockPos const *a1) {
   if (isOp(sp)) return 1;
   int x(a1->x), z(a1->z), dim(sp->getDimensionId());
   FastLand *fl = getFastLand(x, z, dim);
-  if (!fl || fl->hasPerm(sp->getName(), PERM_BUILD)) {
+  if (!fl || fl->hasPerm(sp->getNameTag(), PERM_BUILD)) {
     return 1;
   } else {
     NoticePerm(fl, sp);
@@ -351,7 +361,7 @@ static bool handle_attack(Actor &vi, ActorDamageSource const &src, int &val) {
     auto &pos = vi.getPos();
     int x(pos.x), z(pos.z), dim(vi.getDimensionId());
     FastLand *fl = getFastLand(x, z, dim);
-    if (!fl || fl->hasPerm(sp->getName(), PERM_ATK)) {
+    if (!fl || fl->hasPerm(sp->getNameTag(), PERM_ATK)) {
       return 1;
     } else {
       NoticePerm(fl, sp);
@@ -366,7 +376,7 @@ static bool handle_inter(GameMode *a0, Actor &a1) {
   auto &pos = a1.getPos();
   int x(pos.x), z(pos.z), dim(a1.getDimensionId());
   FastLand *fl = getFastLand(x, z, dim);
-  if (!fl || fl->hasPerm(sp->getName(), PERM_INTERWITHACTOR)) {
+  if (!fl || fl->hasPerm(sp->getNameTag(), PERM_INTERWITHACTOR)) {
     return 1;
   } else {
     NoticePerm(fl, sp);
@@ -399,7 +409,7 @@ static bool handle_useion(GameMode *a0, ItemStack *a1, BlockPos const *a2, Block
     pm = PERM_BUILD;
   }
   FastLand *fl = getFastLand(x, z, dim), *fl2 = getFastLand(dstPos->x, dstPos->z, dim);
-  auto &name = sp->getName();
+  auto &name = sp->getNameTag();
   if (fl && !fl->hasPerm(name, pm)) {
     NoticePerm(fl, sp);
     return 0;
@@ -414,7 +424,7 @@ static bool handle_popitem(ServerPlayer &sp, BlockPos &bpos) {
   if (isOp(&sp)) return 1;
   int x(bpos.x), z(bpos.z), dim(sp.getDimensionId());
   FastLand *fl = getFastLand(x, z, dim);
-  if (!fl || fl->hasPerm(sp.getName(), PERM_POPITEM)) {
+  if (!fl || fl->hasPerm(sp.getNameTag(), PERM_POPITEM)) {
     return 1;
   } else {
     NoticePerm(fl, &sp);
@@ -428,7 +438,7 @@ static unordered_set<string> flying;
 THook(void *, _ZN12ServerPlayer9tickWorldERK4Tick, ServerPlayer *sp, unsigned long const *tk) {
   if (!land_tip) return original(sp, tk);
   if (*tk % 16 == 0) {
-    auto &plyname = sp->getName();
+    auto &plyname = sp->getNameTag();
     auto &oldname = lastland[plyname];
     auto &pos     = sp->getPos();
     int dim       = sp->getDimensionId();

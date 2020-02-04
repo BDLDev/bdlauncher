@@ -6,7 +6,7 @@
 #include "base.h"
 #include <vector>
 #include <Loader.h>
-#include <MC.h>
+//#include <MC.h>
 #include "seral.hpp"
 #include <sys/stat.h>
 #include <unistd.h>
@@ -14,7 +14,9 @@
 #include <memory>
 #include <dlfcn.h>
 #include <cstdlib>
-
+#include <minecraft/item/ItemStack.h>
+#include <minecraft/core/Minecraft.h>
+#include <minecraft/level/Level.h>
 #include "map.h"
 
 const char meta[] __attribute__((used, section("meta"))) =
