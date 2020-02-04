@@ -36,7 +36,7 @@ void ACCommand::invchk(mandatory<Invchk>, mandatory<CommandSelector<Player>> tar
     auto sp = getSP(player);
     if (!sp) continue;
     auto dmp = dumpall(sp);
-    getOutput().addMessage("---dump for " + sp->getName() + "---\n" + dmp);
+    getOutput().addMessage("---dump for " + sp->getNameTag() + "---\n" + dmp);
   }
   getOutput().success();
 }

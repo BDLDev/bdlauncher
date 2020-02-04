@@ -1,11 +1,17 @@
-#include <Loader.h>
-#include <MC.h>
-#include "cmdhelper.h"
-#include <minecraft/json.h>
 #include <fstream>
+
+#include <minecraft/core/getSP.h>
+#include <minecraft/core/types.h>
+#include <minecraft/level/Level.h>
+#include <minecraft/actor/Player.h>
+#include <minecraft/actor/ActorDamageSource.h>
+#include <Loader.h>
+//#include <MC.h>
+#include <cmdhelper.h>
+#include <minecraft/json.h>
+
 #include "base.h"
 #include "../money/money.h"
-#include <fstream>
 #include "main.command.h"
 
 const char meta[] __attribute__((used, section("meta"))) =
@@ -56,7 +62,7 @@ static void handle_die(Mob &a, ActorDamageSource const &b) {
       if (it != bonus_mp.end()) {
         auto mi = it->second.first, mx = it->second.second;
         auto addm = rand() % (mx + 1 - mi) + mi;
-        add_money(sp->getName(), addm);
+        add_money(sp->getNameTag(), addm);
         sendText(sp, "you get $" + std::to_string(addm) + " by killing");
       }
     }

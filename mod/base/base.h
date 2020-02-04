@@ -1,8 +1,9 @@
 #pragma once
 #include "cmdhelper.h"
+#include <bdlexport.h>
 #include <string>
 #include <unordered_map>
-#include <MC.h>
+//#include <MC.h>
 #include <functional>
 #include <vector>
 //#include "db.hpp"
@@ -12,6 +13,8 @@
 #include "cmdreg.h"
 #include "dbimpl.h"
 #include "utils.h"
+#include <minecraft/actor/Player.h>
+#include <minecraft/core/types.h>
 
 using namespace std::literals;
 using std::function;
@@ -19,12 +22,15 @@ using std::string;
 using std::string_view;
 using std::vector;
 
-class Player;
 class Actor;
 class Vec3;
 // class AutomaticID<Dimension,int>;
 class Dimension;
 struct MCRESULT;
+class GameMode;
+class ItemActor;
+class ActorDamageSource;
+class Mob;
 
 enum TextType : char { RAW = 0, POPUP = 3, JUKEBOX_POPUP = 4, TIP = 5 };
 

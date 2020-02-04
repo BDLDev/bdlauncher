@@ -7,6 +7,8 @@
 #include <minecraft/commands/CommandSelector.h>
 #include <minecraft/commands/CommandPosition.h>
 #include <minecraft/json.h>
+//#include <minecraft/block/Block.h>
+class Block;
 
 namespace BDL::CustomCommand {
 
@@ -40,12 +42,10 @@ GENALL(float, _ZZ7type_idI15CommandRegistryfE8typeid_tIT_EvE2id);
 GENALL(DimensionID, _ZZ7type_idI15CommandRegistry11AutomaticIDI9DimensioniEE8typeid_tIT_EvE2id);
 GENALL(Block const *, _ZZ7type_idI15CommandRegistryPK5BlockE8typeid_tIT_EvE2id);
 GENALL(GameType, _ZZ7type_idI15CommandRegistry8GameTypeE8typeid_tIT_EvE2id);
-GENALL(
-    std::string, _ZZ7type_idI15CommandRegistryNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEE8typeid_tIT_EvE2id);
+GENALL(std::string, _ZZ7type_idI15CommandRegistryNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEE8typeid_tIT_EvE2id);
 GENALL(CommandSelector<Actor>, _ZZ7type_idI15CommandRegistry15CommandSelectorI5ActorEE8typeid_tIT_EvE2id);
 GENALL(CommandSelector<Player>, _ZZ7type_idI15CommandRegistry15CommandSelectorI6PlayerEE8typeid_tIT_EvE2id);
-GENALL(
-    WildcardCommandSelector<Actor>, _ZZ7type_idI15CommandRegistry23WildcardCommandSelectorI5ActorEE8typeid_tIT_EvE2id);
+GENALL(WildcardCommandSelector<Actor>, _ZZ7type_idI15CommandRegistry23WildcardCommandSelectorI5ActorEE8typeid_tIT_EvE2id);
 GENALL(RelativeFloat, _ZZ7type_idI15CommandRegistry13RelativeFloatE8typeid_tIT_EvE2id);
 GENALL(CommandPosition, _ZZ7type_idI15CommandRegistry15CommandPositionE8typeid_tIT_EvE2id);
 GENALL(CommandPositionFloat, _ZZ7type_idI15CommandRegistry20CommandPositionFloatE8typeid_tIT_EvE2id);

@@ -3,20 +3,24 @@
 #include <forward_list>
 #include <string>
 #include <unordered_map>
-#include "cmdhelper.h"
 #include <vector>
-#include <Loader.h>
-#include <MC.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include "base.h"
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include "../gui/gui.h"
 #include <fstream>
+
 #include <minecraft/json.h>
+#include <cmdhelper.h>
+#include <Loader.h>
+//#include <MC.h>
+#include <minecraft/core/getSP.h>
+#include <minecraft/actor/Player.h>
+
+#include "base.h"
+#include "../gui/gui.h"
+
 #include "tp.command.h"
 
 const char meta[] __attribute__((used, section("meta"))) =
@@ -124,7 +128,7 @@ static void oncmd_suic(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
 }
 
 static void sendTPChoose(ServerPlayer *sp, int type) { // 0=t
-  string name = sp->getName();
+//  string name = sp->getNameTag();
   gui_ChoosePlayer(sp, "Select target player", "Send teleport request", [type](ServerPlayer *xx, string_view dest) {
     SPBuf<512> sb;
     sb.write("tpa "sv);
@@ -172,7 +176,7 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
   }
   auto sp = getSP(getOrigin().getEntity());
   if (!sp) return;
-  auto &nam = sp->getName();
+  auto &nam = sp->getNameTag();
   switch (mode) {
   case TPCMD::ac: {
     if (tpmap.count(nam) == 0) return;
@@ -229,7 +233,7 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
       getOutput().error("target not found!");
       return;
     }
-    auto &dnm = dst->getName();
+    auto &dnm = dst->getNameTag();
     if (tpmap.count(dnm)) {
       getOutput().error("A request of your target is pending.");
       return;
@@ -250,7 +254,7 @@ void TPACommand::invoke(mandatory<TPCMD> mode, optional<string> target) {
       getOutput().error("target not found!");
       return;
     }
-    auto &dnm = dst->getName();
+    auto &dnm = dst->getNameTag();
     if (tpmap.count(dnm)) {
       getOutput().error("A request of your target is pending.");
       return;
@@ -393,7 +397,7 @@ static void oncmd_back(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   }
   ServerPlayer *sp = (ServerPlayer *) b.getEntity();
   if (!sp) return;
-  auto it = deathpoint.find(sp->getName());
+  auto it = deathpoint.find(sp->getNameTag());
   if (it == deathpoint.end()) {
     outp.error("Can't find deathpoint");
     return;
@@ -408,14 +412,14 @@ static void handle_mobdie(Mob &mb, const ActorDamageSource &) {
   if (sp) {
     ServerPlayer *sp = (ServerPlayer *) &mb;
     sendText(sp, "§bYou can use /back to return last deathpoint");
-    deathpoint[sp->getName()] = {sp->getPos(), sp->getDimensionId()};
+    deathpoint[sp->getNameTag()] = {sp->getPos(), sp->getDimensionId()};
   }
 }
 static int TP_TIMEOUT = 30;
 THook(void *, _ZN12ServerPlayer9tickWorldERK4Tick, ServerPlayer *sp, unsigned long const *tk) {
   auto res = original(sp, tk);
   if (*tk % 40 == 0) {
-    auto &name = sp->getName();
+    auto &name = sp->getNameTag();
     auto it    = tpmap.find(name);
     if (it != tpmap.end()) {
       if (it->second.reqtime + CLOCKS_PER_SEC * TP_TIMEOUT <= clock()) {

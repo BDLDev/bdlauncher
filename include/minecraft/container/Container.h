@@ -7,7 +7,6 @@
 #include <vector>
 
 class ContainerContentChangeListener;
-class ItemStack;
 class BlockSource;
 class Player;
 class CompoundTag;

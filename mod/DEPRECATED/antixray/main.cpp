@@ -1,4 +1,4 @@
-#include <MC.h>
+//#include <MC.h>
 #include <Loader.h>
 #include "minecraft/core/types.h"
 #include "base.h"

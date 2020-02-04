@@ -1,9 +1,10 @@
 #pragma once
 
-#include <global.h>
+#include "global.h"
 #include "Packet.h"
 #include <string>
 #include <dlfcn.h>
+#include <cstdint>
 using std::string;
 struct ObjectiveSortOrder {
   unsigned char x;
@@ -20,9 +21,9 @@ public:
       std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const &criteriaName,
       char sortOrder) {
     void (*pp)(char *) = (typeof(pp)) dlsym(NULL, "_ZN6PacketC2Ev");
-    u64 vt             = (u64) dlsym(NULL, "_ZTV25SetDisplayObjectivePacket");
+    uint64_t vt             = (uint64_t) dlsym(NULL, "_ZTV25SetDisplayObjectivePacket");
     pp(filler);
-    *((u64 *) filler) = vt + 16;
+    *((uint64_t *) filler) = vt + 16;
     new (filler + 32) string(displaySlot);
     new (filler + 64) string(objectiveName);
     new (filler + 96) string(displayName);
@@ -45,10 +46,10 @@ class TransferPacket {
 public:
   inline TransferPacket(string ip, short port) {
     void (*pp)(char *) = (typeof(pp)) dlsym(NULL, "_ZN6PacketC2Ev");
-    u64 vt             = (u64) dlsym(NULL, "_ZTV14TransferPacket");
+    uint64_t vt             = (uint64_t) dlsym(NULL, "_ZTV14TransferPacket");
     printf("get %p\n", vt);
     pp(filler);
-    *((u64 *) filler) = vt + 16;
+    *((uint64_t *) filler) = vt + 16;
     new (filler + 32) string(ip);
     *((short *) (filler + 16)) = port;
   }

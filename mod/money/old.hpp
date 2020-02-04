@@ -1,4 +1,5 @@
 #include "seral.hpp"
+#include <minecraft/core/access.h>
 static void DO_DATA_CONVERT(const char *buf, int sz) {
   do_log("size %d", sz);
   DataStream ds;

@@ -17,8 +17,8 @@ namespace ScriptApi {
 class EventTracking;
 } // namespace ScriptApi
 
-struct Vec3;
-struct BlockPos;
+class Vec3;
+class BlockPos;
 class Actor;
 class ScriptEventCoordinator;
 class EventInfo;

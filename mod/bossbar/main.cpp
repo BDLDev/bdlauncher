@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include <Loader.h>
-#include <MC.h>
+//#include <MC.h>
 #include <unistd.h>
 #include <cstdarg>
 #include "bossbar.command.h"
@@ -12,8 +12,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <minecraft/actor/Player.h>
+#include <minecraft/packet/MyPkt.h>
+#include <minecraft/packet/BinaryStream.h>
+#include <minecraft/core/getSP.h>
+#include <minecraft/level/Level.h>
 using std::string;
 using std::unordered_map;
+class LevelChunk;
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:bossbar\n"

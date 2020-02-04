@@ -1,5 +1,12 @@
+#include <string>
+
 #include <Loader.h>
-#include <MC.h>
+//#include <MC.h>
+#include <minecraft/core/getSP.h>
+#include <minecraft/actor/Player.h>
+#include <minecraft/packet/MyPkt.h>
+#include <minecraft/packet/BinaryStream.h>
+
 #include "base.h"
 #include "main.command.h"
 
@@ -10,9 +17,9 @@ const char meta[] __attribute__((used, section("meta"))) =
     "depend:base@20200121,command@20200121\n";
 
 extern "C" {
-BDL_EXPORT void mod_init(std::list<string> &modlist);
+BDL_EXPORT void mod_init(std::list<std::string> &modlist);
 }
-extern void load_helper(std::list<string> &modlist);
+extern void load_helper(std::list<std::string> &modlist);
 
 void TransferCommand::invoke(mandatory<std::string> server, mandatory<int> port) {
   MyPkt trpk(0x55, [&](void *, BinaryStream &x) -> void {
@@ -29,7 +36,7 @@ void TransferCommand::invoke(mandatory<std::string> server, mandatory<int> port)
   }
 }
 
-void mod_init(std::list<string> &modlist) {
+void mod_init(std::list<std::string> &modlist) {
   register_commands();
   do_log("loaded! V2019-12-14");
   load_helper(modlist);

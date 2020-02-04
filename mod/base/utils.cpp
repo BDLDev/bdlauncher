@@ -1,9 +1,19 @@
 #include <Loader.h>
 #include <global.h>
 #include <logger.h>
-#include <MC.h>
-#include <string>
+//#include <MC.h>
+#include <cstring>
+#include <cassert>
 #include "utils.h"
+#include <minecraft/core/types.h>
+#include <minecraft/actor/Player.h>
+#include <minecraft/actor/ActorDefinitionIdentifier.h>
+#include <minecraft/actor/InventoryTransactionManager.h>
+#include <minecraft/actor/PlayerInventoryProxy.h>
+#include <minecraft/commands/CommandUtils.h>
+#include <minecraft/item/Item.h>
+#include <minecraft/item/ItemStack.h>
+#include <minecraft/item/ItemRegistry.h>
 
 using std::string;
 

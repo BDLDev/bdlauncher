@@ -24,7 +24,7 @@ THook(
 
     if (ChatLimit(p)) {
       string &sv = access(pk, string, 0x28);
-      async_log("[CMD] %s:%s\n", p->getName().c_str(), sv.c_str());
+      async_log("[CMD] %s:%s\n", p->getNameTag().c_str(), sv.c_str());
       return original(sh, iden, pk);
     }
   }

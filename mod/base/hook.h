@@ -1,3 +1,4 @@
+#include <minecraft/core/access.h>
 
 static_deque<bool (*)(ServerPlayer *a0, string &payload)> chat_hook;
 THook(

@@ -1,8 +1,13 @@
 #pragma once
 #define unlikely(cond) __glibc_unlikely(!!(cond))
 #define likely(cond) __glibc_likely(!!(cond))
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <string_view>
 #include <string>
+#include <cstring>
+#include <list>
 #include <logger.h>
 using std::string;
 using std::string_view;
@@ -171,7 +176,7 @@ public:
     return *this;
   }
   template <typename T, typename std::enable_if<!std::is_class<T>{}, int>::type = 0> DataStream &operator>>(T &c) {
-    memcpy(&c, dat.data() + curpos, sizeof(c));
+    std::memcpy(&c, dat.data() + curpos, sizeof(c));
     curpos += sizeof(c);
     return *this;
   }
