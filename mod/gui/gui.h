@@ -41,7 +41,7 @@ struct SharedForm {
       cb(sp, d.substr(2, d.size() - 5), 0);
     else {
       auto idx = atoi(d);
-      if (idx >= 0 && idx < (int)labels.size()) cb(sp, labels[idx], idx);
+      if (idx >= 0 && idx < (int) labels.size()) cb(sp, labels[idx], idx);
     }
   }
   void addInput(string_view text) {

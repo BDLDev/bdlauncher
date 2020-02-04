@@ -47,7 +47,7 @@ extern void load_helper(std::list<string> &modlist);
 
 using std::unordered_map;
 using std::vector;
-//unordered_map<int, SharedForm *> id_forms;
+// unordered_map<int, SharedForm *> id_forms;
 // AllocPool<SharedForm> FormMem;
 SharedForm *getForm(string_view title, string_view cont, bool isInp) {
   return new SharedForm(title, cont, true, isInp); // need free
@@ -55,10 +55,10 @@ SharedForm *getForm(string_view title, string_view cont, bool isInp) {
 static void relForm(SharedForm *sf) {
   if (sf->needfree) { delete sf; /*FormMem.release(sf);*/ }
 }
-struct FormWrap{
-  SharedForm* sf;
-  ~FormWrap(){
-    //printf("def\n");
+struct FormWrap {
+  SharedForm *sf;
+  ~FormWrap() {
+    // printf("def\n");
     relForm(sf);
   }
 };
@@ -84,11 +84,9 @@ static int autoid;
 BDL_EXPORT void sendForm(ServerPlayer &sp, SharedForm *fm) {
   auto x           = fm->serial();
   fm->fid          = ++autoid;
-  if(player_mp.dat.count(&sp)){
-    player_mp.defe(&sp);
-  }
-  player_mp[sp].sf=fm;
-  //printf("%s\n",string(x).c_str());
+  if (player_mp.dat.count(&sp)) { player_mp.defe(&sp); }
+  player_mp[sp].sf = fm;
+  // printf("%s\n",string(x).c_str());
   sendStr(sp, x, autoid);
 }
 THook(
@@ -99,14 +97,14 @@ THook(
     int id  = access(pk, int, 36);
     auto it = player_mp.dat.find(p);
     if (it != player_mp.dat.end()) {
-      auto form=it->second.sf;
-      if(id==form->fid){
-        auto oldfre=form->needfree;
-        form->needfree=false;
-        player_mp.dat.erase(p); //WHY USE THIS SHIT HACK? A FORM CAN BE OPENED IN ANOTHER ONE
-        //printf("recv %d %d\n",id,form->fid);
+      auto form = it->second.sf;
+      if (id == form->fid) {
+        auto oldfre    = form->needfree;
+        form->needfree = false;
+        player_mp.dat.erase(p); // WHY USE THIS SHIT HACK? A FORM CAN BE OPENED IN ANOTHER ONE
+        // printf("recv %d %d\n",id,form->fid);
         form->process(p, access(pk, string, 40));
-        form->needfree=oldfre;
+        form->needfree = oldfre;
         relForm(form);
       }
     }

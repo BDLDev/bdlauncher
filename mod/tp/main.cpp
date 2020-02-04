@@ -61,17 +61,16 @@ struct home {
     ds >> vals;
     cnt = vals.size();
   }
-  home(ServerPlayer& sp){
+  home(ServerPlayer &sp) {
     DataStream ds;
-    if(tp_db.Get("home_" + sp.getName(), ds.dat)) { ds >> *this; }
+    if (tp_db.Get("home_" + sp.getName(), ds.dat)) { ds >> *this; }
   }
-  void save(ServerPlayer& sp){
+  void save(ServerPlayer &sp) {
     DataStream ds;
     ds << *this;
     tp_db.Put("home_" + sp.getName(), ds.dat);
   }
 };
-
 
 void add_warp(int x, int y, int z, int dim, const string &name) {
   warp_list.push_back(name);
@@ -287,9 +286,9 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     return;
   }
   //   int pl            = (int) b.getPermissionsLevel();
-  //string name       = b.getName();
-  ServerPlayer* sp=getSP(b.getEntity());
-  if(!sp){
+  // string name       = b.getName();
+  ServerPlayer *sp = getSP(b.getEntity());
+  if (!sp) {
     outp.error("this is a command for players");
     return;
   }
