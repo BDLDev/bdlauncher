@@ -165,3 +165,5 @@ struct SynchedActorData {
 };
 
 enum class ArmorSlot : int { UNK = 0 };
+
+enum class LevelEvent : unsigned int {};
