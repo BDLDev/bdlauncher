@@ -103,7 +103,7 @@ THook(
   }
   return original(snh, a, b);
 }
-
+static bool NOFMCBUG;
 size_t MAX_CHAT_SIZE;
 static_deque<string, 128> banword;
 
@@ -211,6 +211,12 @@ static void notifyCheat(const string &name, CheatType x) {
   }
 }
 
+THook(void*,_ZNK14FertilizerItem8dispenseER11BlockSourceR9ContaineriRK4Vec3h,void* thi,BlockSource& a, Container& b, int c, Vec3 const& d, unsigned char e){
+  if(NOFMCBUG)
+  return original(thi,a,b,c,d,e);
+  else 
+  return nullptr;
+}
 THook(void *, _ZN5BlockC2EtR7WeakPtrI11BlockLegacyE, Block *a, unsigned short x, void *c) {
   auto ret = original(a, x, c);
   if (FPushBlock) {
@@ -365,6 +371,7 @@ static void _load_config() {
     do_log("%s", msg.c_str());
     exit(1);
   }
+  NOFMCBUG = value["NOFMCBUG"].asBool(false);
   FPushBlock = value["FPushChest"].asBool(false);
   FExpOrb    = value["FSpwanExp"].asBool(false);
   FDest      = value["FDestroyCheck"].asBool(false);

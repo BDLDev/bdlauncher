@@ -4,7 +4,6 @@
 #include <memory>
 #include <vector>
 #include "../core/types.h"
-#include "../core/vtSP.h"
 #include "../core/access.h"
 #include "global.h"
 
@@ -66,7 +65,6 @@ public:
   ActorUniqueID getOwnerId() const;
   void setNameTagVisible(bool);
   inline void setNameTagAlwaysVisible() { getDATA()->set(80, (signed char) 1); }
-  inline bool isPlayer() const { return access(this, void *, 0) == ((void **) vtSP); }
   inline void setSize(float scale, float bbox) {
     getDATA()->set(38, scale);
     getDATA()->set(53, bbox);

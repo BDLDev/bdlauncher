@@ -9,6 +9,7 @@ DESTDIR=/opt/bdlauncher
 INSTALL_SH=./scripts/install.sh
 GENERATE_COMMAND=./scripts/generate_command_definition.py
 CLANG_FORMAT=clang-format
+CLANG_FORMAT_WRAP=./scripts/clang_format.py
 
 HEADERS=$(shell find include -type f -print)
 
@@ -64,14 +65,16 @@ endef
 # Phony Targets
 
 .PHONY: all
-all: bdlauncher preload generate-commands mods
+all: chkgcc9 bdlauncher preload generate-commands mods
 	@echo " DONE"
 
-.PHONY: bdlauncher preload generate-commands mods
+.PHONY: chkgcc9 bdlauncher preload generate-commands mods
+chkgcc9:
+	@gcc -v 2>&1 | grep "9\."
 bdlauncher: $(BIN_LAUNCHER)
 preload: $(DLL_PRELOAD)
 generate-commands: $(GEN_COMMAND_TGT)
-mods: generate-commands $(MOD_OUTS)
+mods: chkgcc9 generate-commands $(MOD_OUTS)
 
 .PHONY: list-mod
 list-mod:
@@ -81,6 +84,7 @@ list-mod:
 clean:
 	@rm -rf obj/*.o obj/*.d
 	@rm -rf $(BIN_LAUNCHER) $(DLL_PRELOAD) $(MOD_OUTS)
+	@rm -rf mod/*/*.gen.cpp
 
 .PHONY: install
 install: $(addprefix install-,launcher preload $(addprefix mod-,$(MOD_LIST)) $(addprefix config-,$(CFG_FILES)))
@@ -94,7 +98,7 @@ format: $(addprefix format-,$(FORMAT_SRCS))
 .PHONY: format-%
 $(addprefix format-,$(FORMAT_SRCS)): format-%: %
 	@echo " FORMAT $<"
-	@$(CLANG_FORMAT) -i $<
+	@$(CLANG_FORMAT) $<
 
 .PHONY: help
 help:
@@ -160,7 +164,8 @@ obj/preload_%_$(OBJ_SUFFIX).d: preload/%.cpp
 .DELETE_ON_ERROR:
 $(GEN_COMMAND_TGT) : %.gen.cpp: %.h $(GENERATE_COMMAND)
 	@echo " GENERATE $@"
-	@$(GENERATE_COMMAND) $< | $(CLANG_FORMAT) >$@
+	@$(GENERATE_COMMAND) $< > $@
+	@$(CLANG_FORMAT_WRAP) $@
 
 define build-mods-rules
 MOD_$1=build/mods/$1.mod

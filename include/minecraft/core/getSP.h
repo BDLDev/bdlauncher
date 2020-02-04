@@ -1,9 +1,14 @@
 #pragma once
 #include <memory>
-#include "vtSP.h"
 #include "access.h"
 
-//typedef void *UNK_64;
+#pragma once
+extern "C" {
+void _ZTV12ServerPlayer(void); // dummy
+}
+
+// utils for runtime type detecting
+static auto vtSP = ((void **) _ZTV12ServerPlayer) + 2;
 class ServerPlayer;
 template <class T> inline ServerPlayer *getSP(T &a) {
   return access(&a, void *, 0) == vtSP ? (ServerPlayer *) &a : nullptr;

@@ -32,7 +32,7 @@ using std::unordered_map;
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:gui\n"
-    "version:20200121\n"
+    "version:20200204\n"
     "author:sysca11\n"
     "depend:base@20200121,command@20200121\n";
 
@@ -47,13 +47,12 @@ extern void load_helper(std::list<string> &modlist);
 using std::unordered_map;
 using std::vector;
 unordered_map<int, SharedForm *> id_forms;
-AllocPool<SharedForm> FormMem;
+//AllocPool<SharedForm> FormMem;
 SharedForm *getForm(string_view title, string_view cont, bool isInp) {
-  //	return new SharedForm(title,cont,true,isInp);
-  return FormMem.get(title, cont, true, isInp); // need free
+  return new SharedForm(title, cont, true, isInp); // need free
 }
 static void relForm(SharedForm *sf) {
-  if (sf->needfree) { FormMem.release(sf); }
+  if (sf->needfree) { delete sf;/*FormMem.release(sf);*/ }
 }
 struct GUIPK {
   MyPkt *pk;
