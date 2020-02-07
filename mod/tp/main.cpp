@@ -138,7 +138,6 @@ static void sendTPChoose(ServerPlayer *sp, int type) { // 0=t
 //  string name = sp->getNameTag();
   gui_ChoosePlayer(sp, "Select target player", "Send teleport request", [type](ServerPlayer *xx, string_view dest) {
     SPBuf<512> sb;
-    printf("sss\n");
     sb.write("tpa "sv);
     if (type == 0)
       sb.write("t");
@@ -285,8 +284,6 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     outp.error("Home not enabled on this server!");
     return;
   }
-  //   int pl            = (int) b.getPermissionsLevel();
-  // string name       = b.getName();
   ServerPlayer *sp = getSP(b.getEntity());
   if (!sp) {
     outp.error("this is a command for players");
@@ -312,18 +309,19 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
     for (auto i = myh.vals.begin(); i != myh.vals.end(); ++i) {
       if (i->name == a[1]) {
         myh.vals.erase(i);
-        break;
+        outp.success("§bHome has been deleted");
+        myh.save(*sp);
+        return;
       }
     }
-    myh.save(*sp);
-    outp.success("§bHome has been deleted");
+    outp.error("not found");
   }
   if (a[0] == "go") {
     ARGSZ(2)
     home &myh = ply_homes[sp];
     for (int i = 0; i < myh.cnt; ++i) {
       if (myh.vals[i].name == a[1]) {
-        myh.vals[i].tele(*b.getEntity());
+        myh.vals[i].tele(*sp);
         outp.success("§bTeleported you to home");
       }
     }
@@ -348,7 +346,24 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
       sb.write("\"");
       runcmdAs(sb.get(), sp);
     };
-    sendForm(*(ServerPlayer *) b.getEntity(), sf);
+    sendForm(*sp, sf);
+    outp.success();
+  }
+  if (a[0] == "delgui") {
+    home &myh = ply_homes[sp];
+    auto sf   = getForm("Home", "Please choose a home to DELETE");
+    for (int i = 0; i < myh.cnt; ++i) {
+      auto &hname = myh.vals[i].name;
+      sf->addButton(hname);
+    }
+    sf->cb = [](ServerPlayer *sp, string_view sv, int idx) {
+      SPBuf<512> sb;
+      sb.write("home del \"");
+      sb.write(sv);
+      sb.write("\"");
+      runcmdAs(sb.get(), sp);
+    };
+    sendForm(*sp, sf);
     outp.success();
   }
 }
@@ -475,7 +490,6 @@ void mod_init(std::list<string> &modlist) {
   load_cfg();
   initTPGUI();
   register_cmd("suicide", oncmd_suic, "kill yourself");
-  // register_cmd("tpa", oncmd, "teleport command");
   register_cmd("home", oncmd_home, "home command");
   register_cmd("warp", oncmd_warp, "warp command");
   register_cmd("back", oncmd_back, "back to deathpoint");

@@ -70,7 +70,7 @@ THook(void *, _ZN14ServerInstance14onLevelCorruptEv, void *x) {
   FILE *fp = fopen(buf, "w");
   fwrite(payload.data(), payload.size(), 1, fp);
   fclose(fp);
-  return original(x);
+  return nullptr;
 }
 
 static ServerNetworkHandler *MCSNH;
