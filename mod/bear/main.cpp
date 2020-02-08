@@ -214,7 +214,7 @@ enum CheatType { FLY, NOCLIP, INV, MOVE };
 static void notifyCheat(const string &name, CheatType x) {
   const char *CName[] = {"FLY", "NOCLIP", "Creative", "Teleport"};
   async_log("[%s] detected for %s\n", CName[x], name.c_str());
-  string kick = string("ac kick \"") + name + "\" §cYou are banned";
+  string kick = string("ac kick \"") + name + "\"";
   switch (x) {
   case FLY: runcmd(kick); break;
   case NOCLIP: runcmd(kick); break;
