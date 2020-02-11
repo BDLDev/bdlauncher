@@ -181,5 +181,5 @@ bs.writeUnsignedVarInt(54);bs.writeUnsignedVarInt(3);bs.writeFloat(5);
 void mod_init(std::list<string> &modlist) {
   do_log("Loaded " BDL_TAG "");
   load_helper(modlist);
-  //register_cmd("g", cm, "debug", 1);
+  // register_cmd("g", cm, "debug", 1);
 }

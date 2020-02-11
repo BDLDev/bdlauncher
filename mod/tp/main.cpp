@@ -292,7 +292,7 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   if (a[0] == "add") {
     ARGSZ(2)
     home &myh = ply_homes[sp];
-    if ((decltype(MaxHomes))myh.vals.size() >= MaxHomes) {
+    if ((decltype(MaxHomes)) myh.vals.size() >= MaxHomes) {
       outp.error("Can't add more homes");
       return;
     }
