@@ -54,12 +54,10 @@ static list<string> warp_list;
 static unordered_map<string, Vpos> warp;
 static LDBImpl tp_db("data_v2/tp");
 struct home {
-  int cnt = 0;
-  vector<Vpos> vals;
+  list<Vpos> vals;
   void packto(DataStream &ds) const { ds << vals; }
   void unpack(DataStream &ds) {
     ds >> vals;
-    cnt = vals.size();
   }
   home(ServerPlayer &sp) {
     DataStream ds;
@@ -294,12 +292,11 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   if (a[0] == "add") {
     ARGSZ(2)
     home &myh = ply_homes[sp];
-    if (myh.cnt >= MaxHomes) {
+    if ((decltype(MaxHomes))myh.vals.size() >= MaxHomes) {
       outp.error("Can't add more homes");
       return;
     }
     myh.vals.push_back(Vpos(pos.x, pos.y, pos.z, b.getEntity()->getDimensionId(), a[1]));
-    myh.cnt++;
     myh.save(*sp);
     outp.success("§bSuccessfully added a home");
   }
@@ -319,9 +316,9 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   if (a[0] == "go") {
     ARGSZ(2)
     home &myh = ply_homes[sp];
-    for (int i = 0; i < myh.cnt; ++i) {
-      if (myh.vals[i].name == a[1]) {
-        myh.vals[i].tele(*sp);
+    for (auto i = myh.vals.begin(); i != myh.vals.end(); ++i) {
+      if (i->name == a[1]) {
+        i->tele(*sp);
         outp.success("§bTeleported you to home");
       }
     }
@@ -329,14 +326,14 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   if (a[0] == "ls") {
     home &myh = ply_homes[sp];
     outp.addMessage("§b====Home list====");
-    for (int i = 0; i < myh.cnt; ++i) outp.addMessage(myh.vals[i].name);
+    for (auto i = myh.vals.begin(); i != myh.vals.end(); ++i) outp.addMessage(i->name);
     outp.success("§b============");
   }
   if (a[0] == "gui") {
     home &myh = ply_homes[sp];
     auto sf   = getForm("Home", "Please choose a home");
-    for (int i = 0; i < myh.cnt; ++i) {
-      auto &hname = myh.vals[i].name;
+    for (auto i = myh.vals.begin(); i != myh.vals.end(); ++i) {
+      auto &hname = i->name;
       sf->addButton(hname);
     }
     sf->cb = [](ServerPlayer *sp, string_view sv, int idx) {
@@ -352,8 +349,8 @@ static void oncmd_home(argVec &a, CommandOrigin const &b, CommandOutput &outp) {
   if (a[0] == "delgui") {
     home &myh = ply_homes[sp];
     auto sf   = getForm("Home", "Please choose a home to DELETE");
-    for (int i = 0; i < myh.cnt; ++i) {
-      auto &hname = myh.vals[i].name;
+    for (auto i = myh.vals.begin(); i != myh.vals.end(); ++i) {
+      auto &hname = i->name;
       sf->addButton(hname);
     }
     sf->cb = [](ServerPlayer *sp, string_view sv, int idx) {
