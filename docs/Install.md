@@ -1,6 +1,6 @@
 # WARNING:1.14 only for testing
 
-# Requirements
+# Compile requirements
 
 | Name | Version | Ubuntu/Debian | Arch Linux |
 | - | - | - | - |
@@ -14,8 +14,17 @@
 
 If you do not have a bedrock server, please download it from the [official website](https://www.minecraft.net/download/server/bedrock/) first
 
-```
+## Download prebuilt binary and install
+
+1. Open [the GitHub Actions Artifact](https://github.com/Sysca11/bdlauncher/actions)
+2. Download latest building
+3. Unzip downloaded file to the directory of bedrock server
+4. Launcher server
+
+## Compile and install
+
 (In your bedrock server folder)
+```
 git clone https://github.com/sysca11/bdlauncher bdlauncher-git -b master --depth=1
 pushd bdlauncher-git
 make install RELEASE=1 DESTDIR=..
