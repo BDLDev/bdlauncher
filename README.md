@@ -4,21 +4,20 @@ Only for BDS Linux<br>
 
 Telegram group: https://t.me/bdlauncher  
 QQ group: 955765957  
-Unofficial forum: https://mc114.top
 
-# License:
+# License
 MIT with additional conditions<br>
 If you want to redistribute software in a commercial manner,please read LICENSE carefully<br>
 商用用途请仔细阅读LICENSE
 
-# Prebuilt binary:
+# Prebuilt binary
 Checkout [the GitHub Actions Artifact](https://github.com/Sysca11/bdlauncher/actions)
 
-# Docs:
-- [Install](docs/Install.md)
-- [Docs folder](docs/Home.md)
+# Install
 
-# Credits:
+- [docs/Install.md](docs/Install.md)
+
+# Credits
 | name | link |
 |  ----|----  |
 | HOOK Lib | https://github.com/Menooker/PFishHook |
