@@ -72,7 +72,7 @@ all: bdlauncher preload generate-commands mods
 chkgcc9:
 	@gcc -v 2>&1 | grep "9\."
 chkg++9:
-        @g++ -v 2>&1 | grep "9\."
+	@g++ -v 2>&1 | grep "9\."
 bdlauncher: chkgcc9 $(BIN_LAUNCHER)
 preload: $(DLL_PRELOAD)
 generate-commands: $(GEN_COMMAND_TGT)
