@@ -1,4 +1,4 @@
-# Compile requirements
+# 手动编译依赖，如果用方法一安装，不需要安装依赖
 
 | Name | Version | Ubuntu/Debian | Arch Linux |
 | - | - | - | - |
@@ -8,18 +8,18 @@
 | python | 3.7+ | `apt install python3 python3-pip` | `pacman -S python python-pip --needed` |
 | ply[pip] | N/A | `pip3 install --user ply` | `pip install --user ply` |
 | clang(OPTIONAL) | 9.0.1 | `apt install clang-format` | `pacman -S clang --needed` |
-# Install it to BDS
+# 安装到服务器
 
 If you do not have a bedrock server, please download it from the [official website](https://www.minecraft.net/download/server/bedrock/) first
 
-## Download prebuilt binary and install
+## 下载GitHub CI的预编译版本
 
-1. Open [the GitHub Actions Artifact](https://github.com/Sysca11/bdlauncher/actions)
-2. Download latest building
-3. Unzip downloaded file to the directory of bedrock server
-4. Launch server
+1. 打开 [the GitHub Actions Artifact](https://github.com/Sysca11/bdlauncher/actions)
+2. 下载最新的版本，RELEASE-CN...zip
+3. 解压到服务器目录
+4. 启动服务器
 
-## Compile by yourself and install
+## 方法二：自己编译
 
 (In your bedrock server folder)
 ```
@@ -29,15 +29,15 @@ make install RELEASE=1 DESTDIR=..
 popd
 ```
 
-# Launch server
+# 启动服务器
 
-`./bdlauncher` if you have compiled launcher.<br>
-or `LD_PRELOAD=./preload.so ./bedrock_server`
+如果你自己编译 使用`./bdlauncher`<br>
+否则 `LD_PRELOAD=./preload.so ./bedrock_server`
 
 # Note
 
-* BDL replaced SIGINT handler so that server will handle ctrl-c safely(use /stop command).
-* If server hangs,you can use pkill -9 `pgrep bedrock_server` to kill your server.
+* BDL 替换了ctrl-c的功能，通过/stop安全关闭服务器
+* 如果服务器卡死，可以 <pre>pkill -9 `pgrep bedrock_server`</pre> 来杀死服务器
 
 # Next
 

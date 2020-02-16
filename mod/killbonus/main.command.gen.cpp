@@ -3,37 +3,37 @@
 #include "main.command.h"
 
 template <> class BDL::CustomCommand::CommandParameterProxy<KillbonusMode> {
-  KillbonusMode value;
+	KillbonusMode value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, KillbonusMode>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "KillbonusMode";
+static auto fetch_tid() { return type_id<CommandRegistry, KillbonusMode>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "KillbonusMode";
 
-  operator KillbonusMode() const noexcept { return value; }
+operator KillbonusMode() const noexcept { return value; }
 };
 
 struct CommandKillbonus_0 : Command {
-  CommandParameterProxy<KillbonusMode> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    CommandKillbonus context{origin, output};
-    context.invoke(mode);
-  }
+	CommandParameterProxy<KillbonusMode> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		CommandKillbonus context {origin, output};
+		context.invoke(mode);
+	}
 };
 
 void register_commands() {
-  auto &instance = CustomCommandRegistry::getInstance();
-  {
-    auto &item = instance.registerEnum<KillbonusMode>();
-    item.addValue("reload", KillbonusMode::Reload);
-    item.addValue("debug", KillbonusMode::Debug);
-  }
-  {
-    auto &cmd = instance.registerCommand<CommandKillbonus>();
-    {
-      auto &ovl = cmd.registerOverload<CommandKillbonus_0>();
-      ovl.addParameter<KillbonusMode>("mode", false, offsetof(CommandKillbonus_0, mode));
-    }
-  }
+	auto &instance = CustomCommandRegistry::getInstance();
+	{
+		auto &item = instance.registerEnum<KillbonusMode>();
+		item.addValue("reload", KillbonusMode::Reload);
+		item.addValue("debug", KillbonusMode::Debug);
+	}
+	{
+		auto &cmd = instance.registerCommand<CommandKillbonus>();
+		{
+			auto &ovl = cmd.registerOverload<CommandKillbonus_0>();
+			ovl.addParameter<KillbonusMode>("mode", false, offsetof(CommandKillbonus_0, mode));
+		}
+	}
 }

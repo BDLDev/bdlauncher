@@ -53,7 +53,7 @@
 static bool NOFMCBUG, NOPLAYERTPA;
 
 #include "log.hpp"
-#include "network.hpp"
+//#include "network.hpp"
 #include "ChatSan.hpp"
 #include "hidechk.hpp"
 #include "invchk.hpp"
@@ -64,7 +64,7 @@ using std::unordered_set;
 
 const char meta[] __attribute__((used, section("meta"))) =
     "name:bear\n"
-    "version:20200121\n"
+    "version:20200216\n"
     "author:sysca11\n"
     "depend:base@20200121,command@20200121,gui@20200121\n";
 
@@ -125,7 +125,7 @@ static bool is_muted(const string &name) {
 }
 static bool hkc(ServerPlayer *b, string &c) {
   if (c.size() > MAX_CHAT_SIZE) {
-    sendText(b, "too long chat");
+    sendText(b, TLONGCHAT);
     return 0;
   }
   for (auto &i : banword) {
@@ -139,7 +139,7 @@ static bool hkc(ServerPlayer *b, string &c) {
   }
   auto &name = b->getNameTag();
   if (is_muted(name)) {
-    sendText(b, "You're muted");
+    sendText(b, URMUTED);
     return 0;
   }
   async_log("[CHAT] %s: %s\n", name.c_str(), c.c_str());
@@ -196,7 +196,7 @@ static bool handle_u(GameMode *a0, ItemStack *a1, BlockPos const *a2, BlockPos c
     async_log(
         "[ITEM] %s tries to use prohibited items(banned) %s pos: %d %d %d\n", sn.c_str(), a1->toString().c_str(), a2->x,
         a2->y, a2->z);
-    sendText(a0->getPlayer(), "§cUnable to use prohibited items", JUKEBOX_POPUP);
+    sendText(a0->getPlayer(), BANNED_ITEM, JUKEBOX_POPUP);
     return 0;
   }
   if (warnitems.has(a1->getId())) {
@@ -212,9 +212,9 @@ static void handle_left(ServerPlayer *a1) { async_log("[LEFT] %s left game\n", a
 static int FPushBlock, FExpOrb, FDest;
 enum CheatType { FLY, NOCLIP, INV, MOVE };
 static void notifyCheat(const string &name, CheatType x) {
-  const char *CName[] = {"FLY", "NOCLIP", "Creative", "Teleport"};
+  const char *CName[] = {"FLY", "NOCLIP", "Inventory HACK", "Teleport"};
   async_log("[%s] detected for %s\n", CName[x], name.c_str());
-  string kick = string("ac kick \"") + name + "\" §cYou are banned";
+  string kick = string("ac kick \"") + name + "\"";
   switch (x) {
   case FLY: runcmd(kick); break;
   case NOCLIP: runcmd(kick); break;
@@ -479,7 +479,7 @@ void mod_init(std::list<string> &modlist) {
   reg_chat(hkc);
   reg_destroy(handle_dest);
   _load_config();
-  if (getenv("LOGNET")) rori = (typeof(rori))(MyHook(fp(recvfrom), fp(recvfrom_hook)));
+  //if (getenv("LOGNET")) rori = (typeof(rori))(MyHook(fp(recvfrom), fp(recvfrom_hook)));
   do_log("Loaded " BDL_TAG);
   load_helper(modlist);
 }

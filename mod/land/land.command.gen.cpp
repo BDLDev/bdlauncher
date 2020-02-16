@@ -3,442 +3,442 @@
 #include "land.command.h"
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Exit> {
-  Exit value;
+	Exit value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Exit>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Exit";
+static auto fetch_tid() { return type_id<CommandRegistry, Exit>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Exit";
 
-  operator Exit() const noexcept { return value; }
+operator Exit() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<AB> {
-  AB value;
+	AB value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, AB>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "AB";
+static auto fetch_tid() { return type_id<CommandRegistry, AB>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "AB";
 
-  operator AB() const noexcept { return value; }
+operator AB() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Query> {
-  Query value;
+	Query value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Query>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Query";
+static auto fetch_tid() { return type_id<CommandRegistry, Query>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Query";
 
-  operator Query() const noexcept { return value; }
+operator Query() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Buy> {
-  Buy value;
+	Buy value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Buy>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Buy";
+static auto fetch_tid() { return type_id<CommandRegistry, Buy>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Buy";
 
-  operator Buy() const noexcept { return value; }
+operator Buy() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Sell> {
-  Sell value;
+	Sell value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Sell>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Sell";
+static auto fetch_tid() { return type_id<CommandRegistry, Sell>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Sell";
 
-  operator Sell() const noexcept { return value; }
+operator Sell() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Trust> {
-  Trust value;
+	Trust value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Trust>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Trust";
+static auto fetch_tid() { return type_id<CommandRegistry, Trust>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Trust";
 
-  operator Trust() const noexcept { return value; }
+operator Trust() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Untrust> {
-  Untrust value;
+	Untrust value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Untrust>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Untrust";
+static auto fetch_tid() { return type_id<CommandRegistry, Untrust>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Untrust";
 
-  operator Untrust() const noexcept { return value; }
+operator Untrust() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Trustgui> {
-  Trustgui value;
+	Trustgui value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Trustgui>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Trustgui";
+static auto fetch_tid() { return type_id<CommandRegistry, Trustgui>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Trustgui";
 
-  operator Trustgui() const noexcept { return value; }
+operator Trustgui() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Untrustgui> {
-  Untrustgui value;
+	Untrustgui value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Untrustgui>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Untrustgui";
+static auto fetch_tid() { return type_id<CommandRegistry, Untrustgui>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Untrustgui";
 
-  operator Untrustgui() const noexcept { return value; }
+operator Untrustgui() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Perm> {
-  Perm value;
+	Perm value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Perm>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Perm";
+static auto fetch_tid() { return type_id<CommandRegistry, Perm>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Perm";
 
-  operator Perm() const noexcept { return value; }
+operator Perm() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Give> {
-  Give value;
+	Give value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Give>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Give";
+static auto fetch_tid() { return type_id<CommandRegistry, Give>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Give";
 
-  operator Give() const noexcept { return value; }
+operator Give() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Forceperm> {
-  Forceperm value;
+	Forceperm value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Forceperm>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Forceperm";
+static auto fetch_tid() { return type_id<CommandRegistry, Forceperm>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Forceperm";
 
-  operator Forceperm() const noexcept { return value; }
+operator Forceperm() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Dumpall> {
-  Dumpall value;
+	Dumpall value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Dumpall>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Dumpall";
+static auto fetch_tid() { return type_id<CommandRegistry, Dumpall>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Dumpall";
 
-  operator Dumpall() const noexcept { return value; }
+operator Dumpall() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Fix> {
-  Fix value;
+	Fix value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Fix>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Fix";
+static auto fetch_tid() { return type_id<CommandRegistry, Fix>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Fix";
 
-  operator Fix() const noexcept { return value; }
+operator Fix() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Reload> {
-  Reload value;
+	Reload value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Reload>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Reload";
+static auto fetch_tid() { return type_id<CommandRegistry, Reload>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Reload";
 
-  operator Reload() const noexcept { return value; }
+operator Reload() const noexcept { return value; }
 };
 
 struct LDCommand_0 : Command {
-  CommandParameterProxy<Exit> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.exit(mode);
-  }
+	CommandParameterProxy<Exit> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.exit(mode);
+	}
 };
 
 struct LDCommand_1 : Command {
-  CommandParameterProxy<AB> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.AB_(mode);
-  }
+	CommandParameterProxy<AB> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.AB_(mode);
+	}
 };
 
 struct LDCommand_2 : Command {
-  CommandParameterProxy<Query> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.query(mode);
-  }
+	CommandParameterProxy<Query> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.query(mode);
+	}
 };
 
 struct LDCommand_3 : Command {
-  CommandParameterProxy<Buy> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.buy(mode);
-  }
+	CommandParameterProxy<Buy> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.buy(mode);
+	}
 };
 
 struct LDCommand_4 : Command {
-  CommandParameterProxy<Sell> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.sell(mode);
-  }
+	CommandParameterProxy<Sell> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.sell(mode);
+	}
 };
 
 struct LDCommand_5 : Command {
-  CommandParameterProxy<Trust> mode;
-  CommandParameterProxy<std::string> target;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.trust(mode, target);
-  }
+	CommandParameterProxy<Trust> mode;
+	CommandParameterProxy<std::string> target;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.trust(mode, target);
+	}
 };
 
 struct LDCommand_6 : Command {
-  CommandParameterProxy<Untrust> mode;
-  CommandParameterProxy<std::string> target;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.untrust(mode, target);
-  }
+	CommandParameterProxy<Untrust> mode;
+	CommandParameterProxy<std::string> target;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.untrust(mode, target);
+	}
 };
 
 struct LDCommand_7 : Command {
-  CommandParameterProxy<Trustgui> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.trustgui(mode);
-  }
+	CommandParameterProxy<Trustgui> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.trustgui(mode);
+	}
 };
 
 struct LDCommand_8 : Command {
-  CommandParameterProxy<Untrustgui> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.untrustgui(mode);
-  }
+	CommandParameterProxy<Untrustgui> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.untrustgui(mode);
+	}
 };
 
 struct LDCommand_9 : Command {
-  CommandParameterProxy<Perm> mode;
-  CommandParameterProxy<int> perm;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.perm(mode, perm);
-  }
+	CommandParameterProxy<Perm> mode;
+	CommandParameterProxy<int> perm;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.perm(mode, perm);
+	}
 };
 
 struct LDCommand_10 : Command {
-  CommandParameterProxy<Give> mode;
-  CommandParameterProxy<CommandSelector<Player>> target;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDCommand context{origin, output};
-    context.give(mode, target);
-  }
+	CommandParameterProxy<Give> mode;
+	CommandParameterProxy<CommandSelector<Player> > target;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDCommand context {origin, output};
+		context.give(mode, target);
+	}
 };
 
 struct LDOCommand_0 : Command {
-  CommandParameterProxy<Fix> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDOCommand context{origin, output};
-    context.fix(mode);
-  }
+	CommandParameterProxy<Fix> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDOCommand context {origin, output};
+		context.fix(mode);
+	}
 };
 
 struct LDOCommand_1 : Command {
-  CommandParameterProxy<Forceperm> mode;
-  CommandParameterProxy<int> perm;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDOCommand context{origin, output};
-    context.forceperm(mode, perm);
-  }
+	CommandParameterProxy<Forceperm> mode;
+	CommandParameterProxy<int> perm;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDOCommand context {origin, output};
+		context.forceperm(mode, perm);
+	}
 };
 
 struct LDOCommand_2 : Command {
-  CommandParameterProxy<Dumpall> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDOCommand context{origin, output};
-    context.dumpall(mode);
-  }
+	CommandParameterProxy<Dumpall> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDOCommand context {origin, output};
+		context.dumpall(mode);
+	}
 };
 
 struct LDOCommand_3 : Command {
-  CommandParameterProxy<Reload> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    LDOCommand context{origin, output};
-    context.reload(mode);
-  }
+	CommandParameterProxy<Reload> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		LDOCommand context {origin, output};
+		context.reload(mode);
+	}
 };
 
 void register_commands() {
-  auto &instance = CustomCommandRegistry::getInstance();
-  {
-    auto &item = instance.registerEnum<Exit>();
-    item.addValue("exit", Exit::exit);
-  }
-  {
-    auto &item = instance.registerEnum<AB>();
-    item.addValue("a", AB::a);
-    item.addValue("b", AB::b);
-  }
-  {
-    auto &item = instance.registerEnum<Query>();
-    item.addValue("query", Query::query);
-  }
-  {
-    auto &item = instance.registerEnum<Buy>();
-    item.addValue("buy", Buy::buy);
-  }
-  {
-    auto &item = instance.registerEnum<Sell>();
-    item.addValue("sell", Sell::sell);
-  }
-  {
-    auto &item = instance.registerEnum<Trust>();
-    item.addValue("trust", Trust::trust);
-  }
-  {
-    auto &item = instance.registerEnum<Untrust>();
-    item.addValue("untrust", Untrust::untrust);
-  }
-  {
-    auto &item = instance.registerEnum<Trustgui>();
-    item.addValue("trustgui", Trustgui::trustgui);
-  }
-  {
-    auto &item = instance.registerEnum<Untrustgui>();
-    item.addValue("untrustgui", Untrustgui::untrustgui);
-  }
-  {
-    auto &item = instance.registerEnum<Perm>();
-    item.addValue("perm", Perm::perm);
-  }
-  {
-    auto &item = instance.registerEnum<Give>();
-    item.addValue("give", Give::give);
-  }
-  {
-    auto &item = instance.registerEnum<Forceperm>();
-    item.addValue("forceperm", Forceperm::forceperm);
-  }
-  {
-    auto &item = instance.registerEnum<Dumpall>();
-    item.addValue("dumpall", Dumpall::dumpall);
-  }
-  {
-    auto &item = instance.registerEnum<Fix>();
-    item.addValue("fix", Fix::fix);
-  }
-  {
-    auto &item = instance.registerEnum<Reload>();
-    item.addValue("reload", Reload::reload);
-  }
-  {
-    auto &cmd = instance.registerCommand<LDCommand>();
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_0>();
-      ovl.addParameter<Exit>("mode", false, offsetof(LDCommand_0, mode));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_1>();
-      ovl.addParameter<AB>("mode", false, offsetof(LDCommand_1, mode));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_2>();
-      ovl.addParameter<Query>("mode", false, offsetof(LDCommand_2, mode));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_3>();
-      ovl.addParameter<Buy>("mode", false, offsetof(LDCommand_3, mode));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_4>();
-      ovl.addParameter<Sell>("mode", false, offsetof(LDCommand_4, mode));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_5>();
-      ovl.addParameter<Trust>("mode", false, offsetof(LDCommand_5, mode));
-      ovl.addParameter<std::string>("target", false, offsetof(LDCommand_5, target));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_6>();
-      ovl.addParameter<Untrust>("mode", false, offsetof(LDCommand_6, mode));
-      ovl.addParameter<std::string>("target", false, offsetof(LDCommand_6, target));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_7>();
-      ovl.addParameter<Trustgui>("mode", false, offsetof(LDCommand_7, mode));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_8>();
-      ovl.addParameter<Untrustgui>("mode", false, offsetof(LDCommand_8, mode));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_9>();
-      ovl.addParameter<Perm>("mode", false, offsetof(LDCommand_9, mode));
-      ovl.addParameter<int>("perm", false, offsetof(LDCommand_9, perm));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDCommand_10>();
-      ovl.addParameter<Give>("mode", false, offsetof(LDCommand_10, mode));
-      ovl.addParameter<CommandSelector<Player>>("target", false, offsetof(LDCommand_10, target));
-    }
-  }
-  {
-    auto &cmd = instance.registerCommand<LDOCommand>();
-    {
-      auto &ovl = cmd.registerOverload<LDOCommand_0>();
-      ovl.addParameter<Fix>("mode", false, offsetof(LDOCommand_0, mode));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDOCommand_1>();
-      ovl.addParameter<Forceperm>("mode", false, offsetof(LDOCommand_1, mode));
-      ovl.addParameter<int>("perm", false, offsetof(LDOCommand_1, perm));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDOCommand_2>();
-      ovl.addParameter<Dumpall>("mode", false, offsetof(LDOCommand_2, mode));
-    }
-    {
-      auto &ovl = cmd.registerOverload<LDOCommand_3>();
-      ovl.addParameter<Reload>("mode", false, offsetof(LDOCommand_3, mode));
-    }
-  }
+	auto &instance = CustomCommandRegistry::getInstance();
+	{
+		auto &item = instance.registerEnum<Exit>();
+		item.addValue("exit", Exit::exit);
+	}
+	{
+		auto &item = instance.registerEnum<AB>();
+		item.addValue("a", AB::a);
+		item.addValue("b", AB::b);
+	}
+	{
+		auto &item = instance.registerEnum<Query>();
+		item.addValue("query", Query::query);
+	}
+	{
+		auto &item = instance.registerEnum<Buy>();
+		item.addValue("buy", Buy::buy);
+	}
+	{
+		auto &item = instance.registerEnum<Sell>();
+		item.addValue("sell", Sell::sell);
+	}
+	{
+		auto &item = instance.registerEnum<Trust>();
+		item.addValue("trust", Trust::trust);
+	}
+	{
+		auto &item = instance.registerEnum<Untrust>();
+		item.addValue("untrust", Untrust::untrust);
+	}
+	{
+		auto &item = instance.registerEnum<Trustgui>();
+		item.addValue("trustgui", Trustgui::trustgui);
+	}
+	{
+		auto &item = instance.registerEnum<Untrustgui>();
+		item.addValue("untrustgui", Untrustgui::untrustgui);
+	}
+	{
+		auto &item = instance.registerEnum<Perm>();
+		item.addValue("perm", Perm::perm);
+	}
+	{
+		auto &item = instance.registerEnum<Give>();
+		item.addValue("give", Give::give);
+	}
+	{
+		auto &item = instance.registerEnum<Forceperm>();
+		item.addValue("forceperm", Forceperm::forceperm);
+	}
+	{
+		auto &item = instance.registerEnum<Dumpall>();
+		item.addValue("dumpall", Dumpall::dumpall);
+	}
+	{
+		auto &item = instance.registerEnum<Fix>();
+		item.addValue("fix", Fix::fix);
+	}
+	{
+		auto &item = instance.registerEnum<Reload>();
+		item.addValue("reload", Reload::reload);
+	}
+	{
+		auto &cmd = instance.registerCommand<LDCommand>();
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_0>();
+			ovl.addParameter<Exit>("mode", false, offsetof(LDCommand_0, mode));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_1>();
+			ovl.addParameter<AB>("mode", false, offsetof(LDCommand_1, mode));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_2>();
+			ovl.addParameter<Query>("mode", false, offsetof(LDCommand_2, mode));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_3>();
+			ovl.addParameter<Buy>("mode", false, offsetof(LDCommand_3, mode));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_4>();
+			ovl.addParameter<Sell>("mode", false, offsetof(LDCommand_4, mode));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_5>();
+			ovl.addParameter<Trust>("mode", false, offsetof(LDCommand_5, mode));
+			ovl.addParameter<std::string>("target", false, offsetof(LDCommand_5, target));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_6>();
+			ovl.addParameter<Untrust>("mode", false, offsetof(LDCommand_6, mode));
+			ovl.addParameter<std::string>("target", false, offsetof(LDCommand_6, target));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_7>();
+			ovl.addParameter<Trustgui>("mode", false, offsetof(LDCommand_7, mode));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_8>();
+			ovl.addParameter<Untrustgui>("mode", false, offsetof(LDCommand_8, mode));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_9>();
+			ovl.addParameter<Perm>("mode", false, offsetof(LDCommand_9, mode));
+			ovl.addParameter<int>("perm", false, offsetof(LDCommand_9, perm));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDCommand_10>();
+			ovl.addParameter<Give>("mode", false, offsetof(LDCommand_10, mode));
+			ovl.addParameter<CommandSelector<Player> >("target", false, offsetof(LDCommand_10, target));
+		}
+	}
+	{
+		auto &cmd = instance.registerCommand<LDOCommand>();
+		{
+			auto &ovl = cmd.registerOverload<LDOCommand_0>();
+			ovl.addParameter<Fix>("mode", false, offsetof(LDOCommand_0, mode));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDOCommand_1>();
+			ovl.addParameter<Forceperm>("mode", false, offsetof(LDOCommand_1, mode));
+			ovl.addParameter<int>("perm", false, offsetof(LDOCommand_1, perm));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDOCommand_2>();
+			ovl.addParameter<Dumpall>("mode", false, offsetof(LDOCommand_2, mode));
+		}
+		{
+			auto &ovl = cmd.registerOverload<LDOCommand_3>();
+			ovl.addParameter<Reload>("mode", false, offsetof(LDOCommand_3, mode));
+		}
+	}
 }

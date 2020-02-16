@@ -3,128 +3,128 @@
 #include "bossbar.command.h"
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Show> {
-  Show value;
+	Show value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Show>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Show";
+static auto fetch_tid() { return type_id<CommandRegistry, Show>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Show";
 
-  operator Show() const noexcept { return value; }
+operator Show() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Hide> {
-  Hide value;
+	Hide value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Hide>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Hide";
+static auto fetch_tid() { return type_id<CommandRegistry, Hide>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Hide";
 
-  operator Hide() const noexcept { return value; }
+operator Hide() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Pin> {
-  Pin value;
+	Pin value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Pin>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Pin";
+static auto fetch_tid() { return type_id<CommandRegistry, Pin>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Pin";
 
-  operator Pin() const noexcept { return value; }
+operator Pin() const noexcept { return value; }
 };
 
 template <> class BDL::CustomCommand::CommandParameterProxy<Unpin> {
-  Unpin value;
+	Unpin value;
 
 public:
-  static auto fetch_tid() { return type_id<CommandRegistry, Unpin>(); }
-  static constexpr auto parser    = &CommandRegistry::fake_parse;
-  static constexpr auto type      = CommandParameterDataType::NORMAL;
-  static constexpr auto enum_name = "Unpin";
+static auto fetch_tid() { return type_id<CommandRegistry, Unpin>(); }
+static constexpr auto parser = &CommandRegistry::fake_parse;
+static constexpr auto type = CommandParameterDataType::NORMAL;
+static constexpr auto enum_name = "Unpin";
 
-  operator Unpin() const noexcept { return value; }
+operator Unpin() const noexcept { return value; }
 };
 
 struct BossbarCommand_0 : Command {
-  CommandParameterProxy<Show> mode;
-  CommandParameterProxy<CommandSelector<Player>> targets;
-  CommandParameterProxy<std::string> text;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    BossbarCommand context{origin, output};
-    context.show(mode, targets, text);
-  }
+	CommandParameterProxy<Show> mode;
+	CommandParameterProxy<CommandSelector<Player> > targets;
+	CommandParameterProxy<std::string> text;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		BossbarCommand context {origin, output};
+		context.show(mode, targets, text);
+	}
 };
 
 struct BossbarCommand_1 : Command {
-  CommandParameterProxy<Hide> mode;
-  CommandParameterProxy<CommandSelector<Player>> targets;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    BossbarCommand context{origin, output};
-    context.hide(mode, targets);
-  }
+	CommandParameterProxy<Hide> mode;
+	CommandParameterProxy<CommandSelector<Player> > targets;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		BossbarCommand context {origin, output};
+		context.hide(mode, targets);
+	}
 };
 
 struct BossbarCommand_2 : Command {
-  CommandParameterProxy<Pin> mode;
-  CommandParameterProxy<std::string> text;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    BossbarCommand context{origin, output};
-    context.pin(mode, text);
-  }
+	CommandParameterProxy<Pin> mode;
+	CommandParameterProxy<std::string> text;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		BossbarCommand context {origin, output};
+		context.pin(mode, text);
+	}
 };
 
 struct BossbarCommand_3 : Command {
-  CommandParameterProxy<Unpin> mode;
-  virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
-    BossbarCommand context{origin, output};
-    context.unpin(mode);
-  }
+	CommandParameterProxy<Unpin> mode;
+	virtual void execute(CommandOrigin const &origin, CommandOutput &output) override {
+		BossbarCommand context {origin, output};
+		context.unpin(mode);
+	}
 };
 
 void register_commands() {
-  auto &instance = CustomCommandRegistry::getInstance();
-  {
-    auto &item = instance.registerEnum<Show>();
-    item.addValue("show", Show::show);
-  }
-  {
-    auto &item = instance.registerEnum<Hide>();
-    item.addValue("hide", Hide::hide);
-  }
-  {
-    auto &item = instance.registerEnum<Pin>();
-    item.addValue("pin", Pin::pin);
-  }
-  {
-    auto &item = instance.registerEnum<Unpin>();
-    item.addValue("unpin", Unpin::unpin);
-  }
-  {
-    auto &cmd = instance.registerCommand<BossbarCommand>();
-    {
-      auto &ovl = cmd.registerOverload<BossbarCommand_0>();
-      ovl.addParameter<Show>("mode", false, offsetof(BossbarCommand_0, mode));
-      ovl.addParameter<CommandSelector<Player>>("targets", false, offsetof(BossbarCommand_0, targets));
-      ovl.addParameter<std::string>("text", false, offsetof(BossbarCommand_0, text));
-    }
-    {
-      auto &ovl = cmd.registerOverload<BossbarCommand_1>();
-      ovl.addParameter<Hide>("mode", false, offsetof(BossbarCommand_1, mode));
-      ovl.addParameter<CommandSelector<Player>>("targets", false, offsetof(BossbarCommand_1, targets));
-    }
-    {
-      auto &ovl = cmd.registerOverload<BossbarCommand_2>();
-      ovl.addParameter<Pin>("mode", false, offsetof(BossbarCommand_2, mode));
-      ovl.addParameter<std::string>("text", false, offsetof(BossbarCommand_2, text));
-    }
-    {
-      auto &ovl = cmd.registerOverload<BossbarCommand_3>();
-      ovl.addParameter<Unpin>("mode", false, offsetof(BossbarCommand_3, mode));
-    }
-  }
+	auto &instance = CustomCommandRegistry::getInstance();
+	{
+		auto &item = instance.registerEnum<Show>();
+		item.addValue("show", Show::show);
+	}
+	{
+		auto &item = instance.registerEnum<Hide>();
+		item.addValue("hide", Hide::hide);
+	}
+	{
+		auto &item = instance.registerEnum<Pin>();
+		item.addValue("pin", Pin::pin);
+	}
+	{
+		auto &item = instance.registerEnum<Unpin>();
+		item.addValue("unpin", Unpin::unpin);
+	}
+	{
+		auto &cmd = instance.registerCommand<BossbarCommand>();
+		{
+			auto &ovl = cmd.registerOverload<BossbarCommand_0>();
+			ovl.addParameter<Show>("mode", false, offsetof(BossbarCommand_0, mode));
+			ovl.addParameter<CommandSelector<Player> >("targets", false, offsetof(BossbarCommand_0, targets));
+			ovl.addParameter<std::string>("text", false, offsetof(BossbarCommand_0, text));
+		}
+		{
+			auto &ovl = cmd.registerOverload<BossbarCommand_1>();
+			ovl.addParameter<Hide>("mode", false, offsetof(BossbarCommand_1, mode));
+			ovl.addParameter<CommandSelector<Player> >("targets", false, offsetof(BossbarCommand_1, targets));
+		}
+		{
+			auto &ovl = cmd.registerOverload<BossbarCommand_2>();
+			ovl.addParameter<Pin>("mode", false, offsetof(BossbarCommand_2, mode));
+			ovl.addParameter<std::string>("text", false, offsetof(BossbarCommand_2, text));
+		}
+		{
+			auto &ovl = cmd.registerOverload<BossbarCommand_3>();
+			ovl.addParameter<Unpin>("mode", false, offsetof(BossbarCommand_3, mode));
+		}
+	}
 }

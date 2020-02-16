@@ -65,16 +65,18 @@ endef
 # Phony Targets
 
 .PHONY: all
-all: chkgcc9 bdlauncher preload generate-commands mods
+all: bdlauncher preload generate-commands mods
 	@echo " DONE"
 
-.PHONY: chkgcc9 bdlauncher preload generate-commands mods
+.PHONY: chkgcc9 chkg++9 bdlauncher preload generate-commands mods
 chkgcc9:
 	@gcc -v 2>&1 | grep "9\."
-bdlauncher: $(BIN_LAUNCHER)
+chkg++9:
+        @g++ -v 2>&1 | grep "9\."
+bdlauncher: chkgcc9 $(BIN_LAUNCHER)
 preload: $(DLL_PRELOAD)
 generate-commands: $(GEN_COMMAND_TGT)
-mods: chkgcc9 generate-commands $(MOD_OUTS)
+mods: chkg++9 generate-commands $(MOD_OUTS)
 
 .PHONY: list-mod
 list-mod:
