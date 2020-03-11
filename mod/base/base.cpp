@@ -51,6 +51,12 @@ BDL_EXPORT void mod_init(list<string> &modlist);
 BDL_EXPORT Minecraft *MC;
 BDL_EXPORT Level *ServLevel;
 }
+
+struct DedicatedServer {
+  void stop();
+};
+
+DedicatedServer *dserver;
 int lvlCorrupt;
 THook(void *, _ZN14ServerInstance14onLevelCorruptEv, void *x) {
   printf("LEVEL CORRUPT DETECTED!!!\n");
@@ -284,11 +290,6 @@ THook(
   return ret;
 }
 
-struct DedicatedServer {
-  void stop();
-};
-
-DedicatedServer *dserver;
 THook(
     void *, _ZN15DedicatedServer5startERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE, DedicatedServer *t,
     string &b) {
