@@ -51,7 +51,7 @@ BDL_EXPORT void mod_init(list<string> &modlist);
 BDL_EXPORT Minecraft *MC;
 BDL_EXPORT Level *ServLevel;
 }
-
+int lvlCorrupt;
 THook(void *, _ZN14ServerInstance14onLevelCorruptEv, void *x) {
   printf("LEVEL CORRUPT DETECTED!!!\n");
   string payload;
@@ -67,9 +67,16 @@ THook(void *, _ZN14ServerInstance14onLevelCorruptEv, void *x) {
   char buf[1024];
   auto TIM = time(0);
   strftime(buf, 1024, "Crash-%Y-%m-%d_%H_%M_%S.txt", localtime(&TIM));
+  if(lvlCorrupt==0){
   FILE *fp = fopen(buf, "w");
   fwrite(payload.data(), payload.size(), 1, fp);
   fclose(fp);
+  }
+  do_log("stoping server");
+  dserver->stop();
+  if(++lvlCorrupt>3){
+   exit(1);   
+  }
   return nullptr;
 }
 
